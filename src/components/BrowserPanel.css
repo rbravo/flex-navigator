@@ -58,26 +58,80 @@
   background-color: white;
 }
 
-/* Indicador de loading */
-.loading-overlay {
+/* Indicador de loading moderno - barra de progresso no topo */
+.loading-bar {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  font-size: 14px;
-  z-index: 50;
+  height: 3px;
+  background-color: transparent;
+  z-index: 100;
+  overflow: hidden;
 }
 
-.loading-content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--nav-accent) 0%, #00d4ff 50%, var(--nav-accent) 100%);
+  background-size: 200% 100%;
+  width: 0%;
+  animation: loadingProgressRealistic 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards, loadingShimmer 1.5s ease-in-out infinite;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+@keyframes loadingProgressRealistic {
+  0% {
+    width: 0%;
+  }
+  15% {
+    width: 25%;
+  }
+  30% {
+    width: 45%;
+  }
+  50% {
+    width: 65%;
+  }
+  70% {
+    width: 78%;
+  }
+  85% {
+    width: 87%;
+  }
+  95% {
+    width: 92%;
+  }
+  98% {
+    width: 95%;
+  }
+  100% {
+    width: 97%;
+  }
+}
+
+@keyframes loadingShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animação de finalização quando o loading para */
+.loading-progress.complete {
+  animation: loadingComplete 0.3s ease-out forwards;
+}
+
+@keyframes loadingComplete {
+  0% {
+    width: 97%;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
 }
 
 /* Fallback container */

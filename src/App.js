@@ -22,7 +22,8 @@ const App = () => {
         tabSetHeaderHeight: 32,
         tabSetTabStripHeight: 32,
         tabSetEnableTabStrip: true,
-        tabSetAutoSelectTab: true
+        tabSetAutoSelectTab: true,
+        tabMinWidth: 250
       },
       borders: [],
       layout: {

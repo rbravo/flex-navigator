@@ -13,6 +13,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   const [url, setUrl] = useState(initialUrl);
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
@@ -78,6 +79,21 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     }
   }, [currentUrl, node]);
 
+  // Timeout para o loading - evita que fique "travado"
+  useEffect(() => {
+    if (isLoading) {
+      const timeout = setTimeout(() => {
+        setLoadingComplete(true);
+        setTimeout(() => {
+          setIsLoading(false);
+          setLoadingComplete(false);
+        }, 300);
+      }, 8000); // 8 segundos timeout (um pouco menos para dar tempo da animação)
+
+      return () => clearTimeout(timeout);
+    }
+  }, [isLoading]);
+
   const handleUrlSubmit = (e) => {
     e.preventDefault();
     let targetUrl = url;
@@ -105,6 +121,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   };
 
   const handleRefresh = () => {
+    setIsLoading(true);
     if (isElectron && webviewRef.current) {
       webviewRef.current.reload();
     } else if (iframeRef.current) {
@@ -130,7 +147,13 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   };
 
   const handleWebviewLoad = () => {
-    setIsLoading(false);
+    // Marca como completo e depois de um pequeno delay remove o loading
+    setLoadingComplete(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setLoadingComplete(false);
+    }, 300);
+    
     if (isElectron && webviewRef.current) {
       setCanGoBack(webviewRef.current.canGoBack());
       setCanGoForward(webviewRef.current.canGoForward());
@@ -197,8 +220,20 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
               border: 'none',
               backgroundColor: 'white'
             }}
-            onLoad={() => setIsLoading(false)}
-            onError={() => setIsLoading(false)}
+            onLoad={() => {
+              setLoadingComplete(true);
+              setTimeout(() => {
+                setIsLoading(false);
+                setLoadingComplete(false);
+              }, 300);
+            }}
+            onError={() => {
+              setLoadingComplete(true);
+              setTimeout(() => {
+                setIsLoading(false);
+                setLoadingComplete(false);
+              }, 300);
+            }}
             title="Browser content"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
           />
@@ -329,9 +364,13 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
                 placeholder="Digite uma URL ou pesquise..."
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
-                prefix={<GlobalOutlined style={{ color: '#999999' }} />}
+                prefix={
+                  isLoading ? 
+                    <ReloadOutlined spin style={{ color: '#007acc' }} /> : 
+                    <GlobalOutlined style={{ color: '#999999' }} />
+                }
                 suffix={
-                  isFocused && (
+                  isFocused && !isLoading && (
                     <Button
                       type="primary"
                       icon={<SendOutlined />}
@@ -360,11 +399,8 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
         
         <div className="content-area">
           {isLoading && (
-            <div className="loading-overlay">
-              <div className="loading-content">
-                <ReloadOutlined spin />
-                Carregando...
-              </div>
+            <div className="loading-bar">
+              <div className={`loading-progress ${loadingComplete ? 'complete' : ''}`}></div>
             </div>
           )}
           {renderWebContent()}
