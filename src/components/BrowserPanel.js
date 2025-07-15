@@ -186,6 +186,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
         <webview
           ref={webviewRef}
           src={currentUrl}
+          data-tab-id={node.getId()}
           style={{
             width: '100%',
             height: '100%',
