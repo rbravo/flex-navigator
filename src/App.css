@@ -1,38 +1,131 @@
 .App {
-  text-align: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: #1e1e1e;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Customizações para o FlexLayout */
+.flexlayout__layout {
+  background-color: #1e1e1e !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.flexlayout__tab {
+  background-color: #2d2d30 !important;
+  color: #cccccc !important;
+  border-color: #3e3e42 !important;
+  font-size: 12px !important;
+  padding: 4px 8px !important;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.flexlayout__tab:hover {
+  background-color: #383838 !important;
+}
+
+.flexlayout__tab_selected {
+  background-color: #007acc !important;
+  color: white !important;
+}
+
+.flexlayout__tabset {
+  background-color: #252526 !important;
+}
+
+.flexlayout__tabset_content {
+  background-color: #1e1e1e !important;
+}
+
+.flexlayout__tabset_header {
+  background-color: #2d2d30 !important;
+  border-bottom: 1px solid #3e3e42 !important;
+  height: 32px !important;
+  min-height: 32px !important;
+}
+
+.flexlayout__tab_button_stretch {
+  background-color: transparent !important;
+  color: #cccccc !important;
+  border: none !important;
+  padding: 2px 6px !important;
+  margin: 2px !important;
+  border-radius: 3px !important;
+  font-size: 11px !important;
+}
+
+.flexlayout__tab_button_stretch:hover {
+  background-color: #383838 !important;
+}
+
+.flexlayout__splitter {
+  background-color: #3e3e42 !important;
+}
+
+.flexlayout__splitter:hover {
+  background-color: #007acc !important;
+}
+
+.flexlayout__outline_rect {
+  border: 2px solid #007acc !important;
+  background-color: rgba(0, 122, 204, 0.1) !important;
+}
+
+/* Customiza os botões de fechar tabs */
+.flexlayout__tab_button {
+  color: #cccccc !important;
+  background-color: transparent !important;
+  border: none !important;
+  padding: 0 4px !important;
+  font-size: 12px !important;
+}
+
+.flexlayout__tab_button:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2px !important;
+}
+
+/* Estilos customizados para os botões de ação do tabset */
+.flexlayout__tab_toolbar_button {
+  /* Estilos básicos para os botões da toolbar */
+  margin: 0 2px !important;
+}
+
+/* Estilos para botões do tabset (sem Tailwind) */
+.tabset-button {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin: 0 2px;
   color: white;
+  background: none;
+  outline: none;
 }
 
-.App-link {
-  color: #61dafb;
+.tabset-button:hover {
+  transform: scale(1.05);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.tabset-button-add {
+ 
+}
+
+.tabset-button-add:hover {
+ 
+}
+
+.tabset-button-split {
+ 
+}
+
+.tabset-button-split:hover {
+  
+}
+
+.tabset-button:active {
+  transform: scale(0.95);
 }

@@ -1,0 +1,6 @@
+@echo off
+echo Iniciando Flex Navigator...
+echo.
+echo 1. Aguardando React iniciar na porta 3000...
+timeout /t 3 > nul
+electron .

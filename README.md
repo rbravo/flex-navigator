@@ -1,53 +1,129 @@
-# Getting Started with Create React App
+# Flex Navigator
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Um navegador flexível e personalizável construído com Electron e React, utilizando FlexLayout para organização de janelas em layouts customizáveis.
 
-## Available Scripts
+## 🚀 Características
 
-In the project directory, you can run:
+- **Layout Flexível**: Use FlexLayout React para organizar múltiplas instâncias do navegador em qualquer configuração
+- **Navegação Real**: Cada painel suporta navegação web completa com controles de voltar/avançar/atualizar
+- **Tabs Dinâmicas**: Adicione quantas tabs quiser em cada painel
+- **Interface Focada**: Controles de navegação aparecem apenas quando o painel está focado
+- **Multiplataforma**: Funciona no Windows, macOS e Linux através do Electron
+- **Tema Escuro**: Interface moderna com tema escuro
 
-### `npm start`
+## 📋 Pré-requisitos
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Node.js (versão 14 ou superior)
+- npm ou yarn
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🛠️ Instalação
 
-### `npm test`
+1. Clone o repositório:
+```bash
+git clone <url-do-repositorio>
+cd flex-navigator
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. Instale as dependências:
+```bash
+npm install
+```
 
-### `npm run build`
+## 🎮 Uso
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Desenvolvimento
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Para executar em modo de desenvolvimento:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+# Inicie o React (terminal 1)
+npm start
 
-### `npm run eject`
+# Em outro terminal, inicie o Electron (terminal 2)
+npx electron .
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Ou use o comando combinado:
+```bash
+npm run dev
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Produção
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Para fazer build da aplicação:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+npm run build
+npm run dist
+```
 
-## Learn More
+## 🎯 Funcionalidades
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Navegação
+- **Barra de URL**: Digite URLs ou termos de busca
+- **Controles**: Botões de voltar, avançar e atualizar
+- **Detecção Automática**: URLs são automaticamente formatadas
+- **Busca Integrada**: Termos sem protocolo são direcionados para o Google
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Layout
+- **Painéis Redimensionáveis**: Arraste as bordas para redimensionar
+- **Tabs Múltiplas**: Cada painel pode ter múltiplas tabs
+- **Foco Visual**: Painéis focados mostram borda azul e controles
+- **Organização Livre**: Organize painéis horizontalmente, verticalmente ou em grid
 
-### Code Splitting
+### Controles Rápidos
+- **Botão "+Nova Tab"**: Adiciona nova tab no painel
+- **Botões Preset**: Acesso rápido a Google, GitHub, YouTube, Stack Overflow
+- **Atalhos de Teclado**: Suporte a atalhos para navegação
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🏗️ Arquitetura
+
+```
+src/
+├── components/
+│   ├── BrowserPanel.js      # Componente principal do navegador
+│   ├── BrowserPanel.css     # Estilos do painel
+│   ├── TabActions.js        # Componente de ações rápidas
+│   └── TabActions.css       # Estilos das ações
+├── App.js                   # Componente principal da aplicação
+├── App.css                  # Estilos globais
+└── index.js                 # Ponto de entrada
+main.js                      # Processo principal do Electron
+```
+
+## 🔧 Como Usar
+
+1. **Execute o projeto**: `npm start` para React + `npx electron .` para Electron
+2. **Foque um painel**: Clique em qualquer painel para ver os controles
+3. **Adicione tabs**: Use o botão "+" ou os botões de preset
+4. **Redimensione**: Arraste as bordas entre painéis
+5. **Navegue**: Use a barra de URL ou botões de navegação
+
+## 🚦 Status do Projeto
+
+### ✅ Implementado
+- [x] Layout flexível com FlexLayout React
+- [x] Painéis de navegador com foco/desfoco
+- [x] Controles de navegação (voltar, avançar, atualizar)
+- [x] Adição dinâmica de tabs
+- [x] Interface com tema escuro
+- [x] Botões de acesso rápido
+- [x] Detecção de ambiente (Electron/Browser)
+- [x] Menu de aplicação
+
+### 🔄 Planejado
+- [ ] Favoritos/Bookmarks
+- [ ] Histórico de navegação
+- [ ] Salvamento de layout
+- [ ] Configurações de usuário
+
+## 📞 Suporte
+
+Para problemas ou sugestões, abra uma issue no repositório.
+
+---
+
+**Desenvolvido com ❤️ usando React, Electron e FlexLayout**
 
 ### Analyzing the Bundle Size
 
