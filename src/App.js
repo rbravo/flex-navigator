@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layout, Model, Actions, DockLocation } from 'flexlayout-react';
-import { Plus, SplitSquareHorizontal, SplitSquareVertical, Terminal } from 'lucide-react';
+import { Plus, SplitSquareHorizontal, SplitSquareVertical, Terminal, Maximize2, Minimize2 } from 'lucide-react';
 import 'flexlayout-react/style/dark.css'; // ou 'light.css' se preferir tema claro
 import './App.css';
 import BrowserPanel from './components/BrowserPanel';
@@ -23,7 +23,8 @@ const App = () => {
         tabSetTabStripHeight: 32,
         tabSetEnableTabStrip: true,
         tabSetAutoSelectTab: true,
-        tabMinWidth: 250
+        tabMinWidth: 250,
+        tabSetEnableMaximize: false
       },
       borders: [],
       layout: {
@@ -281,6 +282,31 @@ const App = () => {
         }}
       >
         <SplitSquareVertical size={14} />
+      </a>
+    );
+
+    renderValues.buttons.push(
+      <a
+        key="maximize"
+        className="tabset-button tabset-button-maximize"
+        title={tabSetNode.isMaximized() ? "Restaurar painel" : "Maximizar painel"}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('Clicou no botão maximizar/restaurar');
+          
+          try {
+            // Usar a API do FlexLayout para maximizar/restaurar o tabset
+            const action = Actions.maximizeToggle(tabSetNode.getId());
+            console.log('Ação de maximizar/restaurar:', action);
+            model.doAction(action);
+          } catch (error) {
+            console.log('Erro ao maximizar/restaurar:', error);
+          }
+        }}
+      >
+        {tabSetNode.isMaximized() ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
       </a>
     );
   };

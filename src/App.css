@@ -129,3 +129,38 @@
 .tabset-button:active {
   transform: scale(0.95);
 }
+
+/* Esconder o botão padrão de maximizar do FlexLayout */
+.flexlayout__tab_button_stretch {
+  display: none !important;
+}
+
+/* Esconder outros botões padrão que possam aparecer */
+.flexlayout__tabset_header .flexlayout__tab_button {
+  display: none !important;
+}
+
+/* Esconder especificamente botões de maximize/minimize padrão */
+.flexlayout__tabset_maximize_button {
+  display: none !important;
+}
+
+.flexlayout__tabset_header_content > .flexlayout__tab_button {
+  display: none !important;
+}
+
+/* Garantir que nossos botões customizados sempre apareçam */
+.tabset-button {
+  display: inline-flex !important;
+  visibility: visible !important;
+}
+
+/* Esconder TODOS os botões padrão do FlexLayout na área de header */
+.flexlayout__tabset_header_content > *:not(.tabset-button) {
+  display: none !important;
+}
+
+/* Alternativa mais específica para garantir que só nossos botões apareçam */
+.flexlayout__tabset_header_content button:not(.tabset-button) {
+  display: none !important;
+}
