@@ -4,6 +4,7 @@ import {
   LeftOutlined, 
   RightOutlined, 
   ReloadOutlined, 
+  StopOutlined,
   GlobalOutlined,
   SendOutlined 
 } from '@ant-design/icons';
@@ -57,6 +58,96 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   useEffect(() => {
     setIsElectron(window.require !== undefined);
   }, []);
+
+  // Configurar listeners da webview quando ela estiver pronta
+  useEffect(() => {
+    if (isElectron && webviewRef.current) {
+      const webview = webviewRef.current;
+      
+      // Aguardar a webview estar pronta
+      const handleDomReady = () => {
+        console.log('WebView DOM ready, configurando listeners');
+        
+        // Aguardar um pequeno delay para garantir que tudo está pronto
+        setTimeout(() => {
+          updateNavigationState();
+          
+          // Tentar obter URL atual de forma segura
+          try {
+            if (webview.getURL && typeof webview.getURL === 'function') {
+              const currentWebviewUrl = webview.getURL();
+              if (currentWebviewUrl && currentWebviewUrl !== 'about:blank') {
+                setCurrentUrl(currentWebviewUrl);
+                setUrl(currentWebviewUrl);
+              }
+            }
+          } catch (error) {
+            console.log('Ainda não é possível obter URL da webview:', error.message);
+          }
+        }, 100);
+        
+        // Adicionar listener para mudanças de navegação
+        webview.addEventListener('did-navigate', (e) => {
+          setCurrentUrl(e.url);
+          setUrl(e.url);
+          updateNavigationState();
+        });
+        
+        webview.addEventListener('did-navigate-in-page', (e) => {
+          setCurrentUrl(e.url);
+          setUrl(e.url);
+          updateNavigationState();
+        });
+        
+        webview.addEventListener('did-start-loading', () => {
+          setIsLoading(true);
+        });
+        
+        webview.addEventListener('did-stop-loading', () => {
+          setLoadingComplete(true);
+          setTimeout(() => {
+            setIsLoading(false);
+            setLoadingComplete(false);
+          }, 300);
+          updateNavigationState();
+        });
+        
+        webview.addEventListener('did-fail-load', (e) => {
+          console.error('Falha ao carregar página:', e);
+          setLoadingComplete(true);
+          setTimeout(() => {
+            setIsLoading(false);
+            setLoadingComplete(false);
+          }, 300);
+          updateNavigationState();
+        });
+
+        // Listener para abrir links em nova aba
+        webview.addEventListener('new-window', (e) => {
+          e.preventDefault();
+          console.log('Link solicitado para abrir em nova janela:', e.url);
+          
+          // Enviar para o processo principal para criar nova aba
+          if (window.require) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('open-in-new-tab', e.url);
+          }
+        });
+      };
+      
+      // Sempre aguardar o evento dom-ready para garantir que a webview está pronta
+      webview.addEventListener('dom-ready', handleDomReady);
+      
+      return () => {
+        // Cleanup listeners
+        try {
+          webview.removeEventListener('dom-ready', handleDomReady);
+        } catch (error) {
+          console.log('Erro ao remover listeners:', error.message);
+        }
+      };
+    }
+  }, [isElectron]); // Removido currentUrl da dependência para evitar re-execução desnecessária
 
   // Atualiza o título da tab com base na URL
   useEffect(() => {
@@ -121,16 +212,30 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   };
 
   const handleRefresh = () => {
-    setIsLoading(true);
+    if (isLoading) {
+      // Se está carregando, para o carregamento
+      handleStop();
+    } else {
+      // Se não está carregando, recarrega a página
+      setIsLoading(true);
+      if (isElectron && webviewRef.current) {
+        webviewRef.current.reload();
+      } else if (iframeRef.current) {
+        // Para desenvolvimento no browser, força reload do iframe
+        const currentSrc = iframeRef.current.src;
+        iframeRef.current.src = '';
+        setTimeout(() => {
+          iframeRef.current.src = currentSrc;
+        }, 10);
+      }
+    }
+  };
+
+  const handleStop = () => {
+    setIsLoading(false);
+    setLoadingComplete(false);
     if (isElectron && webviewRef.current) {
-      webviewRef.current.reload();
-    } else if (iframeRef.current) {
-      // Para desenvolvimento no browser, força reload do iframe
-      const currentSrc = iframeRef.current.src;
-      iframeRef.current.src = '';
-      setTimeout(() => {
-        iframeRef.current.src = currentSrc;
-      }, 10);
+      webviewRef.current.stop();
     }
   };
 
@@ -146,41 +251,14 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     }
   };
 
-  const handleWebviewLoad = () => {
-    // Marca como completo e depois de um pequeno delay remove o loading
-    setLoadingComplete(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setLoadingComplete(false);
-    }, 300);
-    
+  // Função para atualizar o estado de navegação
+  const updateNavigationState = () => {
     if (isElectron && webviewRef.current) {
-      setCanGoBack(webviewRef.current.canGoBack());
-      setCanGoForward(webviewRef.current.canGoForward());
-      setCurrentUrl(webviewRef.current.getURL());
-      setUrl(webviewRef.current.getURL());
-
-      // Configurar context menu específico para esta webview
       try {
-        // Adicionar listener para new-window (abrir links em nova aba/janela)
-        webviewRef.current.addEventListener('new-window', (e) => {
-          e.preventDefault();
-          console.log('Link solicitado para abrir em nova janela:', e.url);
-          
-          // Enviar para o processo principal para criar nova aba
-          if (window.require) {
-            const { ipcRenderer } = window.require('electron');
-            ipcRenderer.send('open-in-new-tab', e.url);
-          }
-        });
-
-        // Configurar context menu personalizado para webview
-        webviewRef.current.addEventListener('context-menu', (e) => {
-          console.log('Context menu solicitado na webview');
-        });
-
+        setCanGoBack(webviewRef.current.canGoBack());
+        setCanGoForward(webviewRef.current.canGoForward());
       } catch (error) {
-        console.error('Erro ao configurar eventos da webview:', error);
+        console.error('Erro ao atualizar estado de navegação:', error);
       }
     }
   };
@@ -214,16 +292,6 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             width: '100%',
             height: '100%',
             border: 'none'
-          }}
-          onLoadStart={() => setIsLoading(true)}
-          onLoadStop={handleWebviewLoad}
-          onDidNavigate={(e) => {
-            setCurrentUrl(e.url);
-            setUrl(e.url);
-          }}
-          onDidNavigateInPage={(e) => {
-            setCurrentUrl(e.url);
-            setUrl(e.url);
           }}
           allowpopups="true"
           nodeintegration="false"
@@ -370,16 +438,16 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
               />
             </Tooltip>
             
-            <Tooltip title={isFocused ? "Atualizar página" : "Clique no painel para focar"}>
+            <Tooltip title={isFocused ? (isLoading ? "Parar carregamento" : "Atualizar página") : "Clique no painel para focar"}>
               <Button
                 type="text"
-                icon={<ReloadOutlined />}
+                icon={isLoading ? <StopOutlined /> : <ReloadOutlined />}
                 size="small"
                 disabled={!isFocused}
                 onClick={handleRefresh}
                 className={!isFocused ? 'opacity-30' : ''}
                 style={{
-                  color: isFocused ? '#cccccc' : '#666666',
+                  color: isFocused ? (isLoading ? '#ff6b6b' : '#cccccc') : '#666666',
                   borderColor: '#3e3e42',
                   backgroundColor: '#383838'
                 }}
