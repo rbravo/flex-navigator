@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Context Menu - Flex Navigator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .test-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .test-link {
+            color: #87CEEB;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .test-link:hover {
+            text-decoration: underline;
+        }
+        .test-image {
+            max-width: 300px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: block;
+        }
+        .instructions {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .highlight {
+            background: rgba(255, 255, 0, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Teste do Context Menu - Flex Navigator</h1>
+        
+        <div class="instructions">
+            <strong>📋 Instruções para testar o Context Menu:</strong>
+            <ul>
+                <li>Clique com o <strong>botão direito</strong> em qualquer área desta página</li>
+                <li>Clique com o botão direito no <strong>texto selecionado</strong> abaixo</li>
+                <li>Clique com o botão direito nos <strong>links</strong></li>
+                <li>Clique com o botão direito na <strong>imagem</strong></li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 Teste de Links</h3>
+            <p class="test-text">
+                Clique com o botão direito nestes links para testar o menu contextual:
+            </p>
+            <ul>
+                <li><a href="https://www.google.com" class="test-link">Google</a></li>
+                <li><a href="https://github.com" class="test-link">GitHub</a></li>
+                <li><a href="https://stackoverflow.com" class="test-link">Stack Overflow</a></li>
+                <li><a href="https://developer.mozilla.org" class="test-link">MDN Web Docs</a></li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 Teste de Texto Selecionável</h3>
+            <p class="test-text">
+                <span class="highlight">Selecione este texto e clique com o botão direito</span> para ver as opções de 
+                copiar, pesquisar no Google, etc. Este é um texto longo especificamente criado para 
+                testar as funcionalidades do context menu quando há texto selecionado.
+            </p>
+            <p class="test-text">
+                Você também pode testar selecionando palavras individuais como: 
+                <strong>JavaScript</strong>, <strong>Electron</strong>, <strong>Context Menu</strong>.
+            </p>
+        </div>
+
+        <div class="test-section">
+            <h3>🖼️ Teste de Imagem</h3>
+            <p class="test-text">Clique com o botão direito na imagem abaixo:</p>
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojNjY3ZWVhO3N0b3Atb3BhY2l0eToxIiAvPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM3NjRiYTI7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0idXJsKCNncmFkaWVudCkiIHJ4PSIxNSIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+8J+MkCBGbGV4IE5hdmlnYXRvcjwvdGV4dD4KPC9zdmc+" 
+                 alt="Flex Navigator Logo" 
+                 class="test-image">
+            <p><em>Imagem de teste para context menu</em></p>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Funcionalidades Esperadas</h3>
+            <p class="test-text">O context menu deve incluir:</p>
+            <ul>
+                <li><strong>Copiar</strong> - Para texto selecionado</li>
+                <li><strong>Copiar imagem</strong> - Para imagens</li>
+                <li><strong>Copiar endereço da imagem</strong> - Para imagens</li>
+                <li><strong>Salvar imagem</strong> - Para imagens</li>
+                <li><strong>Pesquisar no Google</strong> - Para texto selecionado</li>
+                <li><strong>Abrir link em nova aba</strong> - Para links</li>
+                <li><strong>Inspecionar elemento</strong> - Em modo desenvolvimento</li>
+                <li><strong>DevTools da WebView</strong> - Em modo desenvolvimento</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Status da Aplicação</h3>
+            <p class="test-text">
+                <strong>URL atual:</strong> <span id="current-url">Carregando...</span><br>
+                <strong>User Agent:</strong> <span id="user-agent">Carregando...</span><br>
+                <strong>Ambiente:</strong> <span id="environment">Carregando...</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Atualizar informações da página
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('user-agent').textContent = navigator.userAgent;
+        document.getElementById('environment').textContent = 
+            typeof window.require !== 'undefined' ? 'Electron WebView' : 'Browser';
+
+        // Log para debug
+        console.log('Página de teste do Context Menu carregada');
+        console.log('Environment:', typeof window.require !== 'undefined' ? 'Electron' : 'Browser');
+    </script>
+</body>
+</html>

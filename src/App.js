@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Model, Actions, DockLocation } from 'flexlayout-react';
 import { Plus, SplitSquareHorizontal, SplitSquareVertical, Terminal, Maximize2, Minimize2 } from 'lucide-react';
 import 'flexlayout-react/style/dark.css'; // ou 'light.css' se preferir tema claro
@@ -73,6 +73,63 @@ const App = () => {
       }
     })
   );
+
+  // Configurar listeners para eventos do Electron
+  useEffect(() => {
+    if (window.require) {
+      try {
+        const { ipcRenderer } = window.require('electron');
+
+        // Listener para abrir link em nova aba (vindo do context menu)
+        const handleAddNewTab = (event, data) => {
+          console.log('Recebido evento para adicionar nova aba:', data);
+          
+          // Encontrar o primeiro tabset para adicionar a nova aba
+          const rootNode = model.getRoot();
+          const tabsets = [];
+          
+          function findTabsets(node) {
+            if (node.getType() === 'tabset') {
+              tabsets.push(node);
+            }
+            node.getChildren().forEach(child => findTabsets(child));
+          }
+          
+          findTabsets(rootNode);
+          
+          if (tabsets.length > 0) {
+            const targetTabset = tabsets[0]; // Usar o primeiro tabset
+            
+            model.doAction(Actions.addNode({
+              type: "tab",
+              name: "Nova aba",
+              component: "browser",
+              config: {
+                url: data.url
+              }
+            }, targetTabset.getId(), DockLocation.CENTER, -1));
+          }
+        };
+
+        // Listener para comandos do context menu
+        const handleOpenInNewTab = (event, url) => {
+          handleAddNewTab(event, { url });
+        };
+
+        // Registrar listeners
+        ipcRenderer.on('add-new-tab', handleAddNewTab);
+        ipcRenderer.on('open-in-new-tab', handleOpenInNewTab);
+
+        // Cleanup ao desmontar o componente
+        return () => {
+          ipcRenderer.removeListener('add-new-tab', handleAddNewTab);
+          ipcRenderer.removeListener('open-in-new-tab', handleOpenInNewTab);
+        };
+      } catch (error) {
+        console.log('Erro ao configurar IPC listeners:', error);
+      }
+    }
+  }, [model]);
 
   const factory = (node) => {
     const component = node.getComponent();

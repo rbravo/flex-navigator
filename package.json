@@ -12,6 +12,7 @@
     "concurrently": "^9.2.0",
     "electron": "^37.2.1",
     "electron-builder": "^26.0.12",
+    "electron-context-menu": "^4.1.0",
     "electron-is-dev": "^3.0.1",
     "flexlayout-react": "^0.8.17",
     "lucide-react": "^0.525.0",

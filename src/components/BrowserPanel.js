@@ -159,6 +159,29 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
       setCanGoForward(webviewRef.current.canGoForward());
       setCurrentUrl(webviewRef.current.getURL());
       setUrl(webviewRef.current.getURL());
+
+      // Configurar context menu específico para esta webview
+      try {
+        // Adicionar listener para new-window (abrir links em nova aba/janela)
+        webviewRef.current.addEventListener('new-window', (e) => {
+          e.preventDefault();
+          console.log('Link solicitado para abrir em nova janela:', e.url);
+          
+          // Enviar para o processo principal para criar nova aba
+          if (window.require) {
+            const { ipcRenderer } = window.require('electron');
+            ipcRenderer.send('open-in-new-tab', e.url);
+          }
+        });
+
+        // Configurar context menu personalizado para webview
+        webviewRef.current.addEventListener('context-menu', (e) => {
+          console.log('Context menu solicitado na webview');
+        });
+
+      } catch (error) {
+        console.error('Erro ao configurar eventos da webview:', error);
+      }
     }
   };
 
@@ -198,9 +221,14 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             setCurrentUrl(e.url);
             setUrl(e.url);
           }}
+          onDidNavigateInPage={(e) => {
+            setCurrentUrl(e.url);
+            setUrl(e.url);
+          }}
           allowpopups="true"
           nodeintegration="false"
-          webpreferences="allowRunningInsecureContent"
+          webpreferences="allowRunningInsecureContent, contextIsolation=false"
+          partition="persist:webview"
         />
       );
     } else {

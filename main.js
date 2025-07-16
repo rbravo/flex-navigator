@@ -49,22 +49,193 @@ function createWindow() {
   createMenu();
 }
 
+// Function to execute commands on the active webview
+function executeOnActiveWebview(command) {
+  if (!mainWindow || !mainWindow.webContents) {
+    console.log('Janela principal não disponível');
+    return;
+  }
+
+  // Execute script to find active webview and run command
+  mainWindow.webContents.executeJavaScript(`
+    (function() {
+      // Find all webviews
+      const webviews = document.querySelectorAll('webview');
+      let activeWebview = null;
+
+      // Strategy 1: Find webview in active/focused tab
+      const activeTab = document.querySelector('.flexlayout__tab_button--selected');
+      if (activeTab) {
+        const tabContent = activeTab.closest('.flexlayout__tabset').querySelector('.flexlayout__tab');
+        if (tabContent) {
+          activeWebview = tabContent.querySelector('webview');
+        }
+      }
+
+      // Strategy 2: Find focused webview
+      if (!activeWebview) {
+        for (let webview of webviews) {
+          if (document.activeElement === webview || webview.contains(document.activeElement)) {
+            activeWebview = webview;
+            break;
+          }
+        }
+      }
+
+      // Strategy 3: Find visible webview with largest area
+      if (!activeWebview) {
+        let largestArea = 0;
+        for (let webview of webviews) {
+          const rect = webview.getBoundingClientRect();
+          const area = rect.width * rect.height;
+          if (area > largestArea && rect.width > 0 && rect.height > 0) {
+            largestArea = area;
+            activeWebview = webview;
+          }
+        }
+      }
+
+      if (activeWebview) {
+        console.log('Executando comando na webview ativa:', '${command}');
+        console.log('URL da webview:', activeWebview.src);
+        
+        try {
+          // Simple eval for webview commands
+          const result = eval('activeWebview.' + '${command}');
+          console.log('Comando executado com sucesso');
+          return { success: true, url: activeWebview.src, command: '${command}' };
+        } catch (error) {
+          console.error('Erro ao executar comando na webview:', error);
+          return { success: false, error: error.message };
+        }
+      } else {
+        console.log('Nenhuma webview ativa encontrada para executar: ${command}');
+        return { success: false, error: 'Nenhuma webview ativa encontrada' };
+      }
+    })();
+  `).then(result => {
+    if (result && result.success) {
+      console.log('✅ Comando executado na webview:', result.command);
+    } else {
+      console.log('❌ Falha ao executar comando:', result ? result.error : 'Resultado indefinido');
+    }
+  }).catch(error => {
+    console.error('Erro ao executar script na webview ativa:', error);
+  });
+}
+
+// Function to handle zoom commands on active webview
+function executeZoomCommand(action) {
+  if (!mainWindow || !mainWindow.webContents) {
+    console.log('Janela principal não disponível');
+    return;
+  }
+
+  // Execute script to find active webview and handle zoom
+  mainWindow.webContents.executeJavaScript(`
+    (function() {
+      // Find all webviews
+      const webviews = document.querySelectorAll('webview');
+      let activeWebview = null;
+
+      // Strategy 1: Find webview in active/focused tab
+      const activeTab = document.querySelector('.flexlayout__tab_button--selected');
+      if (activeTab) {
+        const tabContent = activeTab.closest('.flexlayout__tabset').querySelector('.flexlayout__tab');
+        if (tabContent) {
+          activeWebview = tabContent.querySelector('webview');
+        }
+      }
+
+      // Strategy 2: Find focused webview
+      if (!activeWebview) {
+        for (let webview of webviews) {
+          if (document.activeElement === webview || webview.contains(document.activeElement)) {
+            activeWebview = webview;
+            break;
+          }
+        }
+      }
+
+      // Strategy 3: Find visible webview with largest area
+      if (!activeWebview) {
+        let largestArea = 0;
+        for (let webview of webviews) {
+          const rect = webview.getBoundingClientRect();
+          const area = rect.width * rect.height;
+          if (area > largestArea && rect.width > 0 && rect.height > 0) {
+            largestArea = area;
+            activeWebview = webview;
+          }
+        }
+      }
+
+      if (activeWebview) {
+        console.log('Aplicando zoom na webview ativa:', activeWebview.src);
+        
+        try {
+          // Use a simple zoom approach with stored zoom levels
+          if (!activeWebview._currentZoom) {
+            activeWebview._currentZoom = 1.0; // Default zoom
+          }
+
+          // Handle different zoom actions
+          if ('${action}' === 'increase') {
+            activeWebview._currentZoom = Math.min(5.0, activeWebview._currentZoom * 1.2); // Max 500%
+            activeWebview.setZoomFactor(activeWebview._currentZoom);
+            console.log('Zoom aumentado para:', (activeWebview._currentZoom * 100).toFixed(0) + '%');
+          } else if ('${action}' === 'decrease') {
+            activeWebview._currentZoom = Math.max(0.25, activeWebview._currentZoom / 1.2); // Min 25%
+            activeWebview.setZoomFactor(activeWebview._currentZoom);
+            console.log('Zoom diminuído para:', (activeWebview._currentZoom * 100).toFixed(0) + '%');
+          } else if ('${action}' === 'reset') {
+            activeWebview._currentZoom = 1.0;
+            activeWebview.setZoomFactor(1.0);
+            console.log('Zoom resetado para: 100%');
+          }
+          
+          return { 
+            success: true, 
+            url: activeWebview.src, 
+            action: '${action}',
+            zoom: (activeWebview._currentZoom * 100).toFixed(0) + '%'
+          };
+        } catch (error) {
+          console.error('Erro ao executar zoom na webview:', error);
+          return { success: false, error: error.message };
+        }
+      } else {
+        console.log('Nenhuma webview ativa encontrada para zoom');
+        return { success: false, error: 'Nenhuma webview ativa encontrada' };
+      }
+    })();
+  `).then(result => {
+    if (result && result.success) {
+      console.log('✅ Zoom executado na webview:', result.action, 'Novo zoom:', result.zoom);
+    } else {
+      console.log('❌ Falha ao executar zoom:', result ? result.error : 'Resultado indefinido');
+    }
+  }).catch(error => {
+    console.error('Erro ao executar script de zoom na webview ativa:', error);
+  });
+}
+
 function createMenu() {
   const template = [
     {
       label: 'Arquivo',
       submenu: [
-        {
-          label: 'Nova Tab',
-          accelerator: 'CmdOrCtrl+T',
-          click: () => {
-            // Pode implementar lógica para adicionar nova tab aqui
-            mainWindow.webContents.executeJavaScript(`
-              console.log('Nova tab solicitada via menu');
-            `);
-          }
-        },
-        { type: 'separator' },
+        // {
+        //   label: 'Nova Tab',
+        //   accelerator: 'CmdOrCtrl+T',
+        //   click: () => {
+        //     // Pode implementar lógica para adicionar nova tab aqui
+        //     mainWindow.webContents.executeJavaScript(`
+        //       console.log('Nova tab solicitada via menu');
+        //     `);
+        //   }
+        // },
+        // { type: 'separator' },
         {
           label: 'Sair',
           accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
@@ -77,27 +248,105 @@ function createMenu() {
     {
       label: 'Editar',
       submenu: [
-        { role: 'undo', label: 'Desfazer' },
-        { role: 'redo', label: 'Refazer' },
+        {
+          label: 'Desfazer',
+          accelerator: 'CmdOrCtrl+Z',
+          click: () => {
+            executeOnActiveWebview('undo()');
+          }
+        },
+        {
+          label: 'Refazer',
+          accelerator: 'CmdOrCtrl+Shift+Z',
+          click: () => {
+            executeOnActiveWebview('redo()');
+          }
+        },
         { type: 'separator' },
-        { role: 'cut', label: 'Recortar' },
-        { role: 'copy', label: 'Copiar' },
-        { role: 'paste', label: 'Colar' },
-        { role: 'selectall', label: 'Selecionar Tudo' }
+        {
+          label: 'Recortar',
+          accelerator: 'CmdOrCtrl+X',
+          click: () => {
+            executeOnActiveWebview('cut()');
+          }
+        },
+        {
+          label: 'Copiar',
+          accelerator: 'CmdOrCtrl+C',
+          click: () => {
+            executeOnActiveWebview('copy()');
+          }
+        },
+        {
+          label: 'Colar',
+          accelerator: 'CmdOrCtrl+V',
+          click: () => {
+            executeOnActiveWebview('paste()');
+          }
+        },
+        {
+          label: 'Selecionar Tudo',
+          accelerator: 'CmdOrCtrl+A',
+          click: () => {
+            executeOnActiveWebview('selectAll()');
+          }
+        }
       ]
     },
     {
       label: 'Visualizar',
       submenu: [
-        { role: 'reload', label: 'Recarregar' },
-        { role: 'forceReload', label: 'Forçar Recarregar' },
-        { role: 'toggleDevTools', label: 'Ferramentas de Desenvolvedor' },
+        {
+          label: 'Recarregar',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            executeOnActiveWebview('reload()');
+          }
+        },
+        {
+          label: 'Forçar Recarregar',
+          accelerator: 'CmdOrCtrl+Shift+R',
+          click: () => {
+            executeOnActiveWebview('reloadIgnoringCache()');
+          }
+        },
+        {
+          label: 'Ferramentas de Desenvolvedor',
+          accelerator: 'F12',
+          click: () => {
+            executeOnActiveWebview('openDevTools()');
+          }
+        },
         { type: 'separator' },
-        { role: 'resetZoom', label: 'Zoom Real' },
-        { role: 'zoomIn', label: 'Aumentar Zoom' },
-        { role: 'zoomOut', label: 'Diminuir Zoom' },
+        {
+          label: 'Zoom Real',
+          accelerator: 'CmdOrCtrl+0',
+          click: () => {
+            executeZoomCommand('reset');
+          }
+        },
+        {
+          label: 'Aumentar Zoom',
+          accelerator: 'CmdOrCtrl+Plus',
+          click: () => {
+            executeZoomCommand('increase');
+          }
+        },
+        {
+          label: 'Diminuir Zoom',
+          accelerator: 'CmdOrCtrl+-',
+          click: () => {
+            executeZoomCommand('decrease');
+          }
+        },
         { type: 'separator' },
-        { role: 'togglefullscreen', label: 'Tela Cheia' }
+        {
+          label: 'Tela Cheia',
+          accelerator: 'F11',
+          click: () => {
+            mainWindow.setFullScreen(!mainWindow.isFullScreen());
+          }
+        }
       ]
     },
     {
@@ -187,6 +436,16 @@ ipcMain.on('open-webview-devtools', (event, data) => {
   }
 });
 
+// Handle open in new tab from context menu
+ipcMain.on('open-in-new-tab', (event, url) => {
+  console.log('Solicitação para abrir URL em nova aba:', url);
+  
+  if (mainWindow && mainWindow.webContents) {
+    // Enviar para o renderer para adicionar nova aba
+    mainWindow.webContents.send('add-new-tab', { url });
+  }
+});
+
 // Quit when all windows are closed
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -215,4 +474,82 @@ app.on('web-contents-created', (event, contents) => {
       event.preventDefault();
     }
   });
+
+  // Configure context menu for webview contents specifically
+  if (contents.getType() === 'webview') {
+    console.log('Configurando context menu para webview:', contents.getURL());
+    
+    // Import and configure context menu for this specific webview
+    import('electron-context-menu').then((contextMenuModule) => {
+      const contextMenu = contextMenuModule.default || contextMenuModule;
+      
+      contextMenu({
+        window: contents,
+        showLookUpSelection: false,
+        showSearchWithGoogle: true,
+        showCopyImage: true,
+        showCopyImageAddress: true,
+        //showSaveImage: true,
+        //showSaveImageAs: true,
+        showInspectElement: true,
+        showServices: false,
+        prepend: (defaultActions, parameters, browserWindow) => [
+          {
+            label: 'Back',
+            visible: contents.navigationHistory && contents.navigationHistory.canGoBack(),
+            click: () => {
+              contents.navigationHistory.goBack();
+            }
+          },
+          {
+            label: 'Forward',
+            visible: contents.navigationHistory && contents.navigationHistory.canGoForward(),
+            click: () => {
+              contents.navigationHistory.goForward();
+            }
+          },
+          {
+            label: 'Reload',
+            click: () => {
+              contents.reload();
+            }
+          },
+          {
+            type: 'separator'
+          },
+          {
+            label: 'Open link in a new tab',
+            visible: !!parameters.linkURL,
+            click: () => {
+              // Enviar evento para o processo principal para criar nova aba
+              if (mainWindow && mainWindow.webContents) {
+                mainWindow.webContents.send('add-new-tab', { url: parameters.linkURL });
+              }
+            }
+          }
+        ],
+        append: (defaultActions, parameters, browserWindow) => [
+          {
+            type: 'separator'
+          },
+          // {
+          //   label: 'Inspecionar Elemento',
+          //   visible: isDev,
+          //   click: () => {
+          //     contents.inspectElement(parameters.x, parameters.y);
+          //   }
+          // },
+          {
+            label: 'Open DevTools',
+            visible: isDev,
+            click: () => {
+              contents.openDevTools();
+            }
+          }
+        ]
+      });
+    }).catch(error => {
+      console.error('Erro ao configurar context menu para webview:', error);
+    });
+  }
 });
