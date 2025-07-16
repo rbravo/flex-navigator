@@ -21,19 +21,15 @@
   outline: none;
 }
 
-.browser-panel.focused {
-  box-shadow: 0 0 0 2px var(--nav-accent);
-}
-
 /* Barra de controles */
 .controls-bar {
   display: flex;
   align-items: center;
   background-color: var(--nav-panel);
   border-bottom: 1px solid var(--nav-border);
-  padding: 8px 12px;
-  gap: 12px;
-  min-height: 48px;
+  padding: 4px 8px;
+  gap: 8px;
+  min-height: 46px;
   z-index: 50;
 }
 

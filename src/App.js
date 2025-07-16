@@ -222,47 +222,47 @@ const App = () => {
       </a>
     );
 
-    renderValues.buttons.push(
-      <a
-        key="devtools"
-        className="tabset-button tabset-button-devtools"
-        title="Abrir DevTools da aba ativa"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+    // renderValues.buttons.push(
+    //   <a
+    //     key="devtools"
+    //     className="tabset-button tabset-button-devtools"
+    //     title="Abrir DevTools da aba ativa"
+    //     onClick={(e) => {
+    //       e.preventDefault();
+    //       e.stopPropagation();
           
-          console.log('Clicou no botão devtools');
+    //       console.log('Clicou no botão devtools');
           
-          // Pegar a tab ativa do tabset
-          const activeTab = tabSetNode.getSelectedNode();
-          if (activeTab && activeTab.getComponent() === "browser") {
-            console.log('Abrindo DevTools para tab ativa:', activeTab.getId());
+    //       // Pegar a tab ativa do tabset
+    //       const activeTab = tabSetNode.getSelectedNode();
+    //       if (activeTab && activeTab.getComponent() === "browser") {
+    //         console.log('Abrindo DevTools para tab ativa:', activeTab.getId());
             
-            // Verificar se está no Electron
-            if (window.require) {
-              try {
-                const { ipcRenderer } = window.require('electron');
-                // Enviar comando para abrir DevTools da webview ativa
-                ipcRenderer.send('open-webview-devtools', {
-                  tabId: activeTab.getId()
-                });
-              } catch (error) {
-                console.log('Erro ao abrir DevTools no Electron:', error);
-              }
-            } else {
-              // No browser de desenvolvimento, mostrar mensagem
-              console.log('DevTools só funcionam no Electron com webviews');
-              alert('DevTools para webviews só funcionam no Electron. Execute com "npm run electron-dev"');
-            }
-          } else {
-            console.log('Nenhuma tab de browser ativa encontrada');
-            alert('Nenhuma aba de navegador ativa encontrada');
-          }
-        }}
-      >
-        <Terminal size={14} />
-      </a>
-    );
+    //         // Verificar se está no Electron
+    //         if (window.require) {
+    //           try {
+    //             const { ipcRenderer } = window.require('electron');
+    //             // Enviar comando para abrir DevTools da webview ativa
+    //             ipcRenderer.send('open-webview-devtools', {
+    //               tabId: activeTab.getId()
+    //             });
+    //           } catch (error) {
+    //             console.log('Erro ao abrir DevTools no Electron:', error);
+    //           }
+    //         } else {
+    //           // No browser de desenvolvimento, mostrar mensagem
+    //           console.log('DevTools só funcionam no Electron com webviews');
+    //           alert('DevTools para webviews só funcionam no Electron. Execute com "npm run electron-dev"');
+    //         }
+    //       } else {
+    //         console.log('Nenhuma tab de browser ativa encontrada');
+    //         alert('Nenhuma aba de navegador ativa encontrada');
+    //       }
+    //     }}
+    //   >
+    //     <Terminal size={14} />
+    //   </a>
+    // );
 
     renderValues.buttons.push(
       <a

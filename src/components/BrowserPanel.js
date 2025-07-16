@@ -15,7 +15,6 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
   const [isElectron, setIsElectron] = useState(false);
@@ -29,7 +28,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
       colorBgContainer: '#2d2d30',
       colorBgElevated: '#383838',
       colorBorder: '#3e3e42',
-      colorPrimary: '#007acc',
+      colorPrimary: '#cccccc',
       colorText: '#cccccc',
       colorTextSecondary: '#999999',
       colorBgLayout: '#1e1e1e',
@@ -48,8 +47,8 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
         borderRadius: 4,
         colorBgContainer: '#383838',
         colorBorder: '#3e3e42',
-        activeBorderColor: '#007acc',
-        hoverBorderColor: '#007acc',
+        activeBorderColor: '#aaaaaa',
+        hoverBorderColor: '#aaaaaa',
       },
     },
   };
@@ -263,23 +262,6 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     }
   };
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    // Adiciona um pequeno delay para evitar blur quando clicando em elementos do painel
-    setTimeout(() => {
-      if (!document.activeElement || !document.activeElement.closest('.browser-panel')) {
-        setIsFocused(false);
-      }
-    }, 100);
-  };
-
-  const handlePanelClick = () => {
-    setIsFocused(true);
-  };
-
   const renderWebContent = () => {
     if (isElectron) {
       // No Electron, usa webview real
@@ -356,7 +338,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
                 <div className="info-row">
                   <span className="info-label">Status:</span> 
                   <span className="info-status">
-                    {isFocused ? '🎯' : '😴'} {isFocused ? 'Focado' : 'Sem foco'}
+                    🎯 Ativo
                   </span>
                 </div>
                 <div className="info-row">
@@ -370,7 +352,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
                 <p>Este é o painel do navegador. No Electron, aqui aparecerá o conteúdo web real usando webview.</p>
                 <div className="tip-panel">
                   <p>
-                    <span className="tip-icon">💡 Dica:</span> Clique neste painel para focar e ver os controles de navegação ativados!
+                    <span className="tip-icon">💡 Dica:</span> A barra de navegação está sempre ativa e pronta para uso!
                   </p>
                 </div>
               </div>
@@ -397,57 +379,47 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
 
   return (
     <ConfigProvider theme={darkTheme}>
-      <div 
-        className={`browser-panel ${isFocused ? 'focused' : ''}`}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onClick={handlePanelClick}
-        tabIndex="0"
-      >
+      <div className="browser-panel">
         <div className="controls-bar">
           <Space size="small">
-            <Tooltip title={isFocused ? "Voltar" : "Clique no painel para focar"}>
+            <Tooltip title="Voltar">
               <Button
                 type="text"
                 icon={<LeftOutlined />}
                 size="small"
-                disabled={!canGoBack || !isFocused}
+                disabled={!canGoBack}
                 onClick={handleBack}
-                className={!isFocused || !canGoBack ? 'opacity-30' : ''}
                 style={{
-                  color: isFocused && canGoBack ? '#cccccc' : '#666666',
+                  color: canGoBack ? '#cccccc' : '#666666',
                   borderColor: '#3e3e42',
                   backgroundColor: '#383838'
                 }}
               />
             </Tooltip>
             
-            <Tooltip title={isFocused ? "Avançar" : "Clique no painel para focar"}>
+            <Tooltip title="Avançar">
               <Button
                 type="text"
                 icon={<RightOutlined />}
                 size="small"
-                disabled={!canGoForward || !isFocused}
+                disabled={!canGoForward}
                 onClick={handleForward}
-                className={!isFocused || !canGoForward ? 'opacity-30' : ''}
                 style={{
-                  color: isFocused && canGoForward ? '#cccccc' : '#666666',
+                  color: canGoForward ? '#cccccc' : '#666666',
                   borderColor: '#3e3e42',
                   backgroundColor: '#383838'
                 }}
               />
             </Tooltip>
             
-            <Tooltip title={isFocused ? (isLoading ? "Parar carregamento" : "Atualizar página") : "Clique no painel para focar"}>
+            <Tooltip title={isLoading ? "Parar carregamento" : "Atualizar página"}>
               <Button
                 type="text"
                 icon={isLoading ? <StopOutlined /> : <ReloadOutlined />}
                 size="small"
-                disabled={!isFocused}
                 onClick={handleRefresh}
-                className={!isFocused ? 'opacity-30' : ''}
                 style={{
-                  color: isFocused ? (isLoading ? '#ff6b6b' : '#cccccc') : '#666666',
+                  color: isLoading ? '#ff6b6b' : '#cccccc',
                   borderColor: '#3e3e42',
                   backgroundColor: '#383838'
                 }}
@@ -467,25 +439,26 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
                     <GlobalOutlined style={{ color: '#999999' }} />
                 }
                 suffix={
-                  isFocused && !isLoading && (
+                  !isLoading && (
                     <Button
-                      type="primary"
+                      type="default"
                       icon={<SendOutlined />}
                       size="small"
                       htmlType="submit"
                       style={{
                         backgroundColor: '#007acc',
                         borderColor: '#007acc',
+                        borderWidth: 0,
                         height: '24px',
                         minWidth: '28px'
                       }}
                     />
                   )
                 }
-                readOnly={!isFocused}
                 style={{
-                  backgroundColor: isFocused ? '#383838' : '#2d2d30',
-                  borderColor: isFocused ? '#007acc' : '#3e3e42',
+                  backgroundColor: '#383838',
+                  // borderColor: '#007acc',
+                  borderWidth: 0,
                   color: '#cccccc'
                 }}
                 onPressEnter={handleUrlSubmit}

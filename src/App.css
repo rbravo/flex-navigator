@@ -15,11 +15,11 @@
   color: #cccccc !important;
   border-color: #3e3e42 !important;
   font-size: 12px !important;
-  padding: 4px 8px !important;
+  /* padding: 4px 8px !important; */
 }
 
 .flexlayout__tab:hover {
-  background-color: #383838 !important;
+  /* background-color: #383838 !important; */
 }
 
 .flexlayout__tab_selected {
