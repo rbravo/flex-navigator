@@ -29,7 +29,7 @@ const WebContent = ({
             height: '100%',
             border: 'none'
           }}
-          allowpopups="true"
+          allowpopups="false"
           nodeintegration="false"
           webpreferences="allowRunningInsecureContent, contextIsolation=false"
           partition="persist:webview"
