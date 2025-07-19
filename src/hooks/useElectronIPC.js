@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { addNewTabToFirstTabset } from '../utils/layoutActions';
+import { updateTabAudioState, startAudioStateMonitoring } from '../utils/tabActions';
 
 /**
  * Hook customizado para gerenciar eventos do Electron IPC
@@ -21,14 +22,36 @@ const useElectronIPC = (model) => {
           handleAddNewTab(event, { url });
         };
 
+        // Listener para atualizações de estado de áudio
+        const handleAudioStateUpdate = (event, data) => {
+          console.log('Recebido update de áudio:', data);
+          if (data.tabId) {
+            if (typeof data.isAudible === 'boolean') {
+              updateTabAudioState(model, data.tabId, data.isAudible);
+            } else {
+              console.warn('Resultado de áudio inválido para tab', data.tabId, ':', data);
+            }
+          }
+        };
+
         // Registrar listeners
         ipcRenderer.on('add-new-tab', handleAddNewTab);
         ipcRenderer.on('open-in-new-tab', handleOpenInNewTab);
+        ipcRenderer.on('audio-state-update', handleAudioStateUpdate);
+
+        // Iniciar monitoramento de áudio
+        const stopAudioMonitoring = startAudioStateMonitoring(model);
 
         // Cleanup ao desmontar o componente
         return () => {
           ipcRenderer.removeListener('add-new-tab', handleAddNewTab);
           ipcRenderer.removeListener('open-in-new-tab', handleOpenInNewTab);
+          ipcRenderer.removeListener('audio-state-update', handleAudioStateUpdate);
+          
+          // Parar monitoramento de áudio
+          if (stopAudioMonitoring) {
+            stopAudioMonitoring();
+          }
         };
       } catch (error) {
         console.log('Erro ao configurar IPC listeners:', error);

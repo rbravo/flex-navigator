@@ -103,6 +103,58 @@ function setupIpcHandlers(mainWindow) {
       });
     }
   });
+
+  // Handle audio state monitoring - polling method as fallback
+  ipcMain.on('check-webview-audio-state', (event, data) => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.executeJavaScript(`
+        (function() {
+          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
+          
+          if (webviewForTab) {
+            try {
+              // Método 1: Tentar isCurrentlyAudible (mais confiável)
+              if (typeof webviewForTab.isCurrentlyAudible === 'function') {
+                const isAudible = webviewForTab.isCurrentlyAudible();
+                console.log('Tab ${data.tabId}: isCurrentlyAudible =', isAudible);
+                return { tabId: '${data.tabId}', isAudible: isAudible, method: 'isCurrentlyAudible' };
+              }
+              
+              // Método 2: Verificar propriedades de áudio (fallback)
+              if (webviewForTab.audioMuted !== undefined) {
+                // Se não conseguir detectar se está tocando, assumir que não
+                return { tabId: '${data.tabId}', isAudible: false, method: 'audioMuted-fallback' };
+              }
+              
+              console.log('Tab ${data.tabId}: Nenhum método de detecção de áudio disponível');
+              return { tabId: '${data.tabId}', isAudible: false, method: 'none' };
+              
+            } catch (error) {
+              console.error('Erro ao verificar áudio para tab ${data.tabId}:', error);
+              return { tabId: '${data.tabId}', isAudible: false, method: 'error', error: error.message };
+            }
+          } else {
+            console.log('Webview não encontrada para tab ${data.tabId}');
+            return { tabId: '${data.tabId}', isAudible: false, method: 'not-found' };
+          }
+        })();
+      `).then(result => {
+        if (result && result.tabId) {
+          // Enviar resultado de volta para o renderer
+          mainWindow.webContents.send('audio-state-update', result);
+        }
+      }).catch(error => {
+        console.error('Erro ao verificar estado de áudio:', error);
+        // Enviar resultado de erro
+        mainWindow.webContents.send('audio-state-update', { 
+          tabId: data.tabId, 
+          isAudible: false, 
+          method: 'script-error',
+          error: error.message 
+        });
+      });
+    }
+  });
 }
 
 module.exports = {

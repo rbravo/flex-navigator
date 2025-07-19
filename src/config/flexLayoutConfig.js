@@ -19,6 +19,7 @@ export const defaultLayoutConfig = {
     tabSetTabStripHeight: 32,
     tabSetEnableTabStrip: true,
     tabSetAutoSelectTab: true,
+    tabSetEnableTabScrollbar: true,
     tabMinWidth: 250,
     tabSetEnableMaximize: false
   },
