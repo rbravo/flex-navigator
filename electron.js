@@ -1,12 +1,23 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
-const isDev = require('electron-is-dev');
+// const contextMenu = require('electron-context-menu'); // Será carregado dinamicamente
+
+// Detecção mais confiável do modo de desenvolvimento
+const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+
+console.log('🔍 Debug info:');
+console.log('process.env.NODE_ENV:', process.env.NODE_ENV);
+console.log('app.isPackaged:', app.isPackaged);
+console.log('isDev:', isDev);
 
 let mainWindow;
 
 function createWindow() {
+  console.log('🚀 Criando janela do Electron...');
+  
   // Create the browser window
   mainWindow = new BrowserWindow({
+    icon: path.join(__dirname, 'build/favicon.ico'),
     width: 1400,
     height: 900,
     minWidth: 800,
@@ -26,18 +37,34 @@ function createWindow() {
   // Load the app
   const startUrl = isDev 
     ? 'http://localhost:3000' 
-    : `file://${path.join(__dirname, '../build/index.html')}`;
+    : `file://${path.join(__dirname, 'build/index.html')}`;
   
-  mainWindow.loadURL(startUrl);
+  console.log('📂 Carregando URL:', startUrl);
+  
+  mainWindow.loadURL(startUrl).then(() => {
+    console.log('✅ URL carregada com sucesso');
+  }).catch(error => {
+    console.error('❌ Erro ao carregar URL:', error);
+  });
 
   // Show window when ready to prevent visual flash
   mainWindow.once('ready-to-show', () => {
+    console.log('🎉 Janela pronta para mostrar');
     mainWindow.show();
     
-    // Open DevTools in development
+    // Open DevTools only in development
     if (isDev) {
       mainWindow.webContents.openDevTools({ mode: 'detach' });
     }
+  });
+
+  // Add error handling
+  mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+    console.error('❌ Falha ao carregar página:', errorCode, errorDescription, validatedURL);
+  });
+
+  mainWindow.webContents.on('crashed', (event) => {
+    console.error('❌ Renderer process crashed');
   });
 
   // Handle window closed
@@ -381,13 +408,17 @@ function createMenu() {
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
+  console.log('🎯 Electron está pronto, criando janela...');
   createWindow();
   
   app.on('activate', () => {
+    console.log('🔄 App ativado...');
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
   });
+}).catch(error => {
+  console.error('❌ Erro ao inicializar Electron:', error);
 });
 
 // Handle IPC events
@@ -454,7 +485,7 @@ app.on('window-all-closed', () => {
 });
 
 // Allow loading any external URLs and enable webviews
-app.on('web-contents-created', (event, contents) => {
+app.on('web-contents-created', async (event, contents) => {
   contents.on('new-window', (event, navigationUrl) => {
     event.preventDefault();
     contents.loadURL(navigationUrl);
@@ -479,11 +510,10 @@ app.on('web-contents-created', (event, contents) => {
   if (contents.getType() === 'webview') {
     console.log('Configurando context menu para webview:', contents.getURL());
     
-    // Import and configure context menu for this specific webview
-    import('electron-context-menu').then((contextMenuModule) => {
-      const contextMenu = contextMenuModule.default || contextMenuModule;
-      
-      contextMenu({
+    // Configure context menu for this specific webview
+    try {
+      const contextMenu = await import('electron-context-menu');
+      contextMenu.default({
         window: contents,
         showLookUpSelection: false,
         showSearchWithGoogle: true,
@@ -532,13 +562,6 @@ app.on('web-contents-created', (event, contents) => {
           {
             type: 'separator'
           },
-          // {
-          //   label: 'Inspecionar Elemento',
-          //   visible: isDev,
-          //   click: () => {
-          //     contents.inspectElement(parameters.x, parameters.y);
-          //   }
-          // },
           {
             label: 'Open DevTools',
             visible: isDev,
@@ -548,8 +571,8 @@ app.on('web-contents-created', (event, contents) => {
           }
         ]
       });
-    }).catch(error => {
+    } catch (error) {
       console.error('Erro ao configurar context menu para webview:', error);
-    });
+    }
   }
 });

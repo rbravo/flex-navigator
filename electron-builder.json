@@ -5,10 +5,9 @@
     "output": "dist"
   },
   "files": [
-    "build/**/*",
-    "main.js",
-    "package.json",
-    "node_modules/**/*"
+      "electron.js",
+      "build/**/*",
+      "node_modules/**/*"
   ],
   "mac": {
     "category": "public.app-category.productivity",
@@ -21,6 +20,10 @@
   },
   "win": {
     "target": [
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      },
       {
         "target": "nsis",
         "arch": ["x64"]
@@ -38,6 +41,12 @@
   },
   "nsis": {
     "oneClick": false,
-    "allowToChangeInstallationDirectory": true
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Flex Navigator"
+  },
+  "extraMetadata": {
+    "main": "electron.js"
   }
 }
