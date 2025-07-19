@@ -1,0 +1,353 @@
+/* Estilos específicos do BrowserPanel com Ant Design - SEM Tailwind */
+
+/* Cores customizadas */
+:root {
+  --nav-dark: #1e1e1e;
+  --nav-panel: #2d2d30;
+  --nav-border: #3e3e42;
+  --nav-accent: #007acc;
+  --nav-text: #cccccc;
+  --nav-hover: #383838;
+}
+
+/* Estilo para compatibilidade com FlexLayout */
+.browser-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  background-color: var(--nav-dark);
+  outline: none;
+}
+
+/* Barra de controles */
+.controls-bar {
+  display: flex;
+  align-items: center;
+  background-color: var(--nav-panel);
+  border-bottom: 1px solid var(--nav-border);
+  padding: 4px 8px;
+  gap: 8px;
+  min-height: 46px;
+  z-index: 50;
+}
+
+/* Form da URL */
+.url-form {
+  flex: 1;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.url-input-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+/* Área de conteúdo */
+.content-area {
+  flex: 1;
+  position: relative;
+  background-color: white;
+}
+
+/* Indicador de loading moderno - barra de progresso no topo */
+.loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: transparent;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--nav-accent) 0%, #00d4ff 50%, var(--nav-accent) 100%);
+  background-size: 200% 100%;
+  width: 0%;
+  animation: loadingProgressRealistic 3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards, loadingShimmer 1.5s ease-in-out infinite;
+  border-radius: 0 0 3px 3px;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+@keyframes loadingProgressRealistic {
+  0% {
+    width: 0%;
+  }
+  15% {
+    width: 25%;
+  }
+  30% {
+    width: 45%;
+  }
+  50% {
+    width: 65%;
+  }
+  70% {
+    width: 78%;
+  }
+  85% {
+    width: 87%;
+  }
+  95% {
+    width: 92%;
+  }
+  98% {
+    width: 95%;
+  }
+  100% {
+    width: 97%;
+  }
+}
+
+@keyframes loadingShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Animação de finalização quando o loading para */
+.loading-progress.complete {
+  animation: loadingComplete 0.3s ease-out forwards;
+}
+
+@keyframes loadingComplete {
+  0% {
+    width: 97%;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+/* Fallback container */
+.fallback-container {
+  width: 100%;
+  height: 100%;
+  background-color: var(--nav-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--nav-text);
+  padding: 32px;
+  text-align: center;
+}
+
+.fallback-content {
+  max-width: 448px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fallback-icon {
+  font-size: 60px;
+  margin-bottom: 16px;
+}
+
+.fallback-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--nav-accent);
+  margin-bottom: 16px;
+}
+
+/* Painel de informações */
+.info-panel {
+  background-color: var(--nav-hover);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--nav-border);
+  font-size: 14px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--nav-accent);
+}
+
+.info-value {
+  color: var(--nav-text);
+  font-size: 12px;
+  font-family: monospace;
+  background-color: var(--nav-dark);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.info-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Descrição */
+.description {
+  color: var(--nav-text);
+  line-height: 1.6;
+}
+
+.description p {
+  margin-bottom: 12px;
+}
+
+.tip-panel {
+  background-color: rgba(0, 122, 204, 0.1);
+  border: 1px solid rgba(0, 122, 204, 0.3);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.tip-panel p {
+  color: var(--nav-accent);
+  font-size: 14px;
+  margin: 0;
+}
+
+.tip-icon {
+  font-weight: 600;
+}
+
+/* Painéis de aviso */
+.warning-panel {
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.warning-panel p {
+  margin: 0;
+}
+
+.warning-yellow {
+  background-color: rgba(113, 88, 0, 0.3);
+  border: 1px solid rgba(161, 123, 0, 0.5);
+  color: #fbbf24;
+}
+
+.warning-red {
+  background-color: rgba(127, 29, 29, 0.3);
+  border: 1px solid rgba(185, 28, 28, 0.5);
+  color: #f87171;
+}
+
+.warning-icon {
+  font-weight: 600;
+}
+
+.warning-panel code {
+  background-color: rgba(113, 88, 0, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* Customizações específicas para Ant Design no tema escuro */
+.browser-panel .ant-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.browser-panel .ant-btn:hover:not(:disabled) {
+  background-color: #4a4a4a !important;
+  border-color: var(--nav-accent) !important;
+}
+
+.browser-panel .ant-btn:disabled {
+  opacity: 0.3 !important;
+  cursor: not-allowed !important;
+}
+
+.browser-panel .ant-input {
+  background-color: var(--nav-hover) !important;
+  border-color: var(--nav-border) !important;
+  color: var(--nav-text) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.browser-panel .ant-input:focus,
+.browser-panel .ant-input-focused {
+  border-color: var(--nav-accent) !important;
+  box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.1) !important;
+  background-color: var(--nav-hover) !important;
+}
+
+.browser-panel .ant-input::placeholder {
+  color: #999999 !important;
+}
+
+/* Estilos específicos do webview e iframe */
+webview {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: white;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+  .controls-bar {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .url-form {
+    order: 1;
+    width: 100%;
+    margin-top: 4px;
+  }
+  
+  /* Ajustes para controles em telas pequenas */
+  .browser-panel .ant-space-item {
+    margin-right: 4px !important;
+  }
+  
+  .browser-panel .ant-btn {
+    min-width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .fallback-container {
+    padding: 16px;
+  }
+  
+  .fallback-icon {
+    font-size: 48px;
+  }
+  
+  .fallback-title {
+    font-size: 20px;
+  }
+}
