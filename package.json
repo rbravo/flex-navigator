@@ -1,9 +1,25 @@
 {
   "name": "flex-navigator",
   "version": "1.0.0",
-  "description": "Navegador flexível com múltiplas abas e webviews",
+  "description": "A flexible and customizable web browser built with Electron and React",
   "author": "rbravo",
-  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rbravo/flex-navigator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rbravo/flex-navigator/issues"
+  },
+  "keywords": [
+    "electron",
+    "react",
+    "browser",
+    "webview",
+    "flex-layout",
+    "desktop-app",
+    "cross-platform"
+  ],
   "dependencies": {
     "@ant-design/icons": "^6.0.0",
     "@testing-library/dom": "^10.4.0",
