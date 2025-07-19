@@ -59,6 +59,50 @@ function setupIpcHandlers(mainWindow) {
       mainWindow.webContents.send('add-new-tab', { url });
     }
   });
+
+  // Handle refresh webview
+  ipcMain.on('refresh-webview', (event, data) => {
+    console.log('Solicitação para atualizar webview da tab:', data.tabId);
+    
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.executeJavaScript(`
+        (function() {
+          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
+          
+          if (webviewForTab) {
+            console.log('Atualizando webview para tab ${data.tabId}:', webviewForTab.src);
+            webviewForTab.reload();
+          } else {
+            console.log('Webview não encontrada para tab ${data.tabId}');
+          }
+        })();
+      `).catch(error => {
+        console.error('Erro ao executar script de refresh:', error);
+      });
+    }
+  });
+
+  // Handle toggle webview mute
+  ipcMain.on('toggle-webview-mute', (event, data) => {
+    console.log('Solicitação para alternar mute da tab:', data.tabId, 'muted:', data.muted);
+    
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.executeJavaScript(`
+        (function() {
+          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
+          
+          if (webviewForTab) {
+            console.log('Alterando mute da webview para tab ${data.tabId}:', ${data.muted});
+            webviewForTab.setAudioMuted(${data.muted});
+          } else {
+            console.log('Webview não encontrada para tab ${data.tabId}');
+          }
+        })();
+      `).catch(error => {
+        console.error('Erro ao executar script de mute:', error);
+      });
+    }
+  });
 }
 
 module.exports = {

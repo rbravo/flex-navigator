@@ -1,0 +1,98 @@
+/* Menu de contexto para tabs */
+.tab-context-menu {
+  background: #2d2d30;
+  border: 1px solid #3e3e42;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 180px;
+  padding: 4px 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  user-select: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  color: #cccccc;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.menu-item:hover {
+  background-color: #383838;
+}
+/* 
+.menu-item.refresh:hover {
+  background-color: rgba(0, 122, 204, 0.15);
+}
+
+.menu-item.duplicate:hover {
+  background-color: rgba(40, 167, 69, 0.15);
+}
+
+.menu-item.mute:hover {
+  background-color: rgba(255, 193, 7, 0.15);
+}
+
+.menu-item.close:hover {
+  background-color: rgba(220, 53, 69, 0.15);
+  color: #ff6b6b;
+} */
+
+.menu-icon {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  width: 16px;
+  height: 16px;
+}
+
+.menu-label {
+  flex: 1;
+  font-weight: 400;
+}
+
+.menu-separator {
+  height: 1px;
+  background-color: #3e3e42;
+  margin: 4px 8px;
+}
+
+/* Animação de entrada */
+.tab-context-menu {
+  animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Estados especiais */
+.menu-item:active {
+  transform: scale(0.98);
+}
+
+/* .menu-item.close .menu-icon {
+  color: #ffffff;
+}
+
+.menu-item.refresh .menu-icon {
+  color: #ffffff;
+}
+
+.menu-item.duplicate .menu-icon {
+  color: #ffffff;
+}
+
+.menu-item.mute .menu-icon {
+  color: #ffffff;
+} */
