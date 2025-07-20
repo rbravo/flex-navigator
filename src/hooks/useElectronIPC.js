@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { addNewTabToFirstTabset } from '../utils/layoutActions';
+import { addNewTabToFirstTabset, addNewTabToSameTabset } from '../utils/layoutActions';
 import { updateTabAudioState, startAudioStateMonitoring } from '../utils/tabActions';
 
 /**
@@ -14,7 +14,16 @@ const useElectronIPC = (model) => {
         // Listener para abrir link em nova aba (vindo do context menu)
         const handleAddNewTab = (event, data) => {
           console.log('Recebido evento para adicionar nova aba:', data);
-          addNewTabToFirstTabset(model, data);
+          
+          if (data.sourceTabId) {
+            // Se temos o ID da tab source, adicionar no mesmo tabset
+            console.log('Adicionando nova aba no mesmo tabset da tab:', data.sourceTabId);
+            addNewTabToSameTabset(model, data.sourceTabId, data);
+          } else {
+            // Fallback para o primeiro tabset
+            console.log('SourceTabId não fornecido, usando primeiro tabset como fallback');
+            addNewTabToFirstTabset(model, data);
+          }
         };
 
         // Listener para comandos do context menu

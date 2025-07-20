@@ -70,9 +70,54 @@ function setupWebContentsHandlers(mainWindow) {
               label: 'Open link in a new tab',
               visible: !!parameters.linkURL,
               click: () => {
-                // Enviar evento para o processo principal para criar nova aba
+                // Executar script no main window para encontrar a tab source
                 if (mainWindow && mainWindow.webContents) {
-                  mainWindow.webContents.send('add-new-tab', { url: parameters.linkURL });
+                  mainWindow.webContents.executeJavaScript(`
+                    (function() {
+                      // Procurar pela webview que corresponde a este contents
+                      const webviews = document.querySelectorAll('webview');
+                      console.log('Procurando webview source, total webviews:', webviews.length);
+                      console.log('URL do contents que acionou context menu:', '${contents.getURL()}');
+                      
+                      for (let i = 0; i < webviews.length; i++) {
+                        const webview = webviews[i];
+                        const webviewUrl = webview.src;
+                        const tabId = webview.getAttribute('data-tab-id');
+                        
+                        console.log('Webview', i, '- URL:', webviewUrl, '- TabId:', tabId);
+                        
+                        // Comparar a URL da webview com a URL atual do contents
+                        // Usar também getURL() se disponível na webview
+                        if (webviewUrl === '${contents.getURL()}' || 
+                            (webview.getURL && webview.getURL() === '${contents.getURL()}')) {
+                          console.log('✅ Encontrada webview correspondente! TabId:', tabId);
+                          return tabId;
+                        }
+                      }
+                      
+                      console.log('❌ Nenhuma webview correspondente encontrada');
+                      return null;
+                    })();
+                  `).then(tabId => {
+                    console.log('Resultado da busca por tab source:', tabId);
+                    
+                    // Enviar evento para o processo principal para criar nova aba no tabset correto
+                    if (tabId) {
+                      console.log('Enviando add-new-tab com sourceTabId:', tabId);
+                      mainWindow.webContents.send('add-new-tab', { 
+                        url: parameters.linkURL,
+                        sourceTabId: tabId
+                      });
+                    } else {
+                      // Fallback para o método antigo se não conseguir encontrar a tab
+                      console.log('Usando fallback - enviando add-new-tab sem sourceTabId');
+                      mainWindow.webContents.send('add-new-tab', { url: parameters.linkURL });
+                    }
+                  }).catch(error => {
+                    console.error('Erro ao executar script para encontrar tab source:', error);
+                    // Fallback para o método antigo
+                    mainWindow.webContents.send('add-new-tab', { url: parameters.linkURL });
+                  });
                 }
               }
             }

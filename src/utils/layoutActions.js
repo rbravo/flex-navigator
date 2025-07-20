@@ -107,6 +107,39 @@ export const findAllTabsets = (model) => {
 };
 
 /**
+ * Encontra o tabset que contém uma tab específica
+ */
+export const findTabsetContainingTab = (model, tabId) => {
+  const tabsets = findAllTabsets(model);
+  
+  for (const tabset of tabsets) {
+    const children = tabset.getChildren();
+    for (const child of children) {
+      if (child.getId() === tabId) {
+        return tabset;
+      }
+    }
+  }
+  return null;
+};
+
+/**
+ * Adiciona uma nova aba ao tabset especificado
+ */
+export const addNewTabToTabset = (model, tabsetId, tabConfig) => {
+  const defaultConfig = {
+    type: "tab",
+    name: "Nova aba",
+    component: "browser",
+    config: {
+      url: tabConfig?.url || "https://www.google.com"
+    }
+  };
+
+  model.doAction(Actions.addNode(defaultConfig, tabsetId, DockLocation.CENTER, -1));
+};
+
+/**
  * Adiciona uma nova aba ao primeiro tabset disponível
  */
 export const addNewTabToFirstTabset = (model, tabConfig) => {
@@ -114,16 +147,21 @@ export const addNewTabToFirstTabset = (model, tabConfig) => {
   
   if (tabsets.length > 0) {
     const targetTabset = tabsets[0];
-    
-    const defaultConfig = {
-      type: "tab",
-      name: "Nova aba",
-      component: "browser",
-      config: {
-        url: tabConfig?.url || "https://www.google.com"
-      }
-    };
+    addNewTabToTabset(model, targetTabset.getId(), tabConfig);
+  }
+};
 
-    model.doAction(Actions.addNode(defaultConfig, targetTabset.getId(), DockLocation.CENTER, -1));
+/**
+ * Adiciona uma nova aba ao mesmo tabset de uma tab específica
+ */
+export const addNewTabToSameTabset = (model, sourceTabId, tabConfig) => {
+  const sourceTabset = findTabsetContainingTab(model, sourceTabId);
+  
+  if (sourceTabset) {
+    addNewTabToTabset(model, sourceTabset.getId(), tabConfig);
+  } else {
+    // Fallback para o primeiro tabset se não encontrar o source
+    console.warn('Tabset não encontrado para tab:', sourceTabId, 'usando primeiro tabset como fallback');
+    addNewTabToFirstTabset(model, tabConfig);
   }
 };
