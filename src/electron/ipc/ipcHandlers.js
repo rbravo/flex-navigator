@@ -1,9 +1,11 @@
 const { ipcMain } = require('electron');
+const SessionManager = require('../utils/SessionManager');
 
 /**
  * Configura todos os manipuladores de eventos IPC
  */
 function setupIpcHandlers(mainWindow) {
+  const sessionManager = new SessionManager();
   // Handle IPC events
   ipcMain.on('open-webview-devtools', (event, data) => {
     console.log('Abrindo DevTools para webview da tab:', data.tabId);
@@ -116,7 +118,7 @@ function setupIpcHandlers(mainWindow) {
               // Método 1: Tentar isCurrentlyAudible (mais confiável)
               if (typeof webviewForTab.isCurrentlyAudible === 'function') {
                 const isAudible = webviewForTab.isCurrentlyAudible();
-                console.log('Tab ${data.tabId}: isCurrentlyAudible =', isAudible);
+                //console.log('Tab ${data.tabId}: isCurrentlyAudible =', isAudible);
                 return { tabId: '${data.tabId}', isAudible: isAudible, method: 'isCurrentlyAudible' };
               }
               
@@ -154,6 +156,71 @@ function setupIpcHandlers(mainWindow) {
         });
       });
     }
+  });
+
+  // Handlers para gerenciamento de sessões
+  
+  // Carregar todas as sessões
+  ipcMain.handle('load-sessions', () => {
+    try {
+      const sessions = sessionManager.loadSessions();
+      console.log('Sessões carregadas:', sessions.length);
+      return { success: true, sessions };
+    } catch (error) {
+      console.error('Erro ao carregar sessões:', error);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Salvar sessão atual
+  ipcMain.handle('save-session', (event, { sessionName, layoutConfig }) => {
+    console.log('Salvando sessão:', sessionName);
+    return sessionManager.saveSession(sessionName, layoutConfig);
+  });
+
+  // Carregar sessão específica
+  ipcMain.handle('load-session', (event, sessionId) => {
+    console.log('Carregando sessão:', sessionId);
+    const session = sessionManager.getSession(sessionId);
+    if (session) {
+      return { success: true, session };
+    } else {
+      return { success: false, error: 'Sessão não encontrada' };
+    }
+  });
+
+  // Deletar sessão
+  ipcMain.handle('delete-session', (event, sessionId) => {
+    console.log('Deletando sessão:', sessionId);
+    return sessionManager.deleteSession(sessionId);
+  });
+
+  // Handler para criar nova janela com sessão específica
+  ipcMain.on('open-session-new-window', (event, sessionId) => {
+    console.log('Abrindo sessão em nova janela:', sessionId);
+    
+    const session = sessionManager.getSession(sessionId);
+    if (session) {
+      // Importar createWindow para criar nova janela
+      const { createWindow } = require('../window/mainWindow');
+      const newWindow = createWindow();
+      
+      // Aguardar que a nova janela seja completamente carregada
+      newWindow.webContents.once('did-finish-load', () => {
+        // Aguardar um pouco mais para garantir que o React foi inicializado
+        setTimeout(() => {
+          console.log('Enviando configuração de sessão para nova janela...');
+          newWindow.webContents.send('load-session-config', session.config);
+        }, 1000);
+      });
+    }
+  });
+
+  // Handler para atualizar menu de sessões
+  ipcMain.on('update-sessions-menu', () => {
+    console.log('🔄 Recebido evento para atualizar menu de sessões...');
+    const { updateSessionsMenu } = require('../menu/applicationMenu');
+    updateSessionsMenu(mainWindow);
   });
 }
 

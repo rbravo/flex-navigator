@@ -1,5 +1,11 @@
 const { Menu, app } = require('electron');
 const { executeOnActiveWebview, executeZoomCommand } = require('../utils/webviewUtils');
+const SessionManager = require('../utils/SessionManager');
+const { isDev } = require('../utils/config');
+
+
+let currentMenu = null;
+const sessionManager = new SessionManager();
 
 /**
  * Cria o menu da aplicação
@@ -123,6 +129,25 @@ function createMenu(mainWindow) {
       ]
     },
     {
+      label: 'Sessão',
+      submenu: [
+        {
+          label: 'Salvar Sessão Atual...',
+          accelerator: 'CmdOrCtrl+S',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('show-save-session-dialog');
+            }
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Gerenciar Sessões',
+          submenu: buildSessionsSubmenu(sessionManager.loadSessions(), mainWindow)
+        }
+      ]
+    },
+    {
       label: 'Janela',
       submenu: [
         { role: 'minimize', label: 'Minimizar' },
@@ -150,8 +175,252 @@ function createMenu(mainWindow) {
 
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+  currentMenu = menu;
+}
+
+/**
+ * Atualiza dinamicamente o submenu de sessões
+ */
+function updateSessionsMenu(mainWindow) {
+  if (!currentMenu) {
+    console.log('Menu atual não encontrado, criando menu...');
+    createMenu(mainWindow);
+    return;
+  }
+  
+  console.log('🔄 Atualizando menu de sessões...');
+  const sessions = sessionManager.loadSessions();
+  console.log('📋 Sessões encontradas para o menu:', sessions.length);
+  
+  // Reconstruir todo o template do menu com as sessões atualizadas
+  const template = [
+    {
+      label: 'Arquivo',
+      submenu: [
+        {
+          label: 'Sair',
+          accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
+          click: () => {
+            app.quit();
+          }
+        }
+      ]
+    },
+    {
+      label: 'Editar',
+      submenu: [
+        {
+          label: 'Desfazer',
+          accelerator: 'CmdOrCtrl+Z',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'undo()');
+          }
+        },
+        {
+          label: 'Refazer',
+          accelerator: 'CmdOrCtrl+Shift+Z',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'redo()');
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Recortar',
+          accelerator: 'CmdOrCtrl+X',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'cut()');
+          }
+        },
+        {
+          label: 'Copiar',
+          accelerator: 'CmdOrCtrl+C',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'copy()');
+          }
+        },
+        {
+          label: 'Colar',
+          accelerator: 'CmdOrCtrl+V',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'paste()');
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Selecionar Tudo',
+          accelerator: 'CmdOrCtrl+A',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'selectAll()');
+          }
+        }
+      ]
+    },
+    {
+      label: 'Navegar',
+      submenu: [
+        {
+          label: 'Voltar',
+          accelerator: 'Alt+Left',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'goBack()');
+          }
+        },
+        {
+          label: 'Avançar',
+          accelerator: 'Alt+Right',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'goForward()');
+          }
+        },
+        {
+          label: 'Recarregar',
+          accelerator: 'CmdOrCtrl+R',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'reload()');
+          }
+        },
+        {
+          label: 'Parar',
+          accelerator: 'Escape',
+          click: () => {
+            executeOnActiveWebview(mainWindow, 'stop()');
+          }
+        }
+      ]
+    },
+    {
+      label: 'Ver',
+      submenu: 
+      isDev ? 
+      [
+        { role: 'reload', label: 'Recarregar' },
+        { role: 'forceReload', label: 'Forçar Recarregamento' },
+        { role: 'toggleDevTools', label: 'Ferramentas do Desenvolvedor' },
+        { type: 'separator' },
+        { role: 'resetZoom', label: 'Zoom Padrão' },
+        { role: 'zoomIn', label: 'Aumentar Zoom' },
+        { role: 'zoomOut', label: 'Diminuir Zoom' },
+        { type: 'separator' },
+        {
+          label: 'Tela Cheia',
+          accelerator: 'F11',
+          click: () => {
+            mainWindow.setFullScreen(!mainWindow.isFullScreen());
+          }
+        }
+      ]
+      :
+      [
+        { role: 'resetZoom', label: 'Zoom Padrão' },
+        { role: 'zoomIn', label: 'Aumentar Zoom' },
+        { role: 'zoomOut', label: 'Diminuir Zoom' },
+        { type: 'separator' },
+        {
+          label: 'Tela Cheia',
+          accelerator: 'F11',
+          click: () => {
+            mainWindow.setFullScreen(!mainWindow.isFullScreen());
+          }
+        }
+      ]
+    },
+    {
+      label: 'Sessão',
+      submenu: [
+        {
+          label: 'Salvar Sessão Atual...',
+          accelerator: 'CmdOrCtrl+S',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('show-save-session-dialog');
+            }
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Gerenciar Sessões',
+          submenu: buildSessionsSubmenu(sessions, mainWindow)
+        }
+      ]
+    },
+    {
+      label: 'Janela',
+      submenu: [
+        { role: 'minimize', label: 'Minimizar' },
+        { role: 'close', label: 'Fechar' }
+      ]
+    }
+  ];
+
+  if (process.platform === 'darwin') {
+    template.unshift({
+      label: app.getName(),
+      submenu: [
+        { role: 'about', label: 'Sobre' },
+        { type: 'separator' },
+        { role: 'services', label: 'Serviços', submenu: [] },
+        { type: 'separator' },
+        { role: 'hide', label: 'Esconder' },
+        { role: 'hideothers', label: 'Esconder Outros' },
+        { role: 'unhide', label: 'Mostrar Todos' },
+        { type: 'separator' },
+        { role: 'quit', label: 'Sair' }
+      ]
+    });
+  }
+
+  // Reconstruir e aplicar o menu completo
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+  currentMenu = menu;
+  
+  console.log('✅ Menu de sessões atualizado com sucesso!');
+}
+
+/**
+ * Constrói o submenu de sessões
+ */
+function buildSessionsSubmenu(sessions, mainWindow) {
+  if (sessions.length === 0) {
+    return [{
+      label: 'Nenhuma sessão salva',
+      enabled: false
+    }];
+  }
+
+  return sessions.map(session => ({
+    label: session.name,
+    submenu: [
+      {
+        label: 'Abrir nesta janela',
+        click: () => {
+          if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('load-session-in-current-window', session.id);
+          }
+        }
+      },
+      {
+        label: 'Abrir em nova janela',
+        click: () => {
+          if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('open-session-new-window', session.id);
+          }
+        }
+      },
+      { type: 'separator' },
+      {
+        label: 'Apagar sessão',
+        click: () => {
+          if (mainWindow && mainWindow.webContents) {
+            mainWindow.webContents.send('confirm-delete-session', session.id, session.name);
+          }
+        }
+      }
+    ]
+  }));
 }
 
 module.exports = {
-  createMenu
+  createMenu,
+  updateSessionsMenu
 };

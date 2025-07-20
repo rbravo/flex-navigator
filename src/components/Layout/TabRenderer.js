@@ -37,7 +37,7 @@ const TabRenderer = ({ model, onContextMenu }) => {
         const isMuted = isTabMuted(model, tabId);
         const isPlayingAudio = isTabPlayingAudio(model, tabId);
         
-        console.log(`Tab ${tabId} - isMuted: ${isMuted}, isPlayingAudio: ${isPlayingAudio}`);
+        //console.log(`Tab ${tabId} - isMuted: ${isMuted}, isPlayingAudio: ${isPlayingAudio}`);
 
         // BOTÃO DE TESTE SIMPLES - para demonstrar a funcionalidade
         if (component === "browser") {

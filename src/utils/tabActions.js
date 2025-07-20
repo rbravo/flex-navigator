@@ -316,7 +316,7 @@ export const setupWebviewListeners = (model) => {
     
     // Quando o áudio para de tocar
     webview.addEventListener('media-paused', () => {
-      console.log(`Audio paused in tab: ${tabId}`);
+      //console.log(`Audio paused in tab: ${tabId}`);
       updateTabAudioState(model, tabId, false);
     });
     
@@ -328,7 +328,7 @@ export const setupWebviewListeners = (model) => {
         try {
           if (typeof webview.isCurrentlyAudible === 'function') {
             const isPlaying = webview.isCurrentlyAudible();
-            console.log(`Audio state check for tab ${tabId}:`, isPlaying);
+            //console.log(`Audio state check for tab ${tabId}:`, isPlaying);
             updateTabAudioState(model, tabId, isPlaying);
           }
         } catch (error) {
@@ -350,7 +350,7 @@ export const setupWebviewListeners = (model) => {
           if (typeof webview.isCurrentlyAudible === 'function') {
             const isPlaying = webview.isCurrentlyAudible();
             if (isPlaying) {
-              console.log(`Audio detected on page load for tab ${tabId}`);
+              //console.log(`Audio detected on page load for tab ${tabId}`);
               updateTabAudioState(model, tabId, true);
             }
           }

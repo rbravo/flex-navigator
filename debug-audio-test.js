@@ -20,14 +20,14 @@ if (isElectron) {
     const tabId = webview.getAttribute('data-tab-id');
     const src = webview.src;
     
-    console.log(`Webview ${index + 1}:`);
-    console.log(`  Tab ID: ${tabId}`);
-    console.log(`  URL: ${src}`);
-    
-    // Verificar se tem métodos de áudio disponíveis
-    console.log(`  isAudioMuted: ${typeof webview.isAudioMuted}`);
-    console.log(`  setAudioMuted: ${typeof webview.setAudioMuted}`);
-    console.log(`  isCurrentlyAudible: ${typeof webview.isCurrentlyAudible}`);
+    //console.log(`Webview ${index + 1}:`);
+    //console.log(`  Tab ID: ${tabId}`);
+    //console.log(`  URL: ${src}`);
+    //
+    //// Verificar se tem métodos de áudio disponíveis
+    //console.log(`  isAudioMuted: ${typeof webview.isAudioMuted}`);
+    //console.log(`  setAudioMuted: ${typeof webview.setAudioMuted}`);
+    //console.log(`  isCurrentlyAudible: ${typeof webview.isCurrentlyAudible}`);
     
     // Testar detecção de áudio se disponível
     if (webview.isCurrentlyAudible) {

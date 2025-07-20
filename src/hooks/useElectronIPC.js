@@ -24,7 +24,7 @@ const useElectronIPC = (model) => {
 
         // Listener para atualizações de estado de áudio
         const handleAudioStateUpdate = (event, data) => {
-          console.log('Recebido update de áudio:', data);
+          //console.log('Recebido update de áudio:', data);
           if (data.tabId) {
             if (typeof data.isAudible === 'boolean') {
               updateTabAudioState(model, data.tabId, data.isAudible);

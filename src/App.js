@@ -6,6 +6,7 @@ import './App.css';
 // Hooks customizados
 import useFlexLayoutModel from './hooks/useFlexLayoutModel';
 import useElectronIPC from './hooks/useElectronIPC';
+import useSessionManager from './hooks/useSessionManager';
 
 // Componentes de layout
 import LayoutFactory from './components/Layout/LayoutFactory';
@@ -13,15 +14,40 @@ import TabSetRenderer from './components/Layout/TabSetRenderer';
 import TabRenderer from './components/Layout/TabRenderer';
 import TabContextMenu from './components/Layout/TabContextMenu';
 
+// Componentes de sessão
+import SaveSessionModal from './components/Session/SaveSessionModal';
+import DeleteSessionModal from './components/Session/DeleteSessionModal';
+
 // Utilitários para ações de tabs
 import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWebviewListeners } from './utils/tabActions';
 
 const App = () => {
   // Gerenciar modelo do FlexLayout
-  const model = useFlexLayoutModel();
+  const { model, loadConfiguration } = useFlexLayoutModel();
 
   // Configurar listeners do Electron IPC
   useElectronIPC(model);
+
+  // Gerenciar sessões
+  const { 
+    sessions, 
+    saveSession, 
+    deleteSession,
+    isLoading: sessionsLoading
+  } = useSessionManager(model, loadConfiguration);
+
+  // Debug das sessões
+  useEffect(() => {
+    console.log('🗂️ Sessões disponíveis:', sessions.length, sessions);
+  }, [sessions]);
+
+  // Estados para modais de sessão
+  const [saveSessionModalVisible, setSaveSessionModalVisible] = useState(false);
+  const [deleteSessionModal, setDeleteSessionModal] = useState({
+    visible: false,
+    sessionId: null,
+    sessionName: ''
+  });
 
   // Configurar event delegation para context menu das tabs
   useEffect(() => {
@@ -110,7 +136,7 @@ const App = () => {
     return () => {
       document.removeEventListener('contextmenu', handleGlobalContextMenu);
     };
-  }, []);
+  }, [model]); // Adicionando model como dependência
 
   // Configurar listeners para atualização automática de tabs
   useEffect(() => {
@@ -126,24 +152,38 @@ const App = () => {
     }
   }, [model]);
 
+  // Configurar listeners para eventos de sessão do menu
+  useEffect(() => {
+    // Listener para mostrar dialog de salvar sessão
+    const handleShowSaveSessionDialog = () => {
+      setSaveSessionModalVisible(true);
+    };
+    
+    // Listener para confirmar deleção de sessão
+    const handleConfirmDeleteSession = (event) => {
+      const { sessionId, sessionName } = event.detail;
+      setDeleteSessionModal({
+        visible: true,
+        sessionId,
+        sessionName
+      });
+    };
+    
+    window.addEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
+    window.addEventListener('confirm-delete-session', handleConfirmDeleteSession);
+    
+    return () => {
+      window.removeEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
+      window.removeEventListener('confirm-delete-session', handleConfirmDeleteSession);
+    };
+  }, []);
+
   // Estado do menu de contexto das tabs
   const [contextMenu, setContextMenu] = useState({
     isVisible: false,
     position: { x: 0, y: 0 },
     tabId: null
   });
-
-  // Handler para o menu de contexto das tabs
-  const handleTabContextMenu = (event, tabId, node) => {
-    event.preventDefault();
-    event.stopPropagation();
-    
-    setContextMenu({
-      isVisible: true,
-      position: { x: event.clientX, y: event.clientY },
-      tabId: tabId
-    });
-  };
 
   // Fechar menu de contexto
   const handleCloseContextMenu = () => {
@@ -159,6 +199,41 @@ const App = () => {
   const handleDuplicate = () => duplicateTab(model, contextMenu.tabId);
   const handleToggleMute = () => toggleTabMute(model, contextMenu.tabId);
   const handleCloseTab = () => closeTab(model, contextMenu.tabId);
+
+  // Handlers para sessões
+  const handleSaveSession = async (sessionName) => {
+    const result = await saveSession(sessionName);
+    setSaveSessionModalVisible(false);
+    
+    // Atualizar menu da aplicação
+    if (window.require) {
+      const electron = window.require('electron');
+      electron.ipcRenderer.send('update-sessions-menu');
+    }
+    
+    return result;
+  };
+
+  const handleDeleteSession = async () => {
+    const result = await deleteSession(deleteSessionModal.sessionId);
+    setDeleteSessionModal({ visible: false, sessionId: null, sessionName: '' });
+    
+    // Atualizar menu da aplicação
+    if (window.require) {
+      const electron = window.require('electron');
+      electron.ipcRenderer.send('update-sessions-menu');
+    }
+    
+    return result;
+  };
+
+  const handleCancelSaveSession = () => {
+    setSaveSessionModalVisible(false);
+  };
+
+  const handleCancelDeleteSession = () => {
+    setDeleteSessionModal({ visible: false, sessionId: null, sessionName: '' });
+  };
 
   // Factory para criação de componentes
   const factory = LayoutFactory({ model });
@@ -205,6 +280,21 @@ const App = () => {
         onToggleMute={handleToggleMute}
         onCloseTab={handleCloseTab}
         isMuted={contextMenu.tabId ? isTabMuted(model, contextMenu.tabId) : false}
+      />
+      
+      {/* Modais de sessão */}
+      <SaveSessionModal
+        isVisible={saveSessionModalVisible}
+        onSave={handleSaveSession}
+        onCancel={handleCancelSaveSession}
+        existingSessions={sessions}
+      />
+      
+      <DeleteSessionModal
+        isVisible={deleteSessionModal.visible}
+        sessionName={deleteSessionModal.sessionName}
+        onConfirm={handleDeleteSession}
+        onCancel={handleCancelDeleteSession}
       />
     </div>
   );
