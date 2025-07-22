@@ -120,6 +120,7 @@ const TabContextMenu = ({
       });
 
       // Estratégia adicional: detectar movimento do mouse para webviews
+      /* 
       const handleMouseMove = (event) => {
         if (isVisible && menuRef.current) {
           const menuRect = menuRef.current.getBoundingClientRect();
@@ -160,6 +161,7 @@ const TabContextMenu = ({
           setTimeout(() => onClose(), 50);
         }
       };
+      */
 
       // Adicionar listeners de mouse em webviews existentes
       webviews.forEach(webview => {
@@ -177,6 +179,7 @@ const TabContextMenu = ({
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         //document.removeEventListener('mousemove', handleMouseMove);
         
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
         }
@@ -227,6 +230,7 @@ const TabContextMenu = ({
 
   return (
     <div 
+      ref={menuRef}
       className="tab-context-menu"
       style={{
         position: 'fixed',

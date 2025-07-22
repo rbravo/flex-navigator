@@ -5,28 +5,40 @@
     "output": "dist"
   },
   "files": [
-      "electron.js",
-      "build/**/*",
-      "node_modules/**/*"
+    "electron.js",
+    "build/**/*",
+    "node_modules/**/*",
+    "src/electron/**/*",
+    "!src/electron/**/*.test.js",
+    "!src/electron/**/*.spec.js"
   ],
+  "win": {
+    "icon": "icon.png",
+    "target": [
+      {
+        "target": "portable",
+        "arch": [
+          "x64"
+        ]
+      },
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ]
+  },
   "mac": {
+    "icon": "icon.png",
     "category": "public.app-category.productivity",
     "target": [
       {
         "target": "dmg",
-        "arch": ["x64", "arm64"]
-      }
-    ]
-  },
-  "win": {
-    "target": [
-      {
-        "target": "portable",
-        "arch": ["x64"]
-      },
-      {
-        "target": "nsis",
-        "arch": ["x64"]
+        "arch": [
+          "x64",
+          "arm64"
+        ]
       }
     ]
   },
@@ -34,7 +46,9 @@
     "target": [
       {
         "target": "AppImage",
-        "arch": ["x64"]
+        "arch": [
+          "x64"
+        ]
       }
     ],
     "category": "Network"
@@ -48,5 +62,7 @@
   },
   "extraMetadata": {
     "main": "electron.js"
-  }
+  },
+  "buildDependenciesFromSource": false,
+  "nodeGypRebuild": false
 }

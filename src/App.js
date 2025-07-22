@@ -32,8 +32,8 @@ const App = () => {
   const { 
     sessions, 
     saveSession, 
-    deleteSession,
-    isLoading: sessionsLoading
+    deleteSession
+    // isLoading: sessionsLoading // Commented out as it's not used
   } = useSessionManager(model, loadConfiguration);
 
   // Debug das sessões

@@ -49,8 +49,9 @@
     "eject": "react-scripts eject",
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && node_modules\\.bin\\electron.cmd .\"",
     "electron": "node_modules\\.bin\\electron.cmd .",
-    "pack": "./node_modules/.bin/electron-builder",
-    "dist": "npm run build && ./node_modules/.bin/electron-builder"
+    "pack": "node_modules\\.bin\\electron-builder.cmd",
+    "distpub": "npm run build && node_modules\\.bin\\electron-builder.cmd --publish always",
+    "dist": "npm run build && node_modules\\.bin\\electron-builder.cmd"
   },
   "main": "electron.js",
   "homepage": "./",
