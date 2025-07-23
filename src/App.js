@@ -17,6 +17,10 @@ import TabContextMenu from './components/Layout/TabContextMenu';
 // Componentes de sessão
 import SaveSessionModal from './components/Session/SaveSessionModal';
 import DeleteSessionModal from './components/Session/DeleteSessionModal';
+import ClearSessionModal from './components/Session/ClearSessionModal';
+
+// Componentes de configurações
+import SettingsModal from './components/Settings/SettingsModal';
 
 // Utilitários para ações de tabs
 import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWebviewListeners } from './utils/tabActions';
@@ -48,6 +52,9 @@ const App = () => {
     sessionId: null,
     sessionName: ''
   });
+
+  // Estados para novos modais
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
   // Configurar event delegation para context menu das tabs
   useEffect(() => {
@@ -168,13 +175,37 @@ const App = () => {
         sessionName
       });
     };
+
+    const handleShowClearSessionDialog = () => {
+      // Usar o componente ClearSessionModal para mostrar confirmação
+      const clearSessionModal = ClearSessionModal({
+        onConfirm: handleClearSession
+      });
+      clearSessionModal.showConfirm();
+    };
+
+    const handleShowSettingsDialog = () => {
+      setSettingsModalVisible(true);
+    };
+
+    const handleOpenUrl = (event) => {
+      const url = event.detail;
+      // Adicionar uma nova tab com a URL
+      addNewTab(url);
+    };
     
     window.addEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
     window.addEventListener('confirm-delete-session', handleConfirmDeleteSession);
+    window.addEventListener('show-clear-session-dialog', handleShowClearSessionDialog);
+    window.addEventListener('show-settings-dialog', handleShowSettingsDialog);
+    window.addEventListener('open-url', handleOpenUrl);
     
     return () => {
       window.removeEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
       window.removeEventListener('confirm-delete-session', handleConfirmDeleteSession);
+      window.removeEventListener('show-clear-session-dialog', handleShowClearSessionDialog);
+      window.removeEventListener('show-settings-dialog', handleShowSettingsDialog);
+      window.removeEventListener('open-url', handleOpenUrl);
     };
   }, []);
 
@@ -225,6 +256,32 @@ const App = () => {
     }
     
     return result;
+  };
+
+  // Função para limpar sessão atual
+  const handleClearSession = () => {
+    // Restaurar a configuração padrão com a página inicial atual do usuário
+    const { getDefaultLayoutConfig } = require('./config/flexLayoutConfig');
+    loadConfiguration(getDefaultLayoutConfig());
+  };
+
+  // Função para adicionar nova tab
+  const addNewTab = (url) => {
+    const defaultHomePage = localStorage.getItem('flex-navigator-settings')
+      ? JSON.parse(localStorage.getItem('flex-navigator-settings')).defaultHomePage
+      : 'https://www.google.com';
+    
+    const targetUrl = url || defaultHomePage;
+    
+    // Usar utilitário para adicionar nova tab
+    const { addNewTab } = require('./utils/layoutActions');
+    addNewTab(model, targetUrl);
+  };
+
+  // Handler para salvar configurações
+  const handleSaveSettings = (settings) => {
+    console.log('Configurações salvas:', settings);
+    // As configurações já são salvas no localStorage pelo modal
   };
 
   const handleCancelSaveSession = () => {
@@ -295,6 +352,13 @@ const App = () => {
         sessionName={deleteSessionModal.sessionName}
         onConfirm={handleDeleteSession}
         onCancel={handleCancelDeleteSession}
+      />
+
+      {/* Modal de configurações */}
+      <SettingsModal
+        visible={settingsModalVisible}
+        onClose={() => setSettingsModalVisible(false)}
+        onSave={handleSaveSettings}
       />
     </div>
   );

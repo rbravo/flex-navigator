@@ -1,5 +1,6 @@
 import React from 'react';
 import BrowserPanel from '../BrowserPanel';
+import { getDefaultHomePage } from '../../utils/userSettings';
 
 /**
  * Factory para criação de componentes do FlexLayout
@@ -28,7 +29,7 @@ const LayoutFactory = ({ model }) => {
           <BrowserPanel 
             node={node}
             model={model}
-            initialUrl={config.url || "https://www.google.com"}
+            initialUrl={config.url || getDefaultHomePage()}
           />
         );
       }
@@ -40,7 +41,7 @@ const LayoutFactory = ({ model }) => {
           <BrowserPanel 
             node={node}
             model={model}
-            initialUrl={config.url || "https://www.google.com"}
+            initialUrl={config.url || getDefaultHomePage()}
           />
         );
       }
@@ -52,7 +53,7 @@ const LayoutFactory = ({ model }) => {
           <BrowserPanel 
             node={node}
             model={model}
-            initialUrl="https://www.google.com"
+            initialUrl={getDefaultHomePage()}
           />
         );
       }

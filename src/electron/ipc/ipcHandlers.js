@@ -222,6 +222,25 @@ function setupIpcHandlers(mainWindow) {
     const { updateSessionsMenu } = require('../menu/applicationMenu');
     updateSessionsMenu(mainWindow);
   });
+
+  // Novos handlers para os modais
+  ipcMain.on('show-clear-session-dialog', () => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('show-clear-session-dialog');
+    }
+  });
+
+  ipcMain.on('show-settings-dialog', () => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('show-settings-dialog');
+    }
+  });
+
+  ipcMain.on('open-url', (event, url) => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('open-url', url);
+    }
+  });
 }
 
 module.exports = {

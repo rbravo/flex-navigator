@@ -31,6 +31,19 @@ const useElectronIPC = (model) => {
           handleAddNewTab(event, { url });
         };
 
+        // Listeners para novos eventos dos modais
+        const handleShowClearSessionDialog = () => {
+          window.dispatchEvent(new CustomEvent('show-clear-session-dialog'));
+        };
+
+        const handleShowSettingsDialog = () => {
+          window.dispatchEvent(new CustomEvent('show-settings-dialog'));
+        };
+
+        const handleOpenUrl = (event, url) => {
+          window.dispatchEvent(new CustomEvent('open-url', { detail: url }));
+        };
+
         // Listener para atualizações de estado de áudio
         const handleAudioStateUpdate = (event, data) => {
           //console.log('Recebido update de áudio:', data);
@@ -47,6 +60,9 @@ const useElectronIPC = (model) => {
         ipcRenderer.on('add-new-tab', handleAddNewTab);
         ipcRenderer.on('open-in-new-tab', handleOpenInNewTab);
         ipcRenderer.on('audio-state-update', handleAudioStateUpdate);
+        ipcRenderer.on('show-clear-session-dialog', handleShowClearSessionDialog);
+        ipcRenderer.on('show-settings-dialog', handleShowSettingsDialog);
+        ipcRenderer.on('open-url', handleOpenUrl);
 
         // Iniciar monitoramento de áudio
         const stopAudioMonitoring = startAudioStateMonitoring(model);
@@ -56,6 +72,9 @@ const useElectronIPC = (model) => {
           ipcRenderer.removeListener('add-new-tab', handleAddNewTab);
           ipcRenderer.removeListener('open-in-new-tab', handleOpenInNewTab);
           ipcRenderer.removeListener('audio-state-update', handleAudioStateUpdate);
+          ipcRenderer.removeListener('show-clear-session-dialog', handleShowClearSessionDialog);
+          ipcRenderer.removeListener('show-settings-dialog', handleShowSettingsDialog);
+          ipcRenderer.removeListener('open-url', handleOpenUrl);
           
           // Parar monitoramento de áudio
           if (stopAudioMonitoring) {

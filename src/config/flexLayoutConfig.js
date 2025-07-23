@@ -3,7 +3,9 @@
  * Define o layout padrão e configurações globais
  */
 
-export const defaultLayoutConfig = {
+import { getDefaultHomePage } from '../utils/userSettings';
+
+export const getDefaultLayoutConfig = () => ({
   global: {
     tabEnableClose: true,
     tabEnableRename: true,
@@ -18,7 +20,7 @@ export const defaultLayoutConfig = {
     tabSetHeaderHeight: 32,
     tabSetTabStripHeight: 32,
     tabSetEnableTabStrip: true,
-    tabSetAutoSelectTab: true,
+    tabSetAutoSelectTab: false,
     tabSetEnableTabScrollbar: true,
     tabMinWidth: 250,
     tabSetEnableMaximize: false
@@ -30,42 +32,23 @@ export const defaultLayoutConfig = {
     children: [
       {
         type: "tabset",
-        weight: 50,
+        weight: 100,
         selected: 0,
         children: [
           {
             type: "tab",
-            name: "Google",
+            name: "Página Inicial",
             component: "browser",
             config: {
-              url: "https://www.google.com"
-            }
-          },
-          {
-            type: "tab",
-            name: "GitHub",
-            component: "browser",
-            config: {
-              url: "https://github.com"
-            }
-          }
-        ]
-      },
-      {
-        type: "tabset",
-        weight: 50,
-        selected: 0,
-        children: [
-          {
-            type: "tab",
-            name: "YouTube",
-            component: "browser",
-            config: {
-              url: "https://www.youtube.com"
+              url: getDefaultHomePage(),
+              originalIndex: 0
             }
           }
         ]
       }
     ]
   }
-};
+});
+
+// Manter compatibilidade com código existente
+export const defaultLayoutConfig = getDefaultLayoutConfig();

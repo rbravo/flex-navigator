@@ -1,4 +1,5 @@
 import { Actions, DockLocation } from 'flexlayout-react';
+import { getDefaultHomePage } from './userSettings';
 
 /**
  * Utilitários para ações do FlexLayout
@@ -13,14 +14,53 @@ export const createNewTab = (model, tabSetId, tabConfig = {}) => {
     name: "Nova Tab",
     component: "browser",
     config: {
-      url: "https://www.google.com"
+      url: getDefaultHomePage()
     }
   };
 
   const finalConfig = { ...defaultConfig, ...tabConfig };
   
-  const action = Actions.addNode(finalConfig, tabSetId, DockLocation.CENTER, -1);
+  // Adiciona select: true para automaticamente selecionar a nova tab
+  const action = Actions.addNode(finalConfig, tabSetId, DockLocation.CENTER, -1, true);
   return model.doAction(action);
+};
+
+/**
+ * Adiciona uma nova tab com URL específica ao primeiro tabset disponível
+ */
+export const addNewTab = (model, url = null, name = null) => {
+  // Usar URL configurada pelo usuário se nenhuma URL for fornecida
+  const targetUrl = url || getDefaultHomePage();
+  
+  // Encontrar o primeiro tabset disponível
+  const root = model.getRoot();
+  const findFirstTabSet = (node) => {
+    if (node.getType() === 'tabset') {
+      return node;
+    }
+    const children = node.getChildren();
+    for (const child of children) {
+      const result = findFirstTabSet(child);
+      if (result) return result;
+    }
+    return null;
+  };
+
+  const firstTabSet = findFirstTabSet(root);
+  if (firstTabSet) {
+    const tabName = name || new URL(targetUrl).hostname || 'Nova Tab';
+    const tabConfig = {
+      name: tabName,
+      config: {
+        url: targetUrl,
+        originalIndex: firstTabSet.getChildren().length
+      }
+    };
+    
+    return createNewTab(model, firstTabSet.getId(), tabConfig);
+  }
+  
+  return null;
 };
 
 /**
@@ -33,16 +73,16 @@ export const splitPanelHorizontal = (model, tabSetId) => {
     name: "Nova Página",
     component: "browser",
     config: {
-      url: "https://www.google.com"
+      url: getDefaultHomePage()
     }
   };
   
-  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1);
+  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1, true);
   const newTab = model.doAction(addTabAction);
   
   // 2. Mover a tab para um novo tabset à direita
   if (newTab) {
-    const moveAction = Actions.moveNode(newTab.getId(), tabSetId, DockLocation.RIGHT, -1);
+    const moveAction = Actions.moveNode(newTab.getId(), tabSetId, DockLocation.RIGHT, -1, true);
     model.doAction(moveAction);
   }
   
@@ -59,16 +99,16 @@ export const splitPanelVertical = (model, tabSetId) => {
     name: "Nova Página",
     component: "browser",
     config: {
-      url: "https://www.google.com"
+      url: getDefaultHomePage()
     }
   };
   
-  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1);
+  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1, true);
   const newTab = model.doAction(addTabAction);
   
   // 2. Mover a tab para um novo tabset abaixo
   if (newTab) {
-    const moveAction = Actions.moveNode(newTab.getId(), tabSetId, DockLocation.BOTTOM, -1);
+    const moveAction = Actions.moveNode(newTab.getId(), tabSetId, DockLocation.BOTTOM, -1, true);
     model.doAction(moveAction);
   }
   
@@ -132,11 +172,11 @@ export const addNewTabToTabset = (model, tabsetId, tabConfig) => {
     name: "Nova aba",
     component: "browser",
     config: {
-      url: tabConfig?.url || "https://www.google.com"
+      url: tabConfig?.url || getDefaultHomePage()
     }
   };
 
-  model.doAction(Actions.addNode(defaultConfig, tabsetId, DockLocation.CENTER, -1));
+  model.doAction(Actions.addNode(defaultConfig, tabsetId, DockLocation.CENTER, -1, true));
 };
 
 /**

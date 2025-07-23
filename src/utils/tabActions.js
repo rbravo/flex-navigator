@@ -94,7 +94,8 @@ export const duplicateTab = (model, tabId) => {
         newTabConfig, 
         tabSetNode.getId(), 
         DockLocation.CENTER, 
-        tabIndex + 1
+        tabIndex + 1,
+        true // Selecionar automaticamente a nova tab
       );
       
       return model.doAction(action);

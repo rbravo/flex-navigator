@@ -39,10 +39,31 @@ const useSessionManager = (model, loadConfiguration) => {
     console.log('💾 Salvando sessão:', sessionName);
     try {
       const layoutConfig = model.toJson();
+      
+      // Função para adicionar índices originais às tabs se não existirem
+      const addOriginalIndexes = (node) => {
+        if (node.type === 'tabset' && node.children) {
+          node.children.forEach((tab, index) => {
+            if (!tab.config) tab.config = {};
+            if (tab.config.originalIndex === undefined) {
+              tab.config.originalIndex = index;
+            }
+          });
+        }
+        
+        if (node.children) {
+          node.children.forEach(child => addOriginalIndexes(child));
+        }
+      };
+      
+      // Criar cópia e adicionar índices
+      const configToSave = JSON.parse(JSON.stringify(layoutConfig));
+      addOriginalIndexes(configToSave.layout);
+      
       const electron = window.require('electron');
       const result = await electron.ipcRenderer.invoke('save-session', {
         sessionName,
-        layoutConfig
+        layoutConfig: configToSave
       });
       
       if (result.success) {
