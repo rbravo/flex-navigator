@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ConfigProvider } from 'antd';
 import { darkTheme } from './utils/theme';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
+import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
 import ControlsBar from './components/ControlsBar';
 import WebContent from './components/WebContent';
 import LoadingBar from './components/LoadingBar';
@@ -12,12 +13,14 @@ import './BrowserPanel.css';
  */
 const BrowserPanel = ({ node, model, initialUrl }) => {
   const [url, setUrl] = useState(initialUrl);
+  const [initialWebviewUrl] = useState(initialUrl); // URL inicial fixa para webview
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingComplete, setLoadingComplete] = useState(false);
   const [isElectron, setIsElectron] = useState(false);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
+  const [hideNavigationBar, setHideNavigationBar] = useState(false);
   
   const webviewRef = useRef(null);
   const iframeRef = useRef(null);
@@ -171,7 +174,8 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     setIsLoading(true);
     
     if (isElectron && webviewRef.current) {
-      webviewRef.current.src = targetUrl;
+      // Navega programaticamente sem recriar a webview
+      webviewRef.current.loadURL(targetUrl);
     } else if (iframeRef.current) {
       // Para desenvolvimento no browser, usa iframe
       iframeRef.current.src = targetUrl;
@@ -214,20 +218,60 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     handleRefresh();
   };
 
+  // Effect para monitorar mudanças na configuração do tabset
+  useEffect(() => {
+    if (node && model) {
+      const updateNavigationBarVisibility = () => {
+        // Encontra o tabset pai da tab atual
+        const parent = node.getParent();
+        if (parent && parent.getType() === 'tabset') {
+          const config = parent.getConfig() || {};
+          const shouldHide = config.hideNavigationBar || false;
+          console.log('BrowserPanel - Configuração do tabset:', parent.getId(), 'hideNavigationBar:', shouldHide);
+          setHideNavigationBar(shouldHide);
+          return shouldHide;
+        }
+        return false;
+      };
+
+      // Verificar imediatamente
+      updateNavigationBarVisibility();
+
+      // Listener para mudanças na configuração do tabset
+      const handleNavigationBarToggle = (eventData) => {
+        const parent = node.getParent();
+        if (parent && parent.getId() === eventData.tabSetId) {
+          console.log('BrowserPanel - Evento recebido para nosso tabset:', eventData);
+          setHideNavigationBar(eventData.hideNavigationBar);
+        }
+      };
+
+      // Registrar listener
+      layoutEventEmitter.on(LAYOUT_EVENTS.NAVIGATION_BAR_TOGGLED, handleNavigationBarToggle);
+
+      return () => {
+        // Cleanup listener
+        layoutEventEmitter.off(LAYOUT_EVENTS.NAVIGATION_BAR_TOGGLED, handleNavigationBarToggle);
+      };
+    }
+  }, [node, model]);
+
   return (
     <ConfigProvider theme={darkTheme}>
       <div className="browser-panel">
-        <ControlsBar
-          canGoBack={canGoBack}
-          canGoForward={canGoForward}
-          isLoading={isLoading}
-          url={url}
-          setUrl={setUrl}
-          onBack={handleBack}
-          onForward={handleForward}
-          onRefresh={handleRefreshClick}
-          onUrlSubmit={handleUrlSubmit}
-        />
+        {!hideNavigationBar && (
+          <ControlsBar
+            canGoBack={canGoBack}
+            canGoForward={canGoForward}
+            isLoading={isLoading}
+            url={url}
+            setUrl={setUrl}
+            onBack={handleBack}
+            onForward={handleForward}
+            onRefresh={handleRefreshClick}
+            onUrlSubmit={handleUrlSubmit}
+          />
+        )}
         
         <div className="content-area">
           <LoadingBar 
@@ -236,7 +280,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
           />
           <WebContent
             isElectron={isElectron}
-            currentUrl={currentUrl}
+            currentUrl={initialWebviewUrl} // Usa URL inicial fixa
             webviewRef={webviewRef}
             iframeRef={iframeRef}
             nodeId={node.getId()}

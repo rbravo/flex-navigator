@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ConfigProvider } from 'antd';
 import { darkTheme } from '../utils/theme';
 import { canUseIframe } from '../utils/urlUtils';
+import { getDefaultUserAgent } from '../utils/userAgentUtils';
 import FallbackContent from './FallbackContent';
 
 /**
@@ -16,25 +17,37 @@ const WebContent = ({
   setIsLoading,
   setLoadingComplete
 }) => {
+  // Memoriza o user agent para evitar recriações desnecessárias
+  const userAgent = useMemo(() => getDefaultUserAgent(), []);
+  
+  // Memoriza a webview para não recriar a cada mudança de URL
+  const webviewElement = useMemo(() => {
+    if (!isElectron) return null;
+    
+    return (
+      <webview
+        ref={webviewRef}
+        src={currentUrl} // Esta será a URL inicial apenas
+        data-tab-id={nodeId}
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none'
+        }}
+        allowpopups="true"
+        nodeintegration="false"
+        webpreferences="allowRunningInsecureContent=false, javascript=true, webSecurity=true, contextIsolation=true"
+        useragent={userAgent}
+        partition="persist:webview"
+        enableremotemodule="false"
+      />
+    );
+  }, [isElectron, currentUrl, nodeId, userAgent]); // currentUrl só afeta na criação inicial
+
   const renderWebContent = () => {
     if (isElectron) {
-      // No Electron, usa webview real
-      return (
-        <webview
-          ref={webviewRef}
-          src={currentUrl}
-          data-tab-id={nodeId}
-          style={{
-            width: '100%',
-            height: '100%',
-            border: 'none'
-          }}
-          allowpopups="false"
-          nodeintegration="false"
-          webpreferences="allowRunningInsecureContent, contextIsolation=false"
-          partition="persist:webview"
-        />
-      );
+      // Retorna a webview memorizada
+      return webviewElement;
     } else {
       // No browser de desenvolvimento, tenta usar iframe quando possível
       const canUseIframeForUrl = canUseIframe(currentUrl);

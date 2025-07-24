@@ -1,5 +1,6 @@
 import { Actions, DockLocation } from 'flexlayout-react';
 import { getDefaultHomePage } from './userSettings';
+import { layoutEventEmitter, LAYOUT_EVENTS } from './layoutEventEmitter';
 
 /**
  * Utilitários para ações do FlexLayout
@@ -124,6 +125,54 @@ export const toggleMaximize = (model, tabSetId) => {
     return model.doAction(action);
   } catch (error) {
     console.log('Erro ao maximizar/restaurar:', error);
+    return null;
+  }
+};
+
+/**
+ * Toggle da visibilidade da barra de navegação de um tabset
+ */
+export const toggleNavigationBar = (model, tabSetId) => {
+  try {
+    // Encontra o tabset
+    const tabset = model.getNodeById(tabSetId);
+    if (!tabset) {
+      console.error('Tabset não encontrado:', tabSetId);
+      return null;
+    }
+
+    // Verifica o estado atual da barra de navegação
+    const currentConfig = tabset.getConfig() || {};
+    const hideNavBar = !currentConfig.hideNavigationBar; // Inverte o estado
+
+    console.log(`${hideNavBar ? 'Escondendo' : 'Mostrando'} barra de navegação do tabset ${tabSetId}`);
+    
+    // Atualiza a configuração do tabset
+    const action = Actions.updateNodeAttributes(tabSetId, {
+      config: {
+        ...currentConfig,
+        hideNavigationBar: hideNavBar
+      }
+    });
+
+    const result = model.doAction(action);
+    
+    // Emitir evento para notificar componentes interessados
+    layoutEventEmitter.emit(LAYOUT_EVENTS.NAVIGATION_BAR_TOGGLED, {
+      tabSetId,
+      hideNavigationBar: hideNavBar
+    });
+    
+    layoutEventEmitter.emit(LAYOUT_EVENTS.TABSET_CONFIG_CHANGED, {
+      tabSetId,
+      config: { ...currentConfig, hideNavigationBar: hideNavBar }
+    });
+    
+    console.log('Evento emitido para tabset:', tabSetId, 'hideNavigationBar:', hideNavBar);
+    
+    return result;
+  } catch (error) {
+    console.log('Erro ao toggle da barra de navegação:', error);
     return null;
   }
 };

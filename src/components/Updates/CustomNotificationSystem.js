@@ -106,19 +106,19 @@ export const NotificationProvider = ({ children }) => {
 
     setNotifications(prev => [...prev, notification]);
     
-    console.log('🔔 Notificação customizada criada:', notification);
+    //console.log('🔔 Notificação customizada criada:', notification);
     
     return id;
   };
 
   const closeNotification = (id) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-    console.log('🔕 Notificação removida:', id);
+    //console.log('🔕 Notificação removida:', id);
   };
 
   const closeAllNotifications = () => {
     setNotifications([]);
-    console.log('🔕 Todas as notificações removidas');
+    //console.log('🔕 Todas as notificações removidas');
   };
 
   // Métodos de conveniência
@@ -325,7 +325,7 @@ export class CustomNotificationManager {
     
     if (!CustomNotificationManager.notificationAPI) return null;
     
-    console.log('📢 Mostrando erro:', error);
+    //console.log('📢 Mostrando erro:', error);
     
     const id = CustomNotificationManager.notificationAPI.error({
       title: 'Erro na Atualização',

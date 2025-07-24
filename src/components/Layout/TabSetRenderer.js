@@ -1,6 +1,6 @@
 import React from 'react';
-import { Plus, SplitSquareHorizontal, SplitSquareVertical, Maximize2, Minimize2 } from 'lucide-react';
-import { createNewTab, splitPanelHorizontal, splitPanelVertical, toggleMaximize } from '../../utils/layoutActions';
+import { Plus, SplitSquareHorizontal, SplitSquareVertical, Maximize2, Minimize2, Navigation, NavigationOff, PanelTopClose, PanelBottomClose } from 'lucide-react';
+import { createNewTab, splitPanelHorizontal, splitPanelVertical, toggleMaximize, toggleNavigationBar } from '../../utils/layoutActions';
 
 /**
  * Renderizador customizado para tabsets do FlexLayout
@@ -9,7 +9,7 @@ import { createNewTab, splitPanelHorizontal, splitPanelVertical, toggleMaximize 
 const TabSetRenderer = ({ model }) => {
   return (tabSetNode, renderValues) => {
     // Botão para adicionar nova tab
-    renderValues.buttons.push(
+    renderValues.stickyButtons.push(
       <button
         key="add-tab"
         className="tabset-button tabset-button-add"
@@ -23,6 +23,25 @@ const TabSetRenderer = ({ model }) => {
         }}
       >
         <Plus size={14} />
+      </button>
+    );
+
+    // Botão para mostrar/esconder barra de navegação
+    const hideNavBar = tabSetNode.getConfig()?.hideNavigationBar || false;
+    renderValues.leading = (
+      <button
+        key="toggle-navbar"
+        className="tabset-button tabset-button-navbar"
+        title={hideNavBar ? "Mostrar barra de navegação" : "Esconder barra de navegação"}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          console.log('Clicou no botão toggle-navbar');
+          toggleNavigationBar(model, tabSetNode.getId());
+        }}
+      >
+        {hideNavBar ? <PanelBottomClose size={14} /> : <PanelTopClose size={14} />}
       </button>
     );
 

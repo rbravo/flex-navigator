@@ -97,7 +97,7 @@
 }
 
 .flexlayout__tab_button.flexlayout__tab_button_top.flexlayout__tab_button--selected {
-    background: #2d2d30 !important;
+  background: #2d2d30 !important;
 }
 
 /* Estilos customizados para os botões de ação do tabset */
@@ -127,20 +127,24 @@
   transform: scale(1.05);
 }
 
-.tabset-button-add {
- 
+.tabset-button-add {}
+
+.tabset-button-add:hover {}
+
+.tabset-button-split {}
+
+.tabset-button-split:hover {}
+
+.tabset-button-navbar {
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 2px;
+  background: #2d2d30;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-.tabset-button-add:hover {
- 
-}
-
-.tabset-button-split {
- 
-}
-
-.tabset-button-split:hover {
-  
+.tabset-button-navbar:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .tabset-button:active {
@@ -162,7 +166,7 @@
   display: none !important;
 }
 
-.flexlayout__tabset_header_content > .flexlayout__tab_button {
+.flexlayout__tabset_header_content>.flexlayout__tab_button {
   display: none !important;
 }
 
@@ -173,7 +177,7 @@
 }
 
 /* Esconder TODOS os botões padrão do FlexLayout na área de header */
-.flexlayout__tabset_header_content > *:not(.tabset-button) {
+.flexlayout__tabset_header_content>*:not(.tabset-button) {
   display: none !important;
 }
 
