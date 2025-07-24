@@ -1,6 +1,6 @@
 {
   "name": "flex-navigator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A flexible and customizable web browser built with Electron and React",
   "author": "rbravo",
   "license": "MIT",
@@ -39,6 +39,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "dotenv-cli": "^9.0.0",
     "electron": "^32.0.1",
     "electron-builder": "^26.0.12"
   },
@@ -50,7 +51,7 @@
     "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && node_modules\\.bin\\electron.cmd .\"",
     "electron": "node_modules\\.bin\\electron.cmd .",
     "pack": "node_modules\\.bin\\electron-builder.cmd",
-    "distpub": "npm run build && node_modules\\.bin\\electron-builder.cmd --publish always",
+    "distpub": "npm run build && dotenv -e .env -- electron-builder --publish always",
     "dist": "npm run build && node_modules\\.bin\\electron-builder.cmd"
   },
   "main": "electron.js",
