@@ -7,12 +7,27 @@ const { Text } = Typography;
 /**
  * Modal de confirmação para limpar sessão atual
  */
-const ClearSessionModal = ({ onConfirm }) => {
-  const showConfirm = () => {
-    Modal.confirm({
-      title: 'Limpar sessão atual',
-      icon: <ExclamationCircleOutlined />,
-      content: (
+const ClearSessionModal = ({ visible, onConfirm, onCancel }) => {
+  return (
+    <Modal
+      title="Limpar sessão atual"
+      open={visible}
+      onOk={onConfirm}
+      onCancel={onCancel}
+      okText="Sim, limpar"
+      cancelText="Cancelar"
+      okType="danger"
+      centered
+      width={420}
+    >
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+        <ExclamationCircleOutlined 
+          style={{ 
+            color: '#faad14', 
+            fontSize: '22px',
+            marginTop: '2px'
+          }} 
+        />
         <div>
           <Text>
             Esta ação irá fechar todas as abas abertas e começar uma nova sessão.
@@ -23,22 +38,9 @@ const ClearSessionModal = ({ onConfirm }) => {
             ⚠️ Certifique-se de salvar sua sessão atual se desejar mantê-la.
           </Text>
         </div>
-      ),
-      okText: 'Sim, limpar',
-      okType: 'danger',
-      cancelText: 'Cancelar',
-      onOk() {
-        if (onConfirm) {
-          onConfirm();
-        }
-      },
-      onCancel() {
-        console.log('Limpeza de sessão cancelada');
-      },
-    });
-  };
-
-  return { showConfirm };
+      </div>
+    </Modal>
+  );
 };
 
 export default ClearSessionModal;

@@ -65,6 +65,7 @@ const AppContent = () => {
 
   // Estados para modais de sessão
   const [saveSessionModalVisible, setSaveSessionModalVisible] = useState(false);
+  const [clearSessionModalVisible, setClearSessionModalVisible] = useState(false);
   const [deleteSessionModal, setDeleteSessionModal] = useState({
     visible: false,
     sessionId: null,
@@ -195,11 +196,8 @@ const AppContent = () => {
     };
 
     const handleShowClearSessionDialog = () => {
-      // Usar o componente ClearSessionModal para mostrar confirmação
-      const clearSessionModal = ClearSessionModal({
-        onConfirm: handleClearSession
-      });
-      clearSessionModal.showConfirm();
+      console.log('🔔 App: Evento show-clear-session-dialog capturado');
+      setClearSessionModalVisible(true);
     };
 
     const handleShowSettingsDialog = () => {
@@ -287,9 +285,36 @@ const AppContent = () => {
 
   // Função para limpar sessão atual
   const handleClearSession = () => {
-    // Restaurar a configuração padrão com a página inicial atual do usuário
-    const { getDefaultLayoutConfig } = require('./config/flexLayoutConfig');
-    loadConfiguration(getDefaultLayoutConfig());
+    try {
+      console.log('🧹 Iniciando limpeza da sessão atual...');
+      
+      // Restaurar a configuração padrão com a página inicial atual do usuário
+      const { getDefaultLayoutConfig } = require('./config/flexLayoutConfig');
+      const defaultConfig = getDefaultLayoutConfig();
+      
+      console.log('📋 Configuração padrão carregada:', defaultConfig);
+      
+      const result = loadConfiguration(defaultConfig);
+      
+      if (result) {
+        console.log('✅ Sessão limpa com sucesso!');
+        
+        // Mostrar notificação de sucesso se disponível
+        if (window.electron?.showNotification) {
+          window.electron.showNotification({
+            title: 'Sessão Limpa',
+            body: 'A sessão atual foi limpa e uma nova sessão foi iniciada.'
+          });
+        }
+      } else {
+        console.error('❌ Erro ao limpar sessão');
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('❌ Erro na função handleClearSession:', error);
+      return false;
+    }
   };
 
   // Função para adicionar nova tab
@@ -317,6 +342,16 @@ const AppContent = () => {
 
   const handleCancelDeleteSession = () => {
     setDeleteSessionModal({ visible: false, sessionId: null, sessionName: '' });
+  };
+
+  const handleClearSessionConfirm = () => {
+    setClearSessionModalVisible(false);
+    handleClearSession();
+  };
+
+  const handleClearSessionCancel = () => {
+    setClearSessionModalVisible(false);
+    console.log('Limpeza de sessão cancelada');
   };
 
   // Factory para criação de componentes
@@ -382,6 +417,12 @@ const AppContent = () => {
           sessionName={deleteSessionModal.sessionName}
           onConfirm={handleDeleteSession}
           onCancel={handleCancelDeleteSession}
+        />
+
+        <ClearSessionModal
+          visible={clearSessionModalVisible}
+          onConfirm={handleClearSessionConfirm}
+          onCancel={handleClearSessionCancel}
         />
 
         {/* Modal de configurações */}

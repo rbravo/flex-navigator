@@ -33,6 +33,7 @@ const useElectronIPC = (model) => {
 
         // Listeners para novos eventos dos modais
         const handleShowClearSessionDialog = () => {
+          console.log('🔔 IPC: Evento show-clear-session-dialog recebido');
           window.dispatchEvent(new CustomEvent('show-clear-session-dialog'));
         };
 

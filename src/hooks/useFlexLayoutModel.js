@@ -11,6 +11,8 @@ const useFlexLayoutModel = () => {
   // Função para carregar uma nova configuração
   const loadConfiguration = useCallback((layoutConfig) => {
     try {
+      console.log('🔄 useFlexLayoutModel: Carregando nova configuração...', layoutConfig);
+      
       // Função para preservar ordem das tabs
       const preserveTabOrder = (node) => {
         if (node.type === 'tabset' && node.children) {
@@ -39,12 +41,17 @@ const useFlexLayoutModel = () => {
       const configCopy = JSON.parse(JSON.stringify(layoutConfig));
       preserveTabOrder(configCopy.layout);
       
+      console.log('📋 Configuração processada:', configCopy);
+      
       const newModel = Model.fromJson(configCopy);
+      console.log('🆕 Novo modelo criado:', newModel);
+      
       setModel(newModel);
+      console.log('✅ Modelo atualizado com sucesso!');
       
       return true;
     } catch (error) {
-      console.error('Erro ao carregar configuração:', error);
+      console.error('❌ Erro ao carregar configuração:', error);
       return false;
     }
   }, []);
