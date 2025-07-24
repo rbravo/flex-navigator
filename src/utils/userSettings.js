@@ -49,6 +49,26 @@ export const getUserSettings = () => {
   }
   
   return {
-    defaultHomePage: 'https://www.google.com'
+    defaultHomePage: 'https://www.google.com',
+    autoUpdate: true,
+    autoDownload: true
   };
+};
+
+/**
+ * Verifica se as atualizações automáticas estão habilitadas
+ * @returns {boolean} True se auto-update estiver habilitado
+ */
+export const isAutoUpdateEnabled = () => {
+  const settings = getUserSettings();
+  return settings.autoUpdate !== false; // Default para true
+};
+
+/**
+ * Verifica se o download automático está habilitado
+ * @returns {boolean} True se auto-download estiver habilitado
+ */
+export const isAutoDownloadEnabled = () => {
+  const settings = getUserSettings();
+  return settings.autoDownload !== false; // Default para true
 };

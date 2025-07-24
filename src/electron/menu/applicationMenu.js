@@ -3,6 +3,8 @@ const { executeOnActiveWebview, executeZoomCommand } = require('../utils/webview
 const SessionManager = require('../utils/SessionManager');
 const { isDev } = require('../utils/config');
 
+let autoUpdaterManager = null;
+
 
 let currentMenu = null;
 const sessionManager = new SessionManager();
@@ -162,14 +164,23 @@ function createMenuTemplate(mainWindow, sessions) {
         }
       ]
     },
-    ...(isDev ? [{
+    {
       label: 'Desenvolver',
       submenu: [
         { role: 'reload', label: 'Recarregar App' },
         { role: 'forceReload', label: 'Forçar Recarregamento' },
         { role: 'toggleDevTools', label: 'DevTools da Aplicação' },
+        // { type: 'separator' },
+        // {
+        //   label: 'Testar Notificações',
+        //   click: () => {
+        //     if (mainWindow && mainWindow.webContents) {
+        //       mainWindow.webContents.send('test-notifications');
+        //     }
+        //   }
+        // }
       ]
-    }] : []),
+    },
     {
       label: 'Sessão',
       submenu: [
@@ -215,6 +226,15 @@ function createMenuTemplate(mainWindow, sessions) {
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('open-url', 'https://github.com/rbravo/flex-navigator');
+            }
+          }
+        },
+        { type: 'separator' },
+        {
+          label: 'Verificar Atualizações',
+          click: () => {
+            if (autoUpdaterManager) {
+              autoUpdaterManager.checkForUpdates();
             }
           }
         },
@@ -342,7 +362,15 @@ function buildSessionsSubmenu(sessions, mainWindow) {
   }));
 }
 
+/**
+ * Define a instância do AutoUpdaterManager
+ */
+function setAutoUpdaterManager(updaterManager) {
+  autoUpdaterManager = updaterManager;
+}
+
 module.exports = {
   createMenu,
-  updateSessionsMenu
+  updateSessionsMenu,
+  setAutoUpdaterManager
 };

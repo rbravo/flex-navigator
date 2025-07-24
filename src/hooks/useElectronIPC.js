@@ -44,6 +44,12 @@ const useElectronIPC = (model) => {
           window.dispatchEvent(new CustomEvent('open-url', { detail: url }));
         };
 
+        // Listener para teste de notificações
+        const handleTestNotifications = () => {
+          console.log('🧪 Teste de notificações solicitado via IPC');
+          window.dispatchEvent(new CustomEvent('test-notifications'));
+        };
+
         // Listener para atualizações de estado de áudio
         const handleAudioStateUpdate = (event, data) => {
           //console.log('Recebido update de áudio:', data);
@@ -63,6 +69,7 @@ const useElectronIPC = (model) => {
         ipcRenderer.on('show-clear-session-dialog', handleShowClearSessionDialog);
         ipcRenderer.on('show-settings-dialog', handleShowSettingsDialog);
         ipcRenderer.on('open-url', handleOpenUrl);
+        ipcRenderer.on('test-notifications', handleTestNotifications);
 
         // Iniciar monitoramento de áudio
         const stopAudioMonitoring = startAudioStateMonitoring(model);
@@ -75,6 +82,7 @@ const useElectronIPC = (model) => {
           ipcRenderer.removeListener('show-clear-session-dialog', handleShowClearSessionDialog);
           ipcRenderer.removeListener('show-settings-dialog', handleShowSettingsDialog);
           ipcRenderer.removeListener('open-url', handleOpenUrl);
+          ipcRenderer.removeListener('test-notifications', handleTestNotifications);
           
           // Parar monitoramento de áudio
           if (stopAudioMonitoring) {

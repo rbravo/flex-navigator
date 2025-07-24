@@ -241,6 +241,47 @@ function setupIpcHandlers(mainWindow) {
       mainWindow.webContents.send('open-url', url);
     }
   });
+
+  // Auto-update handlers
+  ipcMain.handle('check-for-updates', async () => {
+    try {
+      console.log('📞 IPC: Solicitação de verificação de updates recebida');
+      const { AutoUpdaterManager } = require('../utils/autoUpdater');
+      const autoUpdaterManager = new AutoUpdaterManager();
+      const result = await autoUpdaterManager.checkForUpdates();
+      console.log('📞 IPC: Verificação concluída:', result);
+      return { success: true, result };
+    } catch (error) {
+      console.error('📞 IPC: Erro na verificação:', error);
+      return { 
+        success: false, 
+        error: error.message,
+        details: error.stack
+      };
+    }
+  });
+
+  ipcMain.handle('get-app-version', () => {
+    const { app } = require('electron');
+    return app.getVersion();
+  });
+
+  ipcMain.on('download-update', () => {
+    const { autoUpdater } = require('electron-updater');
+    autoUpdater.downloadUpdate();
+  });
+
+  ipcMain.on('install-update', () => {
+    const { autoUpdater } = require('electron-updater');
+    autoUpdater.quitAndInstall();
+  });
+
+  // Handler para teste de notificações
+  ipcMain.on('test-notifications', () => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('test-notifications');
+    }
+  });
 }
 
 module.exports = {

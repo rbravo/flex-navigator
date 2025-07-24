@@ -12,6 +12,12 @@
     "!src/electron/**/*.test.js",
     "!src/electron/**/*.spec.js"
   ],
+  "publish": {
+    "provider": "github",
+    "owner": "rbravo",
+    "repo": "flex-navigator",
+    "private": false
+  },
   "win": {
     "icon": "icon.png",
     "target": [

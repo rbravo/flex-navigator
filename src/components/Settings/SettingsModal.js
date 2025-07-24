@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, Typography } from 'antd';
+import { Modal, Form, Input, Button, Typography, Switch, Divider, Space } from 'antd';
+import { CheckCircleOutlined } from '@ant-design/icons';
 import { getUserSettings, saveUserSettings } from '../../utils/userSettings';
+import { useAutoUpdater } from '../../hooks/useAutoUpdater';
 
 const { Title, Text } = Typography;
 
@@ -10,13 +12,26 @@ const { Title, Text } = Typography;
 const SettingsModal = ({ visible, onClose, onSave }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [currentVersion, setCurrentVersion] = useState('');
+  
+  const { checkForUpdates, getAppVersion } = useAutoUpdater();
 
   // Carregar configurações atuais
   useEffect(() => {
     if (visible) {
       loadCurrentSettings();
+      loadAppVersion();
     }
   }, [visible]);
+
+  const loadAppVersion = async () => {
+    try {
+      const version = await getAppVersion();
+      setCurrentVersion(version || 'Desconhecida');
+    } catch (error) {
+      console.error('Erro ao carregar versão:', error);
+    }
+  };
 
   const loadCurrentSettings = async () => {
     try {
@@ -53,6 +68,14 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
     }
   };
 
+  const handleCheckUpdates = async () => {
+    try {
+      await checkForUpdates();
+    } catch (error) {
+      console.error('Erro ao verificar atualizações:', error);
+    }
+  };
+
   const handleCancel = () => {
     form.resetFields();
     onClose();
@@ -77,7 +100,9 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
         form={form}
         layout="vertical"
         initialValues={{
-          defaultHomePage: 'https://www.google.com'
+          defaultHomePage: 'https://www.google.com',
+          autoUpdate: true,
+          autoDownload: true
         }}
       >
         <Title level={5}>Navegação</Title>
@@ -96,6 +121,51 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
             prefix="🌐"
           />
         </Form.Item>
+
+        <Divider />
+        
+        <Title level={5}>Atualizações</Title>
+        
+        <Form.Item
+          name="autoUpdate"
+          label="Verificar atualizações automaticamente"
+          valuePropName="checked"
+          extra="Verifica por novas versões ao iniciar o aplicativo"
+        >
+          <Switch />
+        </Form.Item>
+
+        <Form.Item
+          name="autoDownload"
+          label="Baixar atualizações automaticamente"
+          valuePropName="checked"
+          extra="Baixa atualizações em segundo plano (requer confirmação para instalar)"
+        >
+          <Switch />
+        </Form.Item>
+        
+        <div style={{ 
+          background: '#f5f5f5', 
+          padding: '12px', 
+          borderRadius: '6px',
+          marginBottom: '16px'
+        }}>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text strong>Versão Atual: {currentVersion}</Text>
+              <Button 
+                size="small" 
+                icon={<CheckCircleOutlined />}
+                onClick={handleCheckUpdates}
+              >
+                Verificar Agora
+              </Button>
+            </div>
+            <Text type="secondary" style={{ fontSize: '12px' }}>
+              Última verificação: ao iniciar o aplicativo
+            </Text>
+          </Space>
+        </div>
        
       </Form>
     </Modal>

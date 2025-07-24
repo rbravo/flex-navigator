@@ -1,0 +1,48 @@
+/* Estilos para garantir que as notificações apareçam por cima de tudo */
+
+.ant-notification {
+  z-index: 99999 !important;
+  position: fixed !important;
+}
+
+.ant-notification-notice {
+  z-index: 99999 !important;
+  position: relative !important;
+  background: white !important;
+  border-radius: 6px !important;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 
+              0 3px 6px -4px rgba(0, 0, 0, 0.12), 
+              0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid #d9d9d9 !important;
+}
+
+.ant-notification-notice-message {
+  color: rgba(0, 0, 0, 0.85) !important;
+  font-weight: 600 !important;
+}
+
+.ant-notification-notice-description {
+  color: rgba(0, 0, 0, 0.65) !important;
+}
+
+/* Garantir que o container principal não oculte as notificações */
+.App {
+  position: relative !important;
+}
+
+/* Sobrescrever qualquer z-index do flexlayout que possa interferir */
+.flexlayout__layout {
+  z-index: 1 !important;
+}
+
+.flexlayout__splitter {
+  z-index: 2 !important;
+}
+
+.flexlayout__tabset {
+  z-index: 3 !important;
+}
+
+.flexlayout__tab {
+  z-index: 4 !important;
+}

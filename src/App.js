@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Layout } from 'flexlayout-react';
+import { ConfigProvider } from 'antd';
 import 'flexlayout-react/style/dark.css'; // ou 'light.css' se preferir tema claro
 import './App.css';
 
@@ -22,12 +23,23 @@ import ClearSessionModal from './components/Session/ClearSessionModal';
 // Componentes de configurações
 import SettingsModal from './components/Settings/SettingsModal';
 
+// Sistema de notificação customizado
+import { NotificationProvider, useNotification } from './components/Updates/CustomNotificationSystem';
+import CustomNotificationManager from './components/Updates/CustomNotificationSystem';
+
+// Componente de atualizações
+import UpdateManager from './components/Updates/UpdateManager';
+
 // Utilitários para ações de tabs
 import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWebviewListeners } from './utils/tabActions';
 
-const App = () => {
+// Componente interno do App que usa o hook de notificação
+const AppContent = () => {
   // Gerenciar modelo do FlexLayout
   const { model, loadConfiguration } = useFlexLayoutModel();
+
+  // Acessar o sistema de notificação
+  const notificationAPI = useNotification();
 
   // Configurar listeners do Electron IPC
   useElectronIPC(model);
@@ -39,6 +51,12 @@ const App = () => {
     deleteSession
     // isLoading: sessionsLoading // Commented out as it's not used
   } = useSessionManager(model, loadConfiguration);
+
+  // Configurar o sistema de notificação customizado
+  useEffect(() => {
+    CustomNotificationManager.setNotificationAPI(notificationAPI);
+    console.log('🔔 Sistema de notificação customizado configurado');
+  }, [notificationAPI]);
 
   // Debug das sessões
   useEffect(() => {
@@ -193,12 +211,20 @@ const App = () => {
       // Adicionar uma nova tab com a URL
       addNewTab(url);
     };
+
+    const handleTestNotifications = (event) => {
+      console.log('🧪 Teste de notificações solicitado via menu');
+      // Usar o novo sistema customizado
+      const manager = CustomNotificationManager.getInstance();
+      manager.testNotification();
+    };
     
     window.addEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
     window.addEventListener('confirm-delete-session', handleConfirmDeleteSession);
     window.addEventListener('show-clear-session-dialog', handleShowClearSessionDialog);
     window.addEventListener('show-settings-dialog', handleShowSettingsDialog);
     window.addEventListener('open-url', handleOpenUrl);
+    window.addEventListener('test-notifications', handleTestNotifications);
     
     return () => {
       window.removeEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
@@ -206,6 +232,7 @@ const App = () => {
       window.removeEventListener('show-clear-session-dialog', handleShowClearSessionDialog);
       window.removeEventListener('show-settings-dialog', handleShowSettingsDialog);
       window.removeEventListener('open-url', handleOpenUrl);
+      window.removeEventListener('test-notifications', handleTestNotifications);
     };
   }, []);
 
@@ -318,49 +345,65 @@ const App = () => {
   };
 
   return (
-    <div className="App">
-      <Layout 
-        model={model} 
-        factory={factory}
-        onAction={onAction}
-        onRenderTabSet={onRenderTabSet}
-        onRenderTab={onRenderTab}
-      />
-      
-      {/* Menu de contexto das tabs */}
-      <TabContextMenu
-        isVisible={contextMenu.isVisible}
-        position={contextMenu.position}
-        onClose={handleCloseContextMenu}
-        onRefresh={handleRefresh}
-        onDuplicate={handleDuplicate}
-        onToggleMute={handleToggleMute}
-        onCloseTab={handleCloseTab}
-        isMuted={contextMenu.tabId ? isTabMuted(model, contextMenu.tabId) : false}
-      />
-      
-      {/* Modais de sessão */}
-      <SaveSessionModal
-        isVisible={saveSessionModalVisible}
-        onSave={handleSaveSession}
-        onCancel={handleCancelSaveSession}
-        existingSessions={sessions}
-      />
-      
-      <DeleteSessionModal
-        isVisible={deleteSessionModal.visible}
-        sessionName={deleteSessionModal.sessionName}
-        onConfirm={handleDeleteSession}
-        onCancel={handleCancelDeleteSession}
-      />
+    <ConfigProvider
+      getPopupContainer={() => document.body}
+    >
+      <div className="App">
+        <Layout 
+          model={model} 
+          factory={factory}
+          onAction={onAction}
+          onRenderTabSet={onRenderTabSet}
+          onRenderTab={onRenderTab}
+        />
+        
+        {/* Menu de contexto das tabs */}
+        <TabContextMenu
+          isVisible={contextMenu.isVisible}
+          position={contextMenu.position}
+          onClose={handleCloseContextMenu}
+          onRefresh={handleRefresh}
+          onDuplicate={handleDuplicate}
+          onToggleMute={handleToggleMute}
+          onCloseTab={handleCloseTab}
+          isMuted={contextMenu.tabId ? isTabMuted(model, contextMenu.tabId) : false}
+        />
+        
+        {/* Modais de sessão */}
+        <SaveSessionModal
+          isVisible={saveSessionModalVisible}
+          onSave={handleSaveSession}
+          onCancel={handleCancelSaveSession}
+          existingSessions={sessions}
+        />
+        
+        <DeleteSessionModal
+          isVisible={deleteSessionModal.visible}
+          sessionName={deleteSessionModal.sessionName}
+          onConfirm={handleDeleteSession}
+          onCancel={handleCancelDeleteSession}
+        />
 
-      {/* Modal de configurações */}
-      <SettingsModal
-        visible={settingsModalVisible}
-        onClose={() => setSettingsModalVisible(false)}
-        onSave={handleSaveSettings}
-      />
-    </div>
+        {/* Modal de configurações */}
+        <SettingsModal
+          visible={settingsModalVisible}
+          onClose={() => setSettingsModalVisible(false)}
+          onSave={handleSaveSettings}
+        />
+
+        {/* Gerenciador de atualizações */}
+        <UpdateManager />
+      </div>
+    </ConfigProvider>
+  );
+};
+
+// Componente principal com Provider de notificação
+const App = () => {
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
   );
 };
 

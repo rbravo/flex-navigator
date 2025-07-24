@@ -96,6 +96,10 @@
   border-radius: 2px !important;
 }
 
+.flexlayout__tab_button.flexlayout__tab_button_top.flexlayout__tab_button--selected {
+    background: #2d2d30 !important;
+}
+
 /* Estilos customizados para os botões de ação do tabset */
 .flexlayout__tab_toolbar_button {
   /* Estilos básicos para os botões da toolbar */

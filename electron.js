@@ -1,12 +1,16 @@
 const { app, BrowserWindow } = require('electron');
 const { printDebugInfo } = require('./src/electron/utils/config');
 const { createWindow, getMainWindow } = require('./src/electron/window/mainWindow');
-const { createMenu } = require('./src/electron/menu/applicationMenu');
+const { createMenu, setAutoUpdaterManager } = require('./src/electron/menu/applicationMenu');
 const { setupIpcHandlers } = require('./src/electron/ipc/ipcHandlers');
 const { setupWebContentsHandlers } = require('./src/electron/utils/webContentsSetup');
+const { AutoUpdaterManager } = require('./src/electron/utils/autoUpdater');
 
 // Imprimir informações de debug
 printDebugInfo();
+
+// Inicializar auto-updater
+const autoUpdaterManager = new AutoUpdaterManager();
 
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
@@ -18,11 +22,39 @@ app.whenReady().then(() => {
   // Criar menu da aplicação
   createMenu(mainWindow);
   
+  // Passar referência do auto-updater para o menu
+  setAutoUpdaterManager(autoUpdaterManager);
+  
   // Configurar manipuladores IPC
   setupIpcHandlers(mainWindow);
   
   // Configurar manipuladores de web contents
   setupWebContentsHandlers(mainWindow);
+  
+  // Verificar por atualizações após 3 segundos (se habilitado)
+  setTimeout(() => {
+    // Verificar se o auto-update está habilitado nas configurações
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const { app } = require('electron');
+      
+      // Tentar ler as configurações do localStorage (em ambiente de produção)
+      // Para desenvolvimento, vamos sempre verificar
+      const isDev = require('electron-is-dev');
+      
+      if (isDev) {
+        console.log('🔄 Modo desenvolvimento - pulando verificação de auto-update');
+        return;
+      }
+      
+      autoUpdaterManager.checkForUpdatesAndNotify();
+    } catch (error) {
+      console.error('Erro ao verificar configurações de auto-update:', error);
+      // Em caso de erro, fazer a verificação mesmo assim
+      autoUpdaterManager.checkForUpdatesAndNotify();
+    }
+  }, 3000);
   
   app.on('activate', () => {
     console.log('🔄 App ativado...');
