@@ -47,6 +47,32 @@
   flex: 1;
 }
 
+/* Seção de extensões */
+.extensions-section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--nav-border);
+  min-width: fit-content;
+}
+
+/* Estilos para Select escuro */
+.dark-select-dropdown .ant-select-item {
+  background-color: #2d2d30 !important;
+  color: #cccccc !important;
+}
+
+.dark-select-dropdown .ant-select-item:hover {
+  background-color: #383838 !important;
+}
+
+.dark-select-dropdown .ant-select-item-option-selected {
+  background-color: #007acc !important;
+  color: #ffffff !important;
+}
+
 /* Área de conteúdo */
 .content-area {
   flex: 1;

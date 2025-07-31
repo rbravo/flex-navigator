@@ -1,13 +1,15 @@
-import React from 'react';
-import { Button, Input, Space, Tooltip } from 'antd';
+import React, { useState } from 'react';
+import { Button, Input, Space, Tooltip, Badge } from 'antd';
 import { 
   LeftOutlined, 
   RightOutlined, 
   ReloadOutlined, 
   StopOutlined,
   GlobalOutlined,
-  SendOutlined 
+  SendOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons';
+import AutoRefreshPopover from './AutoRefreshPopover';
 
 /**
  * Barra de controles de navegação
@@ -21,8 +23,22 @@ const ControlsBar = ({
   onBack,
   onForward,
   onRefresh,
-  onUrlSubmit
+  onUrlSubmit,
+  // Props para auto-refresh
+  isAutoRefreshEnabled,
+  refreshInterval,
+  timeRemaining,
+  onToggleAutoRefresh,
+  onIntervalChange
 }) => {
+  // Formatar o tempo restante para exibição
+  const formatTimeRemaining = (seconds) => {
+    if (seconds <= 0) return '';
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
   return (
     <div className="controls-bar">
       <Space size="small">
@@ -108,6 +124,42 @@ const ControlsBar = ({
           />
         </div>
       </form>
+
+      {/* Seção de Extensions */}
+      <div className="extensions-section">
+        <AutoRefreshPopover
+          isAutoRefreshEnabled={isAutoRefreshEnabled}
+          refreshInterval={refreshInterval}
+          onToggleAutoRefresh={onToggleAutoRefresh}
+          onIntervalChange={onIntervalChange}
+        >
+          <Tooltip 
+            title={
+              isAutoRefreshEnabled 
+                ? `Auto-refresh ativo${timeRemaining > 0 ? ` - próximo em ${formatTimeRemaining(timeRemaining)}` : ''}`
+                : "Configurar auto-refresh"
+            }
+          >
+            <Badge 
+              dot={isAutoRefreshEnabled} 
+              color="#007acc"
+              offset={[-2, 2]}
+            >
+              <Button
+                type="text"
+                icon={<ClockCircleOutlined />}
+                size="small"
+                style={{
+                  color: isAutoRefreshEnabled ? '#007acc' : '#cccccc',
+                  borderColor: '#3e3e42',
+                  backgroundColor: isAutoRefreshEnabled ? '#383838' : '#2d2d30',
+                  border: isAutoRefreshEnabled ? '1px solid #007acc' : '1px solid transparent'
+                }}
+              />
+            </Badge>
+          </Tooltip>
+        </AutoRefreshPopover>
+      </div>
     </div>
   );
 };

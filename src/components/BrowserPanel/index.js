@@ -3,6 +3,7 @@ import { ConfigProvider } from 'antd';
 import { darkTheme } from './utils/theme';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
 import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
+import useAutoRefresh from '../../hooks/useAutoRefresh';
 import ControlsBar from './components/ControlsBar';
 import WebContent from './components/WebContent';
 import LoadingBar from './components/LoadingBar';
@@ -24,6 +25,39 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   
   const webviewRef = useRef(null);
   const iframeRef = useRef(null);
+
+  // Função de refresh que será usada pelo auto-refresh
+  const handleRefresh = useCallback(() => {
+    if (isLoading) {
+      // Se está carregando, para o carregamento
+      setIsLoading(false);
+      if (isElectron && webviewRef.current) {
+        webviewRef.current.stop();
+      }
+    } else {
+      // Se não está carregando, recarrega a página
+      setIsLoading(true);
+      if (isElectron && webviewRef.current) {
+        webviewRef.current.reload();
+      } else if (iframeRef.current) {
+        // Para desenvolvimento no browser, força reload do iframe
+        const currentSrc = iframeRef.current.src;
+        iframeRef.current.src = '';
+        setTimeout(() => {
+          iframeRef.current.src = currentSrc;
+        }, 10);
+      }
+    }
+  }, [isLoading, isElectron]);
+
+  // Hook para gerenciar auto-refresh
+  const {
+    isAutoRefreshEnabled,
+    refreshInterval,
+    timeRemaining,
+    toggleAutoRefresh,
+    updateRefreshInterval
+  } = useAutoRefresh(handleRefresh);
 
   // Detecta se está rodando no Electron
   useEffect(() => {
@@ -145,29 +179,6 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     }
   }, [isElectron, canGoForward]);
 
-  const handleRefresh = useCallback(() => {
-    if (isLoading) {
-      // Se está carregando, para o carregamento
-      setIsLoading(false);
-      if (isElectron && webviewRef.current) {
-        webviewRef.current.stop();
-      }
-    } else {
-      // Se não está carregando, recarrega a página
-      setIsLoading(true);
-      if (isElectron && webviewRef.current) {
-        webviewRef.current.reload();
-      } else if (iframeRef.current) {
-        // Para desenvolvimento no browser, força reload do iframe
-        const currentSrc = iframeRef.current.src;
-        iframeRef.current.src = '';
-        setTimeout(() => {
-          iframeRef.current.src = currentSrc;
-        }, 10);
-      }
-    }
-  }, [isLoading, isElectron]);
-
   const navigateToUrl = useCallback((inputUrl) => {
     const targetUrl = processUrl(inputUrl);
     setCurrentUrl(targetUrl);
@@ -270,6 +281,11 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             onForward={handleForward}
             onRefresh={handleRefreshClick}
             onUrlSubmit={handleUrlSubmit}
+            isAutoRefreshEnabled={isAutoRefreshEnabled}
+            refreshInterval={refreshInterval}
+            timeRemaining={timeRemaining}
+            onToggleAutoRefresh={toggleAutoRefresh}
+            onIntervalChange={updateRefreshInterval}
           />
         )}
         
