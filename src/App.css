@@ -32,6 +32,13 @@
   -webkit-app-region: no-drag;
 }
 
+/* No Mac os "traffic lights" (fechar/minimizar/maximizar) ficam fixos no
+   canto esquerdo por cima da janela; empurramos nosso ícone e menu pra
+   direita para não sobrepor */
+.app-titlebar-mac .app-titlebar-icon {
+  padding-left: 78px;
+}
+
 .app-titlebar-icon img {
   width: 18px;
   height: 18px;

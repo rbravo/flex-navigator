@@ -25,14 +25,21 @@ function createWindow() {
       webviewTag: true // Habilita a tag webview
     },
     // Esconde a barra de título nativa e sobrepõe apenas os botões de
-    // minimizar/maximizar/fechar (desenhados pelo Windows) numa única linha
-    // com o nosso menu customizado, no estilo Chrome/VSCode
+    // minimizar/maximizar/fechar numa única linha com o nosso menu
+    // customizado, no estilo Chrome/VSCode. No Windows/Linux os botões são
+    // desenhados pelo próprio SO (titleBarOverlay); no Mac os "traffic
+    // lights" ficam sempre no canto esquerdo, então reposicionamos e
+    // damos espaço pra eles no CSS (ver .app-titlebar-mac)
     titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#1e1e1e',
-      symbolColor: '#cccccc',
-      height: 40
-    },
+    ...(process.platform === 'darwin'
+      ? { trafficLightPosition: { x: 12, y: 12 } }
+      : {
+          titleBarOverlay: {
+            color: '#1e1e1e',
+            symbolColor: '#cccccc',
+            height: 40
+          }
+        }),
     show: false,
     title: 'Flex Navigator'
   });
