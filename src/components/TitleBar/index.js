@@ -29,7 +29,7 @@ const TitleBar = () => {
   return (
     <div className="app-titlebar">
       <div className="app-titlebar-icon">
-        <img src="/logo192.png" alt="" />
+        <img src={`${process.env.PUBLIC_URL}/logo1024.png`} alt="" />
       </div>
       <div className="app-titlebar-menu">
         {MENU_LABELS.map((label) => (

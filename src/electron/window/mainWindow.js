@@ -9,10 +9,14 @@ let mainWindow = null;
  */
 function createWindow() {
   console.log('🚀 Criando janela do Electron...');
+
+  const windowIcon = isDev
+    ? path.join(__dirname, '../../../public/favicon.ico')
+    : path.join(__dirname, '../../../build/favicon.ico');
   
   // Create the browser window
   mainWindow = new BrowserWindow({
-    icon: path.join(__dirname, '../../../public/favicon.ico'),
+    icon: windowIcon,
     width: 1400,
     height: 900,
     minWidth: 800,
