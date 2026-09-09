@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Desenvolver', 'Sessão', 'Ajuda'];
+const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Sessão', 'Dev', 'Ajuda'];
 
 /**
  * Barra de título customizada: substitui a barra de título nativa + a barra
@@ -26,8 +26,10 @@ const TitleBar = () => {
     }
   };
 
+  const isMac = process.platform === 'darwin';
+
   return (
-    <div className="app-titlebar">
+    <div className={`app-titlebar${isMac ? ' app-titlebar-mac' : ''}`}>
       <div className="app-titlebar-icon">
         <img src={`${process.env.PUBLIC_URL}/logo1024.png`} alt="" />
       </div>

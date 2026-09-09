@@ -49,11 +49,11 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && node_modules\\.bin\\electron.cmd .\"",
-    "electron": "node_modules\\.bin\\electron.cmd .",
-    "pack": "node_modules\\.bin\\electron-builder.cmd",
+    "dev": "concurrently \"npm start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron": "electron .",
+    "pack": "electron-builder",
     "distpub": "npm run build && dotenv -e .env -- electron-builder --publish always",
-    "dist": "npm run build && node_modules\\.bin\\electron-builder.cmd"
+    "dist": "npm run build && electron-builder"
   },
   "main": "electron.js",
   "homepage": "./",
