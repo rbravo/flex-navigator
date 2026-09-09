@@ -2,7 +2,9 @@
 
 *🌐 A flexible and customizable **web browser** built with Electron and React*
 
-<img width="426" height="240" alt="Video Project 1" src="https://github.com/user-attachments/assets/80b4bd40-43e0-463b-ad7c-253476a32075" />
+<img width="532" height="300" alt="Video Project 1" src="https://github.com/user-attachments/assets/80b4bd40-43e0-463b-ad7c-253476a32075" />
+
+[⬇️ Download](https://github.com/rbravo/flex-navigator/releases)
 
 ### 🚀 Features
 
