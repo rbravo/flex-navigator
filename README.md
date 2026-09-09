@@ -6,6 +6,8 @@
 
 [⬇️ Download](https://github.com/rbravo/flex-navigator/releases)
 
+[![Version](https://img.shields.io/github/v/release/rbravo/flex-navigator?label=version)](https://github.com/rbravo/flex-navigator/releases/latest)
+
 ### 🚀 Features
 
 - **🔄 Flexible Layout**: Use FlexLayout React to organize multiple browser instances in any configuration
