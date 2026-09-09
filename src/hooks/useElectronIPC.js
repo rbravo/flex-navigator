@@ -51,6 +51,13 @@ const useElectronIPC = (model) => {
           window.dispatchEvent(new CustomEvent('test-notifications'));
         };
 
+        // Listener para teclas de atalho de navegação capturadas dentro de
+        // uma webview (o keydown do host não dispara nesse caso, então o
+        // processo principal repassa o evento via before-input-event)
+        const handleWebviewNavigationKeyEvent = (event, data) => {
+          window.dispatchEvent(new CustomEvent('webview-navigation-key-event', { detail: data }));
+        };
+
         // Listener para atualizações de estado de áudio
         const handleAudioStateUpdate = (event, data) => {
           //console.log('Recebido update de áudio:', data);
@@ -71,6 +78,7 @@ const useElectronIPC = (model) => {
         ipcRenderer.on('show-settings-dialog', handleShowSettingsDialog);
         ipcRenderer.on('open-url', handleOpenUrl);
         ipcRenderer.on('test-notifications', handleTestNotifications);
+        ipcRenderer.on('navigation-webview-key-event', handleWebviewNavigationKeyEvent);
 
         // Iniciar monitoramento de áudio
         const stopAudioMonitoring = startAudioStateMonitoring(model);
@@ -84,6 +92,7 @@ const useElectronIPC = (model) => {
           ipcRenderer.removeListener('show-settings-dialog', handleShowSettingsDialog);
           ipcRenderer.removeListener('open-url', handleOpenUrl);
           ipcRenderer.removeListener('test-notifications', handleTestNotifications);
+          ipcRenderer.removeListener('navigation-webview-key-event', handleWebviewNavigationKeyEvent);
           
           // Parar monitoramento de áudio
           if (stopAudioMonitoring) {

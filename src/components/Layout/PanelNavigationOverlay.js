@@ -1,23 +1,55 @@
 import React from 'react';
 
 /**
- * Componente que exibe instruções durante o modo de navegação entre painéis
+ * Overlay que mostra os atalhos de navegação entre painéis enquanto os
+ * modificadores configurados (ex.: Ctrl+Shift) estão pressionados
  */
-const PanelNavigationOverlay = ({ isVisible, activePanelIndex, totalPanels }) => {
+const PanelNavigationOverlay = ({
+  isVisible,
+  activePanelIndex,
+  totalPanels,
+  shortcutModifiers = 'Ctrl+Shift'
+}) => {
   if (!isVisible) return null;
+
+  const modifierKeys = shortcutModifiers.split('+');
+
+  const shortcuts = [
+    { label: 'Dividir verticalmente', keys: [...modifierKeys, 'V'] },
+    { label: 'Dividir horizontalmente', keys: [...modifierKeys, 'H'] },
+    { label: 'Navegar entre painéis', keys: [...modifierKeys, '←  →'] },
+    { label: 'Ir para primeiro/último painel', keys: [...modifierKeys, '↑  ↓'] },
+    { label: 'Focar no painel', keys: [...modifierKeys, 'Enter'] },
+    { label: 'Fechar painel', keys: [...modifierKeys, 'W'] },
+    { label: 'Sair do modo', keys: ['Esc'] }
+  ];
 
   return (
     <div className="panel-navigation-overlay">
-      <div className="title">🎯 Navegação entre Painéis</div>
-      <div className="instructions">
-        <div>Painel {activePanelIndex + 1} de {totalPanels}</div>
-        <div><span className="shortcut-key">→ ←</span> Navegar entre painéis</div>
-        <div><span className="shortcut-key">↑ ↓</span> Ir para primeiro/último</div>
-        <div><span className="shortcut-key">V</span>: Dividir verticalmente</div>
-        <div><span className="shortcut-key">H</span>: Dividir horizontalmente</div>
-        <div><span className="shortcut-key">W</span>: Fechar painel</div>
-        <div><span className="shortcut-key">Enter</span>: Focar no painel</div>
-        <div><span className="shortcut-key">Esc</span> ou <span className="shortcut-key">Ctrl+B</span>: Sair</div>
+      <div className="pno-header">
+        <div>
+          <div className="pno-title">🎯 Navegação entre Painéis</div>
+          <div className="pno-subtitle">Segurados juntos · separador é a combinação</div>
+        </div>
+        <div className="pno-panel-count">
+          Painel <strong>{activePanelIndex + 1}</strong> de {totalPanels}
+        </div>
+      </div>
+
+      <div className="pno-list">
+        {shortcuts.map((shortcut) => (
+          <div className="pno-row" key={shortcut.label}>
+            <span className="pno-label">{shortcut.label}</span>
+            <span className="pno-keys">
+              {shortcut.keys.map((key, index) => (
+                <React.Fragment key={`${shortcut.label}-${key}-${index}`}>
+                  {index > 0 && <span className="pno-plus">+</span>}
+                  <kbd className="pno-key">{key}</kbd>
+                </React.Fragment>
+              ))}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

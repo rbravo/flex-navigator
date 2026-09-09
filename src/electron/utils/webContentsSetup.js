@@ -1,5 +1,6 @@
 const { app } = require('electron');
 const { isDev } = require('./config');
+const { attachShortcutInterception } = require('./navigationShortcuts');
 
 /**
  * Configura comportamentos para webviews e context menus
@@ -29,6 +30,10 @@ function setupWebContentsHandlers(mainWindow) {
 
     // Configure context menu for webview contents specifically
     if (contents.getType() === 'webview') {
+      // Permite que os atalhos de navegação entre painéis funcionem mesmo
+      // com o foco dentro da webview
+      attachShortcutInterception(contents, mainWindow);
+
       console.log('Configurando context menu para webview:', contents.getURL());
       
       // Configure context menu for this specific webview

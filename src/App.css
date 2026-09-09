@@ -22,6 +22,8 @@
 .flexlayout__tab_button {
   max-width: 210px !important;
   min-width: 100px !important;
+  border-top-left-radius: 7px !important;
+  border-top-right-radius: 7px !important;
 }
 
 .flexlayout__tab_button_content {
@@ -93,7 +95,8 @@
 
 .flexlayout__tab_button:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
-  border-radius: 2px !important;
+  border-top-left-radius: 7px !important;
+  border-top-right-radius: 7px !important;
 }
 
 .flexlayout__tab_button.flexlayout__tab_button_top.flexlayout__tab_button--selected {
@@ -121,6 +124,8 @@
   color: white;
   background: none;
   outline: none;
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
 }
 
 .tabset-button:hover {
@@ -195,41 +200,102 @@
   position: fixed;
   bottom: 20px;
   left: 20px;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 16px 20px;
-  border-radius: 8px;
+  background: #252526;
+  color: #cccccc;
+  padding: 18px 20px;
+  border-radius: 10px;
+  border: 1px solid #3e3e42;
   font-size: 12px;
   z-index: 10000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  min-width: 220px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  min-width: 320px;
 }
 
-.panel-navigation-overlay .title {
-  font-weight: bold;
+.panel-navigation-overlay .pno-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
   margin-bottom: 8px;
-  color: #007acc;
+  border-bottom: 1px solid #3e3e42;
 }
 
-.panel-navigation-overlay .instructions {
+.panel-navigation-overlay .pno-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.panel-navigation-overlay .pno-subtitle {
   font-size: 11px;
-  line-height: 1.4;
+  color: #8a8a8a;
 }
 
-.panel-navigation-overlay .instructions div {
-  margin-bottom: 3px;
+.panel-navigation-overlay .pno-panel-count {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #9d9d9d;
+  background: #2d2d30;
+  border: 1px solid #3e3e42;
+  border-radius: 12px;
+  padding: 3px 10px;
+  white-space: nowrap;
 }
 
-.panel-navigation-overlay .instructions div:last-child {
-  margin-bottom: 0;
+.panel-navigation-overlay .pno-panel-count strong {
+  color: #4fc1ff;
 }
 
-/* Destacar teclas de atalho */
-.panel-navigation-overlay .shortcut-key {
-  background: rgba(0, 122, 204, 0.3);
-  padding: 1px 4px;
-  border-radius: 3px;
-  font-weight: bold;
+.panel-navigation-overlay .pno-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-navigation-overlay .pno-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.panel-navigation-overlay .pno-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.panel-navigation-overlay .pno-label {
+  font-size: 12px;
+  color: #cccccc;
+  white-space: nowrap;
+}
+
+.panel-navigation-overlay .pno-keys {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.panel-navigation-overlay .pno-key {
+  background: #383838;
+  border: 1px solid #4a4a4e;
+  border-radius: 6px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #e8e8e8;
+  line-height: 1.3;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.panel-navigation-overlay .pno-plus {
+  font-size: 11px;
+  color: #666666;
 }
 
 /* Painel ativo no modo de navegação - usando sistema nativo do FlexLayout */

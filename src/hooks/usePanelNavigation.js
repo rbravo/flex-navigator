@@ -1,17 +1,30 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { splitPanelHorizontal, splitPanelVertical } from '../utils/layoutActions';
 import { Actions } from 'flexlayout-react';
+import useShortcutsConfig from './useShortcutsConfig';
+
+const noop = () => {};
+
+// Cada opção de ShortcutsConfigPopover mapeada para um teste de modificadores
+const MODIFIER_MATCHERS = {
+  'Ctrl+Shift': (e) => e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey,
+  'Ctrl+Alt': (e) => e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey,
+  'Alt+Shift': (e) => e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey,
+  'Ctrl+Meta': (e) => e.ctrlKey && e.metaKey && !e.shiftKey && !e.altKey
+};
 
 /**
- * Hook para navegação entre painéis com teclado
- * Ctrl+B ativa o modo de navegação
- * Setas do teclado navegam entre os painéis
- * ESC ou Ctrl+B novamente desativa o modo
+ * Hook para navegação entre painéis com teclado.
+ * Mantendo pressionada a combinação de modificadores configurada em
+ * ShortcutsConfigPopover (Ctrl+Shift por padrão), o overlay de navegação
+ * aparece e as demais teclas (setas, V, H, W, Enter, Esc) agem sobre os
+ * painéis. Soltar os modificadores sai do modo.
  */
 const usePanelNavigation = (model) => {
   const [isNavigationMode, setIsNavigationMode] = useState(false);
   const [activePanelIndex, setActivePanelIndex] = useState(0);
   const [availablePanels, setAvailablePanels] = useState([]);
+  const { isShortcutsEnabled, shortcutModifiers } = useShortcutsConfig();
 
   // Função para coletar todos os painéis (tabsets) disponíveis
   const collectPanels = useCallback(() => {
@@ -224,78 +237,176 @@ const usePanelNavigation = (model) => {
     }
   }, [availablePanels, activePanelIndex, isNavigationMode]);
 
-  // Event listener para teclas
+  // Sempre aponta para a versão mais recente das funções de ação. As ações
+  // mudam de identidade a cada split/navegação (dependem de availablePanels/
+  // activePanelIndex), então o efeito de teclado abaixo lê essa ref em vez de
+  // depender das funções diretamente — caso contrário, executar uma ação
+  // desmontaria e remontaria os listeners no meio da tecla pressionada,
+  // perdendo o estado local "modificadores segurados" e deixando o overlay
+  // aberto para sempre após soltar as teclas.
+  const actionsRef = useRef({});
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      // Ctrl+B para ativar/desativar modo de navegação
-      if (event.ctrlKey && event.key === 'b') {
-        event.preventDefault();
-        toggleNavigationMode();
-        return;
+    actionsRef.current = {
+      navigateToNextPanel,
+      navigateToPreviousPanel,
+      navigateUp,
+      navigateDown,
+      splitActivePanelHorizontal,
+      splitActivePanelVertical,
+      closeActivePanel,
+      focusActivePanel
+    };
+  });
+
+  // Detecção dos modificadores configurados (mantidos pressionados) + teclas de ação
+  useEffect(() => {
+    // Atalhos desabilitados pelo usuário: garantir que o modo é encerrado e não registrar nada
+    if (!isShortcutsEnabled) {
+      setIsNavigationMode(false);
+      return undefined;
+    }
+
+    const matchesConfiguredModifiers = MODIFIER_MATCHERS[shortcutModifiers] || MODIFIER_MATCHERS['Ctrl+Shift'];
+    let isModifiersHeld = false;
+
+    const activateNavigationMode = () => {
+      if (!isModifiersHeld) {
+        isModifiersHeld = true;
+        setIsNavigationMode(true);
       }
-      
-      // Se não está no modo de navegação, ignorar outras teclas
-      if (!isNavigationMode) return;
-      
-      // ESC para sair do modo de navegação
-      if (event.key === 'Escape') {
-        event.preventDefault();
+    };
+
+    const deactivateNavigationMode = () => {
+      if (isModifiersHeld) {
+        isModifiersHeld = false;
         setIsNavigationMode(false);
-        return;
+
+        // Limpar classes visuais
+        setTimeout(() => {
+          const allTabsets = document.querySelectorAll('.flexlayout__tabset');
+          allTabsets.forEach(tabset => {
+            tabset.classList.remove('panel-navigation-active', 'panel-navigation-inactive');
+          });
+        }, 100);
       }
-      
-      // Setas para navegar entre painéis
-      switch (event.key) {
+    };
+
+    // handleKeyDown/handleKeyUp recebem tanto KeyboardEvent reais (foco fora
+    // de uma webview) quanto objetos repassados pelo processo principal via
+    // 'webview-navigation-key-event' (foco dentro de uma webview, onde o
+    // keydown do host não é disparado)
+    const handleKeyDown = (e) => {
+      if (!matchesConfiguredModifiers(e)) return;
+
+      activateNavigationMode();
+      const actions = actionsRef.current;
+
+      switch (e.key) {
         case 'ArrowRight':
-          event.preventDefault();
-          navigateToNextPanel();
+          e.preventDefault();
+          e.stopPropagation();
+          actions.navigateToNextPanel();
           break;
         case 'ArrowLeft':
-          event.preventDefault();
-          navigateToPreviousPanel();
+          e.preventDefault();
+          e.stopPropagation();
+          actions.navigateToPreviousPanel();
           break;
         case 'ArrowUp':
-          event.preventDefault();
-          navigateUp();
+          e.preventDefault();
+          e.stopPropagation();
+          actions.navigateUp();
           break;
         case 'ArrowDown':
-          event.preventDefault();
-          navigateDown();
-          break;
-        case 'Enter':
-          event.preventDefault();
-          focusActivePanel();
-          setIsNavigationMode(false);
+          e.preventDefault();
+          e.stopPropagation();
+          actions.navigateDown();
           break;
         case 'v':
         case 'V':
-          event.preventDefault();
-          splitActivePanelVertical();
+          e.preventDefault();
+          e.stopPropagation();
+          actions.splitActivePanelVertical();
           break;
         case 'h':
         case 'H':
-          event.preventDefault();
-          splitActivePanelHorizontal();
+          e.preventDefault();
+          e.stopPropagation();
+          actions.splitActivePanelHorizontal();
           break;
         case 'w':
         case 'W':
-          event.preventDefault();
-          closeActivePanel();
+          e.preventDefault();
+          e.stopPropagation();
+          actions.closeActivePanel();
+          break;
+        case 'Enter':
+          e.preventDefault();
+          e.stopPropagation();
+          actions.focusActivePanel();
+          deactivateNavigationMode(); // Sair após focar
+          break;
+        case 'Escape':
+          e.preventDefault();
+          e.stopPropagation();
+          deactivateNavigationMode();
+          break;
+        default:
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+    const handleKeyUp = (e) => {
+      if (isModifiersHeld && !matchesConfiguredModifiers(e)) {
+        // Pequeno delay para evitar flicker
+        setTimeout(deactivateNavigationMode, 50);
+      }
     };
-  }, [isNavigationMode, toggleNavigationMode, navigateToNextPanel, navigateToPreviousPanel, navigateUp, navigateDown, focusActivePanel, splitActivePanelHorizontal, splitActivePanelVertical, closeActivePanel]);
+
+    const handleWindowBlur = () => deactivateNavigationMode();
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        deactivateNavigationMode();
+      }
+    };
+
+    // Eventos reais do host (funcionam quando o foco não está em uma webview)
+    document.addEventListener('keydown', handleKeyDown, true);
+    document.addEventListener('keyup', handleKeyUp, true);
+    window.addEventListener('blur', handleWindowBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Eventos repassados pelo processo principal (before-input-event) quando
+    // o foco está dentro de uma webview
+    const handleWebviewKeyEvent = (event) => {
+      const data = event.detail;
+      if (data.type === 'keyDown') {
+        handleKeyDown({ ...data, preventDefault: noop, stopPropagation: noop });
+      } else if (data.type === 'keyUp') {
+        handleKeyUp(data);
+      }
+    };
+    window.addEventListener('webview-navigation-key-event', handleWebviewKeyEvent);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, true);
+      document.removeEventListener('keyup', handleKeyUp, true);
+      window.removeEventListener('blur', handleWindowBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('webview-navigation-key-event', handleWebviewKeyEvent);
+    };
+    // As ações são lidas via actionsRef (sempre atualizada), não como dependências:
+    // isso mantém os listeners e o estado local "modificadores segurados" estáveis
+    // mesmo quando um split/navegação recria essas funções.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isShortcutsEnabled, shortcutModifiers]);
 
   return {
     isNavigationMode,
     activePanelIndex,
     availablePanels,
+    shortcutModifiers,
     toggleNavigationMode
   };
 };

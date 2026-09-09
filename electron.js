@@ -30,9 +30,9 @@ app.whenReady().then(() => {
   
   // Configurar manipuladores de web contents
   setupWebContentsHandlers(mainWindow);
-  
+
   // Verificar por atualizações após 3 segundos (se habilitado)
-  setTimeout(() => {
+  setTimeout(async () => {
     // Verificar se o auto-update está habilitado nas configurações
     try {
       const fs = require('fs');
@@ -41,7 +41,7 @@ app.whenReady().then(() => {
       
       // Tentar ler as configurações do localStorage (em ambiente de produção)
       // Para desenvolvimento, vamos sempre verificar
-      const isDev = require('electron-is-dev');
+      const { default: isDev } = await import('electron-is-dev');
       
       if (isDev) {
         console.log('🔄 Modo desenvolvimento - pulando verificação de auto-update');

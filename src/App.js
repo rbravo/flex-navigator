@@ -41,10 +41,11 @@ const AppContent = () => {
   const { model, loadConfiguration } = useFlexLayoutModel();
 
   // Hook para navegação entre painéis
-  const { 
-    isNavigationMode, 
-    activePanelIndex, 
-    availablePanels 
+  const {
+    isNavigationMode,
+    activePanelIndex,
+    availablePanels,
+    shortcutModifiers
   } = usePanelNavigation(model);
 
   // Acessar o sistema de notificação
@@ -406,6 +407,7 @@ const AppContent = () => {
           isVisible={isNavigationMode}
           activePanelIndex={activePanelIndex}
           totalPanels={availablePanels.length}
+          shortcutModifiers={shortcutModifiers}
         />
         
         {/* Menu de contexto das tabs */}

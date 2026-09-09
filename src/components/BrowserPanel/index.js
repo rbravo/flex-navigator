@@ -4,6 +4,7 @@ import { darkTheme } from './utils/theme';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
 import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
 import useAutoRefresh from '../../hooks/useAutoRefresh';
+import useShortcutsConfig from '../../hooks/useShortcutsConfig';
 import ControlsBar from './components/ControlsBar';
 import WebContent from './components/WebContent';
 import LoadingBar from './components/LoadingBar';
@@ -58,6 +59,14 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     toggleAutoRefresh,
     updateRefreshInterval
   } = useAutoRefresh(handleRefresh);
+
+  // Hook para gerenciar configurações de shortcuts
+  const {
+    isShortcutsEnabled,
+    shortcutModifiers,
+    toggleShortcuts,
+    updateModifiers
+  } = useShortcutsConfig();
 
   // Detecta se está rodando no Electron
   useEffect(() => {
@@ -286,6 +295,10 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             timeRemaining={timeRemaining}
             onToggleAutoRefresh={toggleAutoRefresh}
             onIntervalChange={updateRefreshInterval}
+            isShortcutsEnabled={isShortcutsEnabled}
+            shortcutModifiers={shortcutModifiers}
+            onToggleShortcuts={toggleShortcuts}
+            onShortcutModifiersChange={updateModifiers}
           />
         )}
         

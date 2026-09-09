@@ -43,5 +43,6 @@ export const layoutEventEmitter = new LayoutEventEmitter();
 // Eventos disponíveis
 export const LAYOUT_EVENTS = {
   NAVIGATION_BAR_TOGGLED: 'navigationBarToggled',
-  TABSET_CONFIG_CHANGED: 'tabsetConfigChanged'
+  TABSET_CONFIG_CHANGED: 'tabsetConfigChanged',
+  SHORTCUTS_CONFIG_CHANGED: 'shortcutsConfigChanged'
 };
