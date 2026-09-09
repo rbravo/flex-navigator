@@ -185,3 +185,81 @@
 .flexlayout__tabset_header_content button:not(.tabset-button) {
   display: none !important;
 }
+
+/* ======================== */
+/* NAVEGAÇÃO ENTRE PAINÉIS */
+/* ======================== */
+
+/* Modo de navegação ativo - overlay de instruções */
+.panel-navigation-overlay {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  min-width: 220px;
+}
+
+.panel-navigation-overlay .title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #007acc;
+}
+
+.panel-navigation-overlay .instructions {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.panel-navigation-overlay .instructions div {
+  margin-bottom: 3px;
+}
+
+.panel-navigation-overlay .instructions div:last-child {
+  margin-bottom: 0;
+}
+
+/* Destacar teclas de atalho */
+.panel-navigation-overlay .shortcut-key {
+  background: rgba(0, 122, 204, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+/* Painel ativo no modo de navegação - usando sistema nativo do FlexLayout */
+.flexlayout__tabset.panel-navigation-active .flexlayout__tabset_header {
+  background-color: #007acc !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Painéis inativos no modo de navegação */
+.flexlayout__tabset.panel-navigation-inactive {
+  opacity: 0.9 !important;
+  transition: opacity 0.2s ease !important;
+}
+
+/* Header dos painéis inativos - cor mais escura */
+.flexlayout__tabset.panel-navigation-inactive .flexlayout__tabset_header {
+  background-color: #1a1a1a !important;
+  transition: background-color 0.2s ease !important;
+}
+
+/* Transições suaves para o modo de navegação */
+.flexlayout__tabset {
+  transition: opacity 0.2s ease !important;
+}
+
+.flexlayout__tabset .flexlayout__tabset_header {
+  transition: background-color 0.2s ease !important;
+}
+
+/* Realçar painel ativo do FlexLayout com uma cor mais sutil quando não está no modo de navegação */
+.flexlayout__tabset_selected:not(.panel-navigation-active):not(.panel-navigation-inactive) .flexlayout__tabset_header {
+  background-color: #383838 !important;
+}

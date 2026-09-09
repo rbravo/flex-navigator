@@ -8,12 +8,14 @@ import './App.css';
 import useFlexLayoutModel from './hooks/useFlexLayoutModel';
 import useElectronIPC from './hooks/useElectronIPC';
 import useSessionManager from './hooks/useSessionManager';
+import usePanelNavigation from './hooks/usePanelNavigation';
 
 // Componentes de layout
 import LayoutFactory from './components/Layout/LayoutFactory';
 import TabSetRenderer from './components/Layout/TabSetRenderer';
 import TabRenderer from './components/Layout/TabRenderer';
 import TabContextMenu from './components/Layout/TabContextMenu';
+import PanelNavigationOverlay from './components/Layout/PanelNavigationOverlay';
 
 // Componentes de sessão
 import SaveSessionModal from './components/Session/SaveSessionModal';
@@ -37,6 +39,13 @@ import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWeb
 const AppContent = () => {
   // Gerenciar modelo do FlexLayout
   const { model, loadConfiguration } = useFlexLayoutModel();
+
+  // Hook para navegação entre painéis
+  const { 
+    isNavigationMode, 
+    activePanelIndex, 
+    availablePanels 
+  } = usePanelNavigation(model);
 
   // Acessar o sistema de notificação
   const notificationAPI = useNotification();
@@ -390,6 +399,13 @@ const AppContent = () => {
           onAction={onAction}
           onRenderTabSet={onRenderTabSet}
           onRenderTab={onRenderTab}
+        />
+        
+        {/* Overlay de navegação entre painéis */}
+        <PanelNavigationOverlay
+          isVisible={isNavigationMode}
+          activePanelIndex={activePanelIndex}
+          totalPanels={availablePanels.length}
         />
         
         {/* Menu de contexto das tabs */}
