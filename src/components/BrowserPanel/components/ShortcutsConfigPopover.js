@@ -53,8 +53,8 @@ const ShortcutsConfigPopover = ({
   ];
 
   const content = (
-    <div style={{ 
-      width: '320px', 
+    <div style={{
+      width: '320px',
       backgroundColor: '#2d2d30',
       border: 'none'
     }}>
@@ -71,14 +71,14 @@ const ShortcutsConfigPopover = ({
           />
         </div>
 
-        <Divider style={{ margin: '8px 0', backgroundColor: '#3e3e42' }} />
+        <Divider style={{ margin: '0px 0', backgroundColor: '#3e3e42' }} />
 
         {/* Configuração das teclas modificadoras */}
         <div style={{ opacity: localEnabled ? 1 : 0.5 }}>
           <Text style={{ color: '#cccccc', fontSize: '14px' }}>
             Teclas modificadoras
           </Text>
-          
+
           <div style={{ marginTop: '8px' }}>
             <Select
               value={localModifiers}
@@ -95,10 +95,10 @@ const ShortcutsConfigPopover = ({
               }}
             >
               {modifierOptions.map(option => (
-                <Option 
-                  key={option.value} 
+                <Option
+                  key={option.value}
                   value={option.value}
-                  style={{ 
+                  style={{
                     backgroundColor: '#383838',
                     color: '#cccccc'
                   }}
@@ -108,26 +108,28 @@ const ShortcutsConfigPopover = ({
               ))}
             </Select>
           </div>
-          
+
           <Text style={{ color: '#666666', fontSize: '11px', marginTop: '4px', display: 'block' }}>
             Mantenha as teclas pressionadas para ativar o modo
           </Text>
         </div>
 
-        <Divider style={{ margin: '8px 0', backgroundColor: '#3e3e42' }} />
+        <Divider style={{ margin: '0px 0', backgroundColor: '#3e3e42' }} />
 
         {/* Lista de atalhos */}
         <div style={{ opacity: localEnabled ? 1 : 0.3 }}>
           <Text style={{ color: '#cccccc', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
             Atalhos disponíveis:
           </Text>
-          
-          <div style={{ maxHeight: '180px', overflowY: 'auto' }}>
+
+          <div style={{
+            //maxHeight: '180px', overflowY: 'auto'
+          }}>
             {shortcuts.map((shortcut, index) => (
-              <div 
+              <div
                 key={index}
-                style={{ 
-                  display: 'flex', 
+                style={{
+                  display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '4px 0',
@@ -137,9 +139,9 @@ const ShortcutsConfigPopover = ({
                 <Text style={{ color: '#999999', fontSize: '11px', flex: 1 }}>
                   {shortcut.action}
                 </Text>
-                <div style={{ 
-                  backgroundColor: '#383838', 
-                  padding: '2px 6px', 
+                <div style={{
+                  backgroundColor: '#383838',
+                  padding: '2px 6px',
                   borderRadius: '3px',
                   //border: '1px solid #3e3e42'
                 }}>
@@ -153,9 +155,9 @@ const ShortcutsConfigPopover = ({
         </div>
 
         {/* Info sobre funcionamento */}
-        <div style={{ 
-          backgroundColor: '#383838', 
-          padding: '8px', 
+        <div style={{
+          backgroundColor: '#383838',
+          padding: '8px',
           borderRadius: '4px',
           marginTop: '8px'
         }}>
