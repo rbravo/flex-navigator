@@ -1,6 +1,25 @@
 import { useEffect } from 'react';
-import { addNewTabToFirstTabset, addNewTabToSameTabset } from '../utils/layoutActions';
+import {
+  addNewTabToFirstTabset,
+  addNewTabToSameTabset,
+  createNewTab,
+  splitPanelHorizontal,
+  splitPanelVertical,
+  findAllTabsets
+} from '../utils/layoutActions';
 import { updateTabAudioState, startAudioStateMonitoring } from '../utils/tabActions';
+
+/**
+ * Retorna o id do tabset "atual": o ativo no FlexLayout ou, na ausência de
+ * um ativo, o primeiro disponível
+ */
+const getCurrentTabsetId = (model) => {
+  const activeTabset = model.getActiveTabset && model.getActiveTabset();
+  if (activeTabset) return activeTabset.getId();
+
+  const tabsets = findAllTabsets(model);
+  return tabsets.length > 0 ? tabsets[0].getId() : null;
+};
 
 /**
  * Hook customizado para gerenciar eventos do Electron IPC
@@ -51,6 +70,23 @@ const useElectronIPC = (model) => {
           window.dispatchEvent(new CustomEvent('test-notifications'));
         };
 
+        // Listeners para os comandos do menu "Arquivo": nova aba e divisão
+        // de painel, sempre agindo sobre o tabset atualmente ativo
+        const handleMenuNewTab = () => {
+          const tabsetId = getCurrentTabsetId(model);
+          if (tabsetId) createNewTab(model, tabsetId);
+        };
+
+        const handleMenuSplitHorizontal = () => {
+          const tabsetId = getCurrentTabsetId(model);
+          if (tabsetId) splitPanelHorizontal(model, tabsetId);
+        };
+
+        const handleMenuSplitVertical = () => {
+          const tabsetId = getCurrentTabsetId(model);
+          if (tabsetId) splitPanelVertical(model, tabsetId);
+        };
+
         // Listener para teclas de atalho de navegação capturadas dentro de
         // uma webview (o keydown do host não dispara nesse caso, então o
         // processo principal repassa o evento via before-input-event)
@@ -79,6 +115,9 @@ const useElectronIPC = (model) => {
         ipcRenderer.on('open-url', handleOpenUrl);
         ipcRenderer.on('test-notifications', handleTestNotifications);
         ipcRenderer.on('navigation-webview-key-event', handleWebviewNavigationKeyEvent);
+        ipcRenderer.on('menu-new-tab', handleMenuNewTab);
+        ipcRenderer.on('menu-split-horizontal', handleMenuSplitHorizontal);
+        ipcRenderer.on('menu-split-vertical', handleMenuSplitVertical);
 
         // Iniciar monitoramento de áudio
         const stopAudioMonitoring = startAudioStateMonitoring(model);
@@ -93,6 +132,9 @@ const useElectronIPC = (model) => {
           ipcRenderer.removeListener('open-url', handleOpenUrl);
           ipcRenderer.removeListener('test-notifications', handleTestNotifications);
           ipcRenderer.removeListener('navigation-webview-key-event', handleWebviewNavigationKeyEvent);
+          ipcRenderer.removeListener('menu-new-tab', handleMenuNewTab);
+          ipcRenderer.removeListener('menu-split-horizontal', handleMenuSplitHorizontal);
+          ipcRenderer.removeListener('menu-split-vertical', handleMenuSplitVertical);
           
           // Parar monitoramento de áudio
           if (stopAudioMonitoring) {

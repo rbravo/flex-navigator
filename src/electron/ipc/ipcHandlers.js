@@ -1,5 +1,6 @@
 const { ipcMain } = require('electron');
 const SessionManager = require('../utils/SessionManager');
+const { popupMenuItem } = require('../menu/applicationMenu');
 
 /**
  * Configura todos os manipuladores de eventos IPC
@@ -281,6 +282,11 @@ function setupIpcHandlers(mainWindow) {
     if (mainWindow && mainWindow.webContents) {
       mainWindow.webContents.send('test-notifications');
     }
+  });
+
+  // Abre o submenu nativo correspondente a um item da barra de título customizada
+  ipcMain.on('popup-app-menu', (event, { label, x, y }) => {
+    popupMenuItem(mainWindow, label, x, y);
   });
 }
 

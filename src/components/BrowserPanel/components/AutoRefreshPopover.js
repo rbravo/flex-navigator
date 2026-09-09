@@ -58,8 +58,8 @@ const AutoRefreshPopover = ({
   };
 
   const content = (
-    <div style={{ 
-      width: '280px', 
+    <div style={{
+      width: '280px',
       backgroundColor: '#2d2d30',
       border: 'none'
     }}>
@@ -76,14 +76,16 @@ const AutoRefreshPopover = ({
           />
         </div>
 
-        <Divider style={{ margin: '8px 0', backgroundColor: '#3e3e42' }} />
+        <p style={{ color: '#a0a0a0', fontSize: 11, marginTop: -5, marginBottom: -5 }}>Atualizar aba automaticamente no intervalo definido</p>
+
+        <Divider style={{ margin: '0 0 0 0', backgroundColor: '#3e3e42' }} />
 
         {/* Configuração do intervalo */}
         <div style={{ opacity: isAutoRefreshEnabled ? 1 : 0.5 }}>
           <Text style={{ color: '#cccccc', fontSize: '14px' }}>
             Intervalo de atualização
           </Text>
-          
+
           <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <InputNumber
               min={getMinValue()}

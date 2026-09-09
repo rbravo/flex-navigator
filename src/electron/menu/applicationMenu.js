@@ -18,12 +18,38 @@ function createMenuTemplate(mainWindow, sessions) {
       label: 'Arquivo',
       submenu: [
         {
+          label: 'Nova Aba',
+          accelerator: 'CmdOrCtrl+T',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('menu-new-tab');
+            }
+          }
+        },
+        {
+          label: 'Dividir Painel Horizontalmente',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('menu-split-horizontal');
+            }
+          }
+        },
+        {
+          label: 'Dividir Painel Verticalmente',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('menu-split-vertical');
+            }
+          }
+        },
+        { type: 'separator' },
+        {
           label: 'Sair',
           accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
           click: () => {
             app.quit();
           }
-        }
+        },
       ]
     },
     {
@@ -165,23 +191,6 @@ function createMenuTemplate(mainWindow, sessions) {
       ]
     },
     {
-      label: 'Desenvolver',
-      submenu: [
-        { role: 'reload', label: 'Recarregar App' },
-        { role: 'forceReload', label: 'Forçar Recarregamento' },
-        { role: 'toggleDevTools', label: 'DevTools da Aplicação' },
-        // { type: 'separator' },
-        // {
-        //   label: 'Testar Notificações',
-        //   click: () => {
-        //     if (mainWindow && mainWindow.webContents) {
-        //       mainWindow.webContents.send('test-notifications');
-        //     }
-        //   }
-        // }
-      ]
-    },
-    {
       label: 'Sessão',
       submenu: [
         {
@@ -206,6 +215,23 @@ function createMenuTemplate(mainWindow, sessions) {
           label: 'Gerenciar Sessões',
           submenu: buildSessionsSubmenu(sessions, mainWindow)
         }
+      ]
+    },
+    {
+      label: 'Dev',
+      submenu: [
+        { role: 'reload', label: 'Recarregar App' },
+        { role: 'forceReload', label: 'Forçar Recarregamento' },
+        { role: 'toggleDevTools', label: 'DevTools da Aplicação' },
+        // { type: 'separator' },
+        // {
+        //   label: 'Testar Notificações',
+        //   click: () => {
+        //     if (mainWindow && mainWindow.webContents) {
+        //       mainWindow.webContents.send('test-notifications');
+        //     }
+        //   }
+        // }
       ]
     },
     {
@@ -275,6 +301,10 @@ function createMenu(mainWindow) {
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
   currentMenu = menu;
+
+  // A barra de menu nativa fica oculta: o menu é exibido pela barra de
+  // título customizada em React, via popupMenuItem()
+  mainWindow.setMenuBarVisibility(false);
 }
 
 /**
@@ -286,11 +316,11 @@ function updateSessionsMenu(mainWindow) {
     createMenu(mainWindow);
     return;
   }
-  
+
   console.log('🔄 Atualizando menu de sessões...');
   const sessions = sessionManager.loadSessions();
   console.log('📋 Sessões encontradas para o menu:', sessions.length);
-  
+
   // Usar o template centralizado
   const template = createMenuTemplate(mainWindow, sessions);
 
@@ -315,8 +345,27 @@ function updateSessionsMenu(mainWindow) {
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
   currentMenu = menu;
-  
+  mainWindow.setMenuBarVisibility(false);
+
   console.log('✅ Menu de sessões atualizado com sucesso!');
+}
+
+/**
+ * Exibe o submenu de um item de topo (ex.: "Arquivo") na posição informada.
+ * Usado pela barra de título customizada, já que a barra de menu nativa
+ * fica oculta.
+ */
+function popupMenuItem(mainWindow, label, x, y) {
+  if (!currentMenu) return;
+
+  const item = currentMenu.items.find((menuItem) => menuItem.label === label);
+  if (item && item.submenu) {
+    item.submenu.popup({
+      window: mainWindow,
+      x: Math.round(x),
+      y: Math.round(y)
+    });
+  }
 }
 
 /**
@@ -372,5 +421,6 @@ function setAutoUpdaterManager(updaterManager) {
 module.exports = {
   createMenu,
   updateSessionsMenu,
-  setAutoUpdaterManager
+  setAutoUpdaterManager,
+  popupMenuItem
 };

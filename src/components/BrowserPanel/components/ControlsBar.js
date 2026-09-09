@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Button, Input, Space, Tooltip, Badge } from 'antd';
-import { 
-  LeftOutlined, 
-  RightOutlined, 
-  ReloadOutlined, 
+import {
+  LeftOutlined,
+  RightOutlined,
+  ReloadOutlined,
   StopOutlined,
   GlobalOutlined,
   SendOutlined,
   ClockCircleOutlined,
-  ControlOutlined
+  ControlOutlined,
+  SettingOutlined,
+  AppstoreAddOutlined
 } from '@ant-design/icons';
 import AutoRefreshPopover from './AutoRefreshPopover';
 import ShortcutsConfigPopover from './ShortcutsConfigPopover';
@@ -63,7 +65,7 @@ const ControlsBar = ({
             }}
           />
         </Tooltip>
-        
+
         <Tooltip title="Avançar">
           <Button
             type="text"
@@ -78,7 +80,7 @@ const ControlsBar = ({
             }}
           />
         </Tooltip>
-        
+
         <Tooltip title={isLoading ? "Parar carregamento" : "Atualizar página"}>
           <Button
             type="text"
@@ -93,7 +95,7 @@ const ControlsBar = ({
           />
         </Tooltip>
       </Space>
-      
+
       <form className="url-form" onSubmit={onUrlSubmit}>
         <div className="url-input-container">
           <Input
@@ -101,8 +103,8 @@ const ControlsBar = ({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             prefix={
-              isLoading ? 
-                <ReloadOutlined spin style={{ color: '#007acc' }} /> : 
+              isLoading ?
+                <ReloadOutlined spin style={{ color: '#007acc' }} /> :
                 <GlobalOutlined style={{ color: '#999999' }} />
             }
             suffix={
@@ -117,7 +119,8 @@ const ControlsBar = ({
                     borderColor: '#007acc',
                     borderWidth: 0,
                     height: '24px',
-                    minWidth: '28px'
+                    minWidth: '28px',
+                    marginRight: '-5px'
                   }}
                 />
               )
@@ -141,15 +144,15 @@ const ControlsBar = ({
             onToggleAutoRefresh={onToggleAutoRefresh}
             onIntervalChange={onIntervalChange}
           >
-            <Tooltip 
+            <Tooltip
               title={
-                isAutoRefreshEnabled 
+                isAutoRefreshEnabled
                   ? `Auto-refresh ativo${timeRemaining > 0 ? ` - próximo em ${formatTimeRemaining(timeRemaining)}` : ''}`
                   : "Configurar auto-refresh"
               }
             >
-              <Badge 
-                dot={isAutoRefreshEnabled} 
+              <Badge
+                dot={isAutoRefreshEnabled}
                 color="#007acc"
                 offset={[-2, 2]}
               >
@@ -174,21 +177,21 @@ const ControlsBar = ({
             onToggleShortcuts={onToggleShortcuts}
             onModifiersChange={onShortcutModifiersChange}
           >
-            <Tooltip 
+            <Tooltip
               title={
-                isShortcutsEnabled 
+                isShortcutsEnabled
                   ? `Atalhos ativos - ${shortcutModifiers} + tecla`
                   : "Configurar atalhos de navegação"
               }
             >
-              <Badge 
-                dot={isShortcutsEnabled} 
+              <Badge
+                dot={isShortcutsEnabled}
                 color="#007acc"
                 offset={[-2, 2]}
               >
                 <Button
                   type="text"
-                  icon={<ControlOutlined />}
+                  icon={<AppstoreAddOutlined />}
                   size="small"
                   style={{
                     color: isShortcutsEnabled ? '#007acc' : '#cccccc',
@@ -200,6 +203,22 @@ const ControlsBar = ({
               </Badge>
             </Tooltip>
           </ShortcutsConfigPopover>
+
+          <Tooltip title={"Configurações"}>
+            <Button
+              type="text"
+              icon={<SettingOutlined />}
+              size="small"
+              onClick={() => window.dispatchEvent(new CustomEvent('show-settings-dialog'))}
+              style={{
+                color: '#cccccc',
+                borderColor: '#3e3e42',
+                backgroundColor: '#2d2d30',
+                border: '1px solid transparent'
+              }}
+            />
+          </Tooltip>
+
         </Space>
       </div>
     </div>

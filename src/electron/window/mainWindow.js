@@ -24,7 +24,15 @@ function createWindow() {
       webSecurity: false, // Permite carregar qualquer URL
       webviewTag: true // Habilita a tag webview
     },
-    titleBarStyle: 'default',
+    // Esconde a barra de título nativa e sobrepõe apenas os botões de
+    // minimizar/maximizar/fechar (desenhados pelo Windows) numa única linha
+    // com o nosso menu customizado, no estilo Chrome/VSCode
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#1e1e1e',
+      symbolColor: '#cccccc',
+      height: 40
+    },
     show: false,
     title: 'Flex Navigator'
   });

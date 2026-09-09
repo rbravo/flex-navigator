@@ -12,7 +12,7 @@ import { layoutEventEmitter, LAYOUT_EVENTS } from './layoutEventEmitter';
 export const createNewTab = (model, tabSetId, tabConfig = {}) => {
   const defaultConfig = {
     type: "tab",
-    name: "Nova Tab",
+    name: "Nova aba",
     component: "browser",
     config: {
       url: getDefaultHomePage()
@@ -49,7 +49,7 @@ export const addNewTab = (model, url = null, name = null) => {
 
   const firstTabSet = findFirstTabSet(root);
   if (firstTabSet) {
-    const tabName = name || new URL(targetUrl).hostname || 'Nova Tab';
+    const tabName = name || new URL(targetUrl).hostname || 'Nova aba';
     const tabConfig = {
       name: tabName,
       config: {

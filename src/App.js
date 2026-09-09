@@ -11,6 +11,7 @@ import useSessionManager from './hooks/useSessionManager';
 import usePanelNavigation from './hooks/usePanelNavigation';
 
 // Componentes de layout
+import TitleBar from './components/TitleBar';
 import LayoutFactory from './components/Layout/LayoutFactory';
 import TabSetRenderer from './components/Layout/TabSetRenderer';
 import TabRenderer from './components/Layout/TabRenderer';
@@ -394,14 +395,18 @@ const AppContent = () => {
       getPopupContainer={() => document.body}
     >
       <div className="App">
-        <Layout 
-          model={model} 
-          factory={factory}
-          onAction={onAction}
-          onRenderTabSet={onRenderTabSet}
-          onRenderTab={onRenderTab}
-        />
-        
+        <TitleBar />
+
+        <div className="app-layout-container">
+          <Layout
+            model={model}
+            factory={factory}
+            onAction={onAction}
+            onRenderTabSet={onRenderTabSet}
+            onRenderTab={onRenderTab}
+          />
+        </div>
+
         {/* Overlay de navegação entre painéis */}
         <PanelNavigationOverlay
           isVisible={isNavigationMode}
