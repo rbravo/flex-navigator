@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX, Music } from 'lucide-react';
+import { Volume2, VolumeX, Music, Globe } from 'lucide-react';
 import { isTabMuted, isTabPlayingAudio } from '../../utils/tabActions';
 
 /**
@@ -21,17 +21,22 @@ const TabRenderer = ({ model, onContextMenu }) => {
       try {
         const url = new URL(config.url);
         const domain = `${url.protocol}//${url.hostname}`;
-        
-        // Tentar múltiplas estratégias para favicon
+
+        // Ordem de tentativas: o favicon que a própria página declarou (via
+        // evento 'page-favicon-updated' da webview, o mais preciso) primeiro;
+        // depois as convenções comuns de caminho. Sem serviço de terceiros -
+        // se tudo isso falhar, cai no ícone genérico (Globe) abaixo, sem
+        // depender de enviar o domínio visitado para o Google.
         const faviconUrls = [
+          config.faviconUrl,
           `${domain}/favicon.ico`,
           `${domain}/favicon.png`,
-          `${domain}/apple-touch-icon.png`,
-          `https://www.google.com/s2/favicons?domain=${url.hostname}&sz=16`
-        ];
-        
-        // Gerar key único baseado na URL para forçar atualização do favicon
-        const faviconKey = `favicon-${tabId}-${url.hostname}`;
+          `${domain}/apple-touch-icon.png`
+        ].filter(Boolean);
+
+        // Gerar key único baseado na URL/favicon para forçar atualização
+        // (e reiniciar a cadeia de fallback) quando a tab navega
+        const faviconKey = `favicon-${tabId}-${url.hostname}-${config.faviconUrl || 'default'}`;
         
         // Verificar estado de áudio e mute
         const isMuted = isTabMuted(model, tabId);
@@ -81,31 +86,59 @@ const TabRenderer = ({ model, onContextMenu }) => {
             </div>
           );
         } else {
-          // Mostrar favicon APENAS se não houver áudio e não estiver mutado
+          // Mostrar favicon APENAS se não houver áudio e não estiver mutado.
+          // O ícone genérico (Globe) fica sempre por baixo, mas só continua
+          // visível enquanto a <img> não carregou (ou depois de esgotar
+          // todas as tentativas) - onLoad esconde o Globe assim que um
+          // favicon carrega de verdade, senão favicons com transparência
+          // deixam o Globe aparecendo por trás.
           renderValues.leading = (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <img 
-                key={faviconKey} // Key único para forçar re-render quando URL muda
-                src={faviconUrls[3]} // Usar Google favicons como padrão (mais confiável)
-                alt="favicon" 
-                style={{
-                  width: '16px',
-                  height: '16px',
-                  marginRight: '6px',
-                  borderRadius: '2px'
-                }}
-                onError={(e) => {
-                  // Tentar próxima URL se a atual falhar
-                  const currentSrc = e.target.src;
-                  const currentIndex = faviconUrls.findIndex(url => url === currentSrc);
-                  
-                  if (currentIndex >= 0 && currentIndex < faviconUrls.length - 1) {
-                    e.target.src = faviconUrls[currentIndex + 1];
-                  } else {
-                    e.target.style.display = 'none';
-                  }
-                }}
+            <div
+              key={faviconKey} // Remonta Globe + img juntos quando a cadeia de favicon reinicia,
+              // senão o Globe (não controlado pelo React após o onLoad imperativo) fica
+              // com display:none preso de uma tentativa anterior bem-sucedida
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                position: 'relative',
+                width: '16px',
+                height: '16px',
+                marginRight: '6px'
+              }}>
+              <Globe
+                size={16}
+                style={{ position: 'absolute', top: 0, left: 0, color: '#999999' }}
               />
+              {faviconUrls.length > 0 && (
+                <img
+                  src={faviconUrls[0]}
+                  alt="favicon"
+                  style={{
+                    position: 'relative',
+                    width: '16px',
+                    height: '16px',
+                    borderRadius: '2px'
+                  }}
+                  onLoad={(e) => {
+                    // Favicon carregou de verdade: esconde o Globe por baixo
+                    const globeIcon = e.target.previousElementSibling;
+                    if (globeIcon) globeIcon.style.display = 'none';
+                  }}
+                  onError={(e) => {
+                    // Tentar a próxima URL da cadeia de fallback se a atual falhar
+                    const attemptIndex = Number(e.target.dataset.faviconAttempt || 0);
+                    const nextIndex = attemptIndex + 1;
+
+                    if (nextIndex < faviconUrls.length) {
+                      e.target.dataset.faviconAttempt = nextIndex;
+                      e.target.src = faviconUrls[nextIndex];
+                    } else {
+                      // Esgotou as tentativas: esconde a img, revelando o Globe
+                      e.target.style.display = 'none';
+                    }
+                  }}
+                />
+              )}
             </div>
           );
         }

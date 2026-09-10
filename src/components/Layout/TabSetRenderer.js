@@ -1,6 +1,7 @@
 import React from 'react';
 import { Plus, SplitSquareHorizontal, SplitSquareVertical, Maximize2, Minimize2, Navigation, NavigationOff, PanelTopClose, PanelBottomClose } from 'lucide-react';
 import { createNewTab, splitPanelHorizontal, splitPanelVertical, toggleMaximize, toggleNavigationBar } from '../../utils/layoutActions';
+import { markTabForUrlBarFocus } from '../../utils/tabActions';
 
 /**
  * Renderizador customizado para tabsets do FlexLayout
@@ -19,7 +20,8 @@ const TabSetRenderer = ({ model }) => {
           e.stopPropagation();
           
           console.log('Clicou no botão add-tab');
-          createNewTab(model, tabSetNode.getId());
+          const newTab = createNewTab(model, tabSetNode.getId());
+          if (newTab) markTabForUrlBarFocus(newTab.getId());
         }}
       >
         <Plus size={14} />

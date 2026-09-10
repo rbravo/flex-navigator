@@ -4,6 +4,22 @@ import { Actions, DockLocation } from 'flexlayout-react';
  * Utilitários para ações específicas das tabs
  */
 
+// Ids de tabs recém-criadas que devem focar a barra de URL assim que
+// montarem - o mais natural após abrir uma aba em branco (como no Chrome).
+// Fica só em memória (não vai pro config da tab/modelo): é um sinal
+// transitório de UI, não deve sobreviver a salvar/carregar sessão.
+const tabsAwaitingUrlBarFocus = new Set();
+
+export const markTabForUrlBarFocus = (tabId) => {
+  tabsAwaitingUrlBarFocus.add(tabId);
+};
+
+export const consumeUrlBarFocusRequest = (tabId) => {
+  if (!tabsAwaitingUrlBarFocus.has(tabId)) return false;
+  tabsAwaitingUrlBarFocus.delete(tabId);
+  return true;
+};
+
 /**
  * Atualiza uma tab (recarrega o conteúdo)
  */
@@ -238,6 +254,29 @@ export const updateTabAudioState = (model, tabId, isPlayingAudio) => {
 };
 
 /**
+ * Atualiza a URL do favicon de uma tab a partir do que a própria página
+ * declarou (evento 'page-favicon-updated' da webview, mais preciso do que
+ * adivinhar caminhos como /favicon.ico e sem depender de um serviço de
+ * terceiros para toda navegação)
+ */
+export const updateTabFavicon = (model, tabId, faviconUrl) => {
+  try {
+    const tabNode = model.getNodeById(tabId);
+    if (tabNode && tabNode.getComponent() === 'browser') {
+      const config = tabNode.getConfig();
+
+      // Só atualizar se o favicon realmente mudou
+      if (config.faviconUrl !== faviconUrl) {
+        const newConfig = { ...config, faviconUrl };
+        model.doAction(Actions.updateNodeAttributes(tabId, { config: newConfig }));
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao atualizar favicon da tab:', error);
+  }
+};
+
+/**
  * Verifica periodicamente o estado de áudio de todas as tabs
  */
 export const startAudioStateMonitoring = (model) => {
@@ -321,9 +360,15 @@ export const setupWebviewListeners = (model) => {
       updateTabAudioState(model, tabId, false);
     });
     
-    // Evento quando o áudio é pausado ou parado completamente
-    webview.addEventListener('page-favicon-updated', () => {
-      // Este evento pode indicar mudanças na página que afetam o áudio
+    // Evento em que a própria página declara seu(s) favicon(s) - é a fonte
+    // mais confiável, muito melhor do que adivinhar /favicon.ico ou depender
+    // de um serviço de terceiros pra toda navegação
+    webview.addEventListener('page-favicon-updated', (event) => {
+      if (event.favicons && event.favicons.length > 0) {
+        updateTabFavicon(model, tabId, event.favicons[0]);
+      }
+
+      // Este evento também pode indicar mudanças na página que afetam o áudio
       // Vamos usar como trigger para verificar o estado atual
       setTimeout(() => {
         try {
@@ -340,8 +385,10 @@ export const setupWebviewListeners = (model) => {
     
     // Event listeners adicionais para capturar mudanças de estado de mídia
     webview.addEventListener('did-start-loading', () => {
-      // Quando começa a carregar uma nova página, resetar estado de áudio
+      // Quando começa a carregar uma nova página, resetar estado de áudio e
+      // favicon (evita mostrar por um instante o favicon da página anterior)
       updateTabAudioState(model, tabId, false);
+      updateTabFavicon(model, tabId, null);
     });
     
     webview.addEventListener('dom-ready', () => {

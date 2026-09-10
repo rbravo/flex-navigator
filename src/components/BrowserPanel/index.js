@@ -3,6 +3,7 @@ import { ConfigProvider } from 'antd';
 import { Actions } from 'flexlayout-react';
 import { darkTheme } from './utils/theme';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
+import { consumeUrlBarFocusRequest } from '../../utils/tabActions';
 import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
 import useAutoRefresh from '../../hooks/useAutoRefresh';
 import useShortcutsConfig from '../../hooks/useShortcutsConfig';
@@ -232,6 +233,18 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     window.addEventListener('focus-url-bar', handleFocusUrlBar);
     return () => window.removeEventListener('focus-url-bar', handleFocusUrlBar);
   }, [node]);
+
+  // Uma aba em branco recém-criada (botão "+", Ctrl+T, menu "Nova Aba") já
+  // nasce marcada para focar a barra de URL - é o mais natural que o usuário
+  // vai querer fazer em seguida, como no Chrome. Verificado no mount (não via
+  // evento) porque a tab é criada e montada antes de haver qualquer listener
+  // pronto para escutar um evento disparado no mesmo instante.
+  useEffect(() => {
+    if (node && consumeUrlBarFocusRequest(node.getId())) {
+      urlInputRef.current?.focus({ cursor: 'all' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Timeout para o loading - evita que fique "travado"
   useEffect(() => {

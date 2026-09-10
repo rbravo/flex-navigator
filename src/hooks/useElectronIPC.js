@@ -8,7 +8,7 @@ import {
   findAllTabsets,
   cycleTabInTabset
 } from '../utils/layoutActions';
-import { updateTabAudioState, startAudioStateMonitoring, closeTab } from '../utils/tabActions';
+import { updateTabAudioState, startAudioStateMonitoring, closeTab, markTabForUrlBarFocus } from '../utils/tabActions';
 
 /**
  * Retorna o id do tabset "atual": o ativo no FlexLayout ou, na ausência de
@@ -90,7 +90,10 @@ const useElectronIPC = (model) => {
         // de painel, sempre agindo sobre o tabset atualmente ativo
         const handleMenuNewTab = () => {
           const tabsetId = getCurrentTabsetId(model);
-          if (tabsetId) createNewTab(model, tabsetId);
+          if (tabsetId) {
+            const newTab = createNewTab(model, tabsetId);
+            if (newTab) markTabForUrlBarFocus(newTab.getId());
+          }
         };
 
         const handleMenuSplitHorizontal = () => {
