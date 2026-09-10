@@ -10,17 +10,22 @@ function setupIpcHandlers(mainWindow) {
   // Handle IPC events
   ipcMain.on('open-webview-devtools', (event, data) => {
     console.log('Abrindo DevTools para webview da tab:', data.tabId);
-    
+
     // Encontrar a webview específica e abrir seus DevTools
     if (mainWindow && mainWindow.webContents) {
+      // JSON.stringify escapa o valor com segurança antes de interpolar no
+      // template do script (evita quebrar a string literal se tabId algum
+      // dia vier de uma fonte menos confiável)
+      const tabIdJson = JSON.stringify(data.tabId);
       // Executar script no renderer para encontrar e abrir DevTools da webview específica
       mainWindow.webContents.executeJavaScript(`
         (function() {
+          const tabId = ${tabIdJson};
           // Encontrar a webview específica usando o data-tab-id
-          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
-          
+          const webviewForTab = document.querySelector('webview[data-tab-id="' + tabId + '"]');
+
           if (webviewForTab) {
-            console.log('DevTools: Encontrou webview para tab ${data.tabId}:', webviewForTab.src);
+            console.log('DevTools: Encontrou webview para tab', tabId, ':', webviewForTab.src);
             try {
               // Abrir DevTools da webview específica em modo detached
               webviewForTab.openDevTools();
@@ -29,7 +34,7 @@ function setupIpcHandlers(mainWindow) {
               console.error('Erro ao abrir DevTools da webview:', error);
             }
           } else {
-            console.log('DevTools: Webview não encontrada para tab ${data.tabId}');
+            console.log('DevTools: Webview não encontrada para tab', tabId);
             // Fallback: tentar encontrar webview ativa
             const allWebviews = document.querySelectorAll('webview');
             for (let i = 0; i < allWebviews.length; i++) {
@@ -68,15 +73,17 @@ function setupIpcHandlers(mainWindow) {
     console.log('Solicitação para atualizar webview da tab:', data.tabId);
     
     if (mainWindow && mainWindow.webContents) {
+      const tabIdJson = JSON.stringify(data.tabId);
       mainWindow.webContents.executeJavaScript(`
         (function() {
-          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
-          
+          const tabId = ${tabIdJson};
+          const webviewForTab = document.querySelector('webview[data-tab-id="' + tabId + '"]');
+
           if (webviewForTab) {
-            console.log('Atualizando webview para tab ${data.tabId}:', webviewForTab.src);
+            console.log('Atualizando webview para tab', tabId, ':', webviewForTab.src);
             webviewForTab.reload();
           } else {
-            console.log('Webview não encontrada para tab ${data.tabId}');
+            console.log('Webview não encontrada para tab', tabId);
           }
         })();
       `).catch(error => {
@@ -90,15 +97,19 @@ function setupIpcHandlers(mainWindow) {
     console.log('Solicitação para alternar mute da tab:', data.tabId, 'muted:', data.muted);
     
     if (mainWindow && mainWindow.webContents) {
+      const tabIdJson = JSON.stringify(data.tabId);
+      const mutedJson = JSON.stringify(Boolean(data.muted));
       mainWindow.webContents.executeJavaScript(`
         (function() {
-          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
-          
+          const tabId = ${tabIdJson};
+          const muted = ${mutedJson};
+          const webviewForTab = document.querySelector('webview[data-tab-id="' + tabId + '"]');
+
           if (webviewForTab) {
-            console.log('Alterando mute da webview para tab ${data.tabId}:', ${data.muted});
-            webviewForTab.setAudioMuted(${data.muted});
+            console.log('Alterando mute da webview para tab', tabId, ':', muted);
+            webviewForTab.setAudioMuted(muted);
           } else {
-            console.log('Webview não encontrada para tab ${data.tabId}');
+            console.log('Webview não encontrada para tab', tabId);
           }
         })();
       `).catch(error => {
@@ -110,35 +121,37 @@ function setupIpcHandlers(mainWindow) {
   // Handle audio state monitoring - polling method as fallback
   ipcMain.on('check-webview-audio-state', (event, data) => {
     if (mainWindow && mainWindow.webContents) {
+      const tabIdJson = JSON.stringify(data.tabId);
       mainWindow.webContents.executeJavaScript(`
         (function() {
-          const webviewForTab = document.querySelector('webview[data-tab-id="${data.tabId}"]');
-          
+          const tabId = ${tabIdJson};
+          const webviewForTab = document.querySelector('webview[data-tab-id="' + tabId + '"]');
+
           if (webviewForTab) {
             try {
               // Método 1: Tentar isCurrentlyAudible (mais confiável)
               if (typeof webviewForTab.isCurrentlyAudible === 'function') {
                 const isAudible = webviewForTab.isCurrentlyAudible();
-                //console.log('Tab ${data.tabId}: isCurrentlyAudible =', isAudible);
-                return { tabId: '${data.tabId}', isAudible: isAudible, method: 'isCurrentlyAudible' };
+                //console.log('Tab', tabId, ': isCurrentlyAudible =', isAudible);
+                return { tabId: tabId, isAudible: isAudible, method: 'isCurrentlyAudible' };
               }
-              
+
               // Método 2: Verificar propriedades de áudio (fallback)
               if (webviewForTab.audioMuted !== undefined) {
                 // Se não conseguir detectar se está tocando, assumir que não
-                return { tabId: '${data.tabId}', isAudible: false, method: 'audioMuted-fallback' };
+                return { tabId: tabId, isAudible: false, method: 'audioMuted-fallback' };
               }
-              
-              console.log('Tab ${data.tabId}: Nenhum método de detecção de áudio disponível');
-              return { tabId: '${data.tabId}', isAudible: false, method: 'none' };
-              
+
+              console.log('Tab', tabId, ': Nenhum método de detecção de áudio disponível');
+              return { tabId: tabId, isAudible: false, method: 'none' };
+
             } catch (error) {
-              console.error('Erro ao verificar áudio para tab ${data.tabId}:', error);
-              return { tabId: '${data.tabId}', isAudible: false, method: 'error', error: error.message };
+              console.error('Erro ao verificar áudio para tab', tabId, ':', error);
+              return { tabId: tabId, isAudible: false, method: 'error', error: error.message };
             }
           } else {
-            console.log('Webview não encontrada para tab ${data.tabId}');
-            return { tabId: '${data.tabId}', isAudible: false, method: 'not-found' };
+            console.log('Webview não encontrada para tab', tabId);
+            return { tabId: tabId, isAudible: false, method: 'not-found' };
           }
         })();
       `).then(result => {

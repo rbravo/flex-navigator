@@ -24,7 +24,6 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      webSecurity: false, // Permite carregar qualquer URL
       webviewTag: true // Habilita a tag webview
     },
     // Esconde a barra de título nativa e sobrepõe apenas os botões de

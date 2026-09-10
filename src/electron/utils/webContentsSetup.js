@@ -77,24 +77,32 @@ function setupWebContentsHandlers(mainWindow) {
               click: () => {
                 // Executar script no main window para encontrar a tab source
                 if (mainWindow && mainWindow.webContents) {
+                  // JSON.stringify escapa aspas/backslashes com segurança - a
+                  // URL da página vem de um site arbitrário (não confiável),
+                  // então NUNCA deve ser interpolada crua num template de
+                  // script: uma URL malformada de propósito poderia escapar
+                  // da string literal e injetar JS no contexto do main
+                  // window, que tem nodeIntegration habilitado.
+                  const currentContentsUrl = JSON.stringify(contents.getURL());
                   mainWindow.webContents.executeJavaScript(`
                     (function() {
                       // Procurar pela webview que corresponde a este contents
                       const webviews = document.querySelectorAll('webview');
+                      const currentUrl = ${currentContentsUrl};
                       console.log('Procurando webview source, total webviews:', webviews.length);
-                      console.log('URL do contents que acionou context menu:', '${contents.getURL()}');
-                      
+                      console.log('URL do contents que acionou context menu:', currentUrl);
+
                       for (let i = 0; i < webviews.length; i++) {
                         const webview = webviews[i];
                         const webviewUrl = webview.src;
                         const tabId = webview.getAttribute('data-tab-id');
-                        
+
                         console.log('Webview', i, '- URL:', webviewUrl, '- TabId:', tabId);
-                        
+
                         // Comparar a URL da webview com a URL atual do contents
                         // Usar também getURL() se disponível na webview
-                        if (webviewUrl === '${contents.getURL()}' || 
-                            (webview.getURL && webview.getURL() === '${contents.getURL()}')) {
+                        if (webviewUrl === currentUrl ||
+                            (webview.getURL && webview.getURL() === currentUrl)) {
                           console.log('✅ Encontrada webview correspondente! TabId:', tabId);
                           return tabId;
                         }
