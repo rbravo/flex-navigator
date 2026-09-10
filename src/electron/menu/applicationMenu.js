@@ -18,11 +18,25 @@ function createMenuTemplate(mainWindow, sessions) {
       label: 'Arquivo',
       submenu: [
         {
+          // Sem "accelerator": Ctrl+T é tratado inteiramente pelo listener de
+          // teclado do renderer + repasse via webview (ver
+          // useElectronIPC.js / navigationShortcuts.js) - o accelerator
+          // nativo do Menu do Electron para de disparar de forma confiável
+          // assim que qualquer <webview> já ganhou foco de teclado.
           label: 'Nova Aba',
-          accelerator: 'CmdOrCtrl+T',
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('menu-new-tab');
+            }
+          }
+        },
+        {
+          // Mesmo motivo do item acima: sem "accelerator", Ctrl+W é tratado
+          // pelo renderer/webview.
+          label: 'Fechar Aba',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('menu-close-tab');
             }
           }
         },

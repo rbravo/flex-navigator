@@ -13,10 +13,13 @@ const ShortcutsConfigPopover = ({
   isShortcutsEnabled = true,
   shortcutModifiers = 'Ctrl+Shift',
   onToggleShortcuts,
-  onModifiersChange
+  onModifiersChange,
+  showOverlay = true,
+  onToggleShowOverlay
 }) => {
   const [localEnabled, setLocalEnabled] = useState(isShortcutsEnabled);
   const [localModifiers, setLocalModifiers] = useState(shortcutModifiers);
+  const [localShowOverlay, setLocalShowOverlay] = useState(showOverlay);
 
   useEffect(() => {
     setLocalEnabled(isShortcutsEnabled);
@@ -26,6 +29,10 @@ const ShortcutsConfigPopover = ({
     setLocalModifiers(shortcutModifiers);
   }, [shortcutModifiers]);
 
+  useEffect(() => {
+    setLocalShowOverlay(showOverlay);
+  }, [showOverlay]);
+
   const handleToggleChange = (checked) => {
     setLocalEnabled(checked);
     onToggleShortcuts?.(checked);
@@ -34,6 +41,11 @@ const ShortcutsConfigPopover = ({
   const handleModifiersChange = (value) => {
     setLocalModifiers(value);
     onModifiersChange?.(value);
+  };
+
+  const handleShowOverlayChange = (checked) => {
+    setLocalShowOverlay(checked);
+    onToggleShowOverlay?.(checked);
   };
 
   const modifierOptions = [
@@ -162,9 +174,35 @@ const ShortcutsConfigPopover = ({
           marginTop: '8px'
         }}>
           <Text style={{ color: '#999999', fontSize: '11px' }}>
-            💡 Mantenha as teclas modificadoras pressionadas para ver o overlay com os atalhos disponíveis
+            {localShowOverlay
+              ? '💡 Mantenha as teclas modificadoras pressionadas para ver o overlay com os atalhos disponíveis'
+              : '💡 Os atalhos continuam funcionando normalmente, só o overlay foi desativado'}
           </Text>
         </div>
+
+        {/* Toggle do overlay de atalhos */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          opacity: localEnabled ? 1 : 0.5
+        }}>
+          <div>
+            <Text style={{ color: '#cccccc' }}>Mostrar overlay ao usar os atalhos</Text>
+            <Text style={{ color: '#666666', fontSize: '11px', display: 'block' }}>
+              Desative se você já souber os atalhos de cor
+            </Text>
+          </div>
+          <Switch
+            checked={localShowOverlay}
+            onChange={handleShowOverlayChange}
+            disabled={!localEnabled}
+            style={{
+              backgroundColor: localShowOverlay ? '#007acc' : '#434343'
+            }}
+          />
+        </div>
+        
       </Space>
     </div>
   );

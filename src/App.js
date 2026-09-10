@@ -43,7 +43,7 @@ const AppContent = () => {
 
   // Hook para navegação entre painéis
   const {
-    isNavigationMode,
+    isOverlayVisible,
     activePanelIndex,
     availablePanels,
     shortcutModifiers
@@ -148,8 +148,8 @@ const AppContent = () => {
           }
         };
         
-        if (model.getRoot) {
-          collectTabs(model.getRoot());
+        if (model.getRootRow) {
+          collectTabs(model.getRootRow());
         }
         
         // Para cada tab, verificar se o elemento corresponde
@@ -409,7 +409,7 @@ const AppContent = () => {
 
         {/* Overlay de navegação entre painéis */}
         <PanelNavigationOverlay
-          isVisible={isNavigationMode}
+          isVisible={isOverlayVisible}
           activePanelIndex={activePanelIndex}
           totalPanels={availablePanels.length}
           shortcutModifiers={shortcutModifiers}

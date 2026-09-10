@@ -24,14 +24,14 @@ const usePanelNavigation = (model) => {
   const [isNavigationMode, setIsNavigationMode] = useState(false);
   const [activePanelIndex, setActivePanelIndex] = useState(0);
   const [availablePanels, setAvailablePanels] = useState([]);
-  const { isShortcutsEnabled, shortcutModifiers } = useShortcutsConfig();
+  const { isShortcutsEnabled, shortcutModifiers, showOverlay } = useShortcutsConfig();
 
   // Função para coletar todos os painéis (tabsets) disponíveis
   const collectPanels = useCallback(() => {
-    if (!model || !model.getRoot) return [];
-    
+    if (!model || !model.getRootRow) return [];
+
     const panels = [];
-    
+
     const collectTabSets = (node) => {
       if (node.getType && node.getType() === 'tabset') {
         panels.push({
@@ -46,7 +46,7 @@ const usePanelNavigation = (model) => {
       }
     };
     
-    collectTabSets(model.getRoot());
+    collectTabSets(model.getRootRow());
     return panels;
   }, [model]);
 
@@ -296,6 +296,11 @@ const usePanelNavigation = (model) => {
     // 'webview-navigation-key-event' (foco dentro de uma webview, onde o
     // keydown do host não é disparado)
     const handleKeyDown = (e) => {
+      // Tab é tratado inteiramente por outro atalho (Ctrl+Tab / Ctrl+Shift+Tab
+      // cicla as abas do painel ativo, ver useElectronIPC.js) - nunca deve
+      // abrir o overlay de navegação entre painéis, mesmo que os
+      // modificadores coincidam com o combo configurado.
+      if (e.key === 'Tab') return;
       if (!matchesConfiguredModifiers(e)) return;
 
       activateNavigationMode();
@@ -371,9 +376,24 @@ const usePanelNavigation = (model) => {
       }
     };
 
+    // Rede de segurança: se por algum motivo o keyup real dos modificadores
+    // não chegar por nenhum dos dois caminhos acima (nem o document normal,
+    // nem o repasse via webview), o modo de navegação ficaria preso ligado.
+    // Eventos de mouse carregam ctrlKey/shiftKey do estado atual e disparam a
+    // qualquer leve movimento fora da webview — então usamos o próximo
+    // mousemove/mousedown para detectar que os modificadores já foram
+    // soltos, mesmo que o keyup em si tenha sido perdido.
+    const handlePointerActivity = (e) => {
+      if (isModifiersHeld && !matchesConfiguredModifiers(e)) {
+        deactivateNavigationMode();
+      }
+    };
+
     // Eventos reais do host (funcionam quando o foco não está em uma webview)
     document.addEventListener('keydown', handleKeyDown, true);
     document.addEventListener('keyup', handleKeyUp, true);
+    document.addEventListener('mousemove', handlePointerActivity, true);
+    document.addEventListener('mousedown', handlePointerActivity, true);
     window.addEventListener('blur', handleWindowBlur);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
@@ -392,6 +412,8 @@ const usePanelNavigation = (model) => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true);
       document.removeEventListener('keyup', handleKeyUp, true);
+      document.removeEventListener('mousemove', handlePointerActivity, true);
+      document.removeEventListener('mousedown', handlePointerActivity, true);
       window.removeEventListener('blur', handleWindowBlur);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('webview-navigation-key-event', handleWebviewKeyEvent);
@@ -404,6 +426,7 @@ const usePanelNavigation = (model) => {
 
   return {
     isNavigationMode,
+    isOverlayVisible: isNavigationMode && showOverlay,
     activePanelIndex,
     availablePanels,
     shortcutModifiers,

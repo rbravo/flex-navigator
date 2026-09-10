@@ -10,8 +10,6 @@ export const getDefaultLayoutConfig = () => ({
     tabEnableClose: true,
     tabEnableRename: true,
     tabEnableDrag: true,
-    tabDragSpeed: 0.3,
-    splitterSize: 6,
     tabSetMinWidth: 150,
     tabSetMinHeight: 100,
     borderBarSize: 0,

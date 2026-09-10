@@ -8,9 +8,9 @@ const { attachShortcutInterception } = require('./navigationShortcuts');
 function setupWebContentsHandlers(mainWindow) {
   // Allow loading any external URLs and enable webviews
   app.on('web-contents-created', async (event, contents) => {
-    contents.on('new-window', (event, navigationUrl) => {
-      event.preventDefault();
-      contents.loadURL(navigationUrl);
+    contents.setWindowOpenHandler(({ url }) => {
+      contents.loadURL(url);
+      return { action: 'deny' };
     });
     
     // Enable webview

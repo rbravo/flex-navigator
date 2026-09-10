@@ -97,6 +97,7 @@
 /* Customizações para o FlexLayout */
 .flexlayout__layout {
   background-color: #1e1e1e !important;
+  --splitter-size: 6px;
 }
 
 .flexlayout__tab {
@@ -113,6 +114,9 @@
   min-width: 100px !important;
   border-top-left-radius: 7px !important;
   border-top-right-radius: 7px !important;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
 }
 
 .flexlayout__tab_button_content {
@@ -120,6 +124,7 @@
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
+  flex: 1;
 }
 
 .flexlayout__tab_button_trailing svg:hover {
@@ -195,7 +200,8 @@
 }
 
 .flexlayout__tab_button.flexlayout__tab_button_top.flexlayout__tab_button--selected {
-  background: #2d2d30 !important;
+  /* background: #2d2d30 !important; */
+  background-image: linear-gradient(#36363a, #2d2d30) !important;
 }
 
 /* Estilos customizados para os botões de ação do tabset */
@@ -238,12 +244,14 @@
 
 .tabset-button-navbar {
   background: rgba(255, 255, 255, 0.1);
-  margin-top: 2px;
+  margin-top: 0px;
   background: #2d2d30;
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
-
+.button-hidenavbar {
+  margin-bottom: -2px;
+}
 .tabset-button-navbar:hover {
   background: rgba(255, 255, 255, 0.2);
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ConfigProvider } from 'antd';
+import { Actions } from 'flexlayout-react';
 import { darkTheme } from './utils/theme';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
 import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
@@ -26,6 +27,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   
   const webviewRef = useRef(null);
   const iframeRef = useRef(null);
+  const urlInputRef = useRef(null);
 
   // Função de refresh que será usada pelo auto-refresh
   const handleRefresh = useCallback(() => {
@@ -64,8 +66,10 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   const {
     isShortcutsEnabled,
     shortcutModifiers,
+    showOverlay,
     toggleShortcuts,
-    updateModifiers
+    updateModifiers,
+    toggleShowOverlay
   } = useShortcutsConfig();
 
   // Detecta se está rodando no Electron
@@ -194,8 +198,14 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     setIsLoading(true);
     
     if (isElectron && webviewRef.current) {
-      // Navega programaticamente sem recriar a webview
-      webviewRef.current.loadURL(targetUrl);
+      // Navega programaticamente sem recriar a webview.
+      // loadURL() retorna uma Promise que rejeita se a webview for destruída
+      // antes da navegação terminar (ex.: usuário fecha a aba com Ctrl+W
+      // enquanto a página ainda está carregando) - sem o catch, isso vira uma
+      // unhandled rejection.
+      webviewRef.current.loadURL(targetUrl).catch((error) => {
+        console.log('Navegação cancelada ou falhou:', error.message);
+      });
     } else if (iframeRef.current) {
       // Para desenvolvimento no browser, usa iframe
       iframeRef.current.src = targetUrl;
@@ -206,13 +216,22 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   useEffect(() => {
     if (node && currentUrl) {
       const title = extractDomainOrTitle(currentUrl);
-      node.getModel().doAction({
-        type: 'rename_tab',
-        node: node.getId(),
-        text: title
-      });
+      node.getModel().doAction(Actions.renameTab(node.getId(), title));
     }
   }, [currentUrl, node]);
+
+  // Atalho Ctrl+L (global, via menu do Electron): foca e seleciona o texto
+  // da barra de URL desta aba, só quando ela é a aba ativa
+  useEffect(() => {
+    const handleFocusUrlBar = (event) => {
+      if (node && event.detail?.tabId === node.getId()) {
+        urlInputRef.current?.focus({ cursor: 'all' });
+      }
+    };
+
+    window.addEventListener('focus-url-bar', handleFocusUrlBar);
+    return () => window.removeEventListener('focus-url-bar', handleFocusUrlBar);
+  }, [node]);
 
   // Timeout para o loading - evita que fique "travado"
   useEffect(() => {
@@ -290,6 +309,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             onForward={handleForward}
             onRefresh={handleRefreshClick}
             onUrlSubmit={handleUrlSubmit}
+            urlInputRef={urlInputRef}
             isAutoRefreshEnabled={isAutoRefreshEnabled}
             refreshInterval={refreshInterval}
             timeRemaining={timeRemaining}
@@ -299,6 +319,8 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             shortcutModifiers={shortcutModifiers}
             onToggleShortcuts={toggleShortcuts}
             onShortcutModifiersChange={updateModifiers}
+            showShortcutsOverlay={showOverlay}
+            onToggleShortcutsOverlay={toggleShowOverlay}
           />
         )}
         

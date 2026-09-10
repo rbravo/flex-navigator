@@ -28,6 +28,7 @@ const ControlsBar = ({
   onForward,
   onRefresh,
   onUrlSubmit,
+  urlInputRef,
   // Props para auto-refresh
   isAutoRefreshEnabled,
   refreshInterval,
@@ -38,7 +39,9 @@ const ControlsBar = ({
   isShortcutsEnabled = true,
   shortcutModifiers = 'Ctrl+Shift',
   onToggleShortcuts,
-  onShortcutModifiersChange
+  onShortcutModifiersChange,
+  showShortcutsOverlay = true,
+  onToggleShortcutsOverlay
 }) => {
   // Formatar o tempo restante para exibição
   const formatTimeRemaining = (seconds) => {
@@ -99,6 +102,7 @@ const ControlsBar = ({
       <form className="url-form" onSubmit={onUrlSubmit}>
         <div className="url-input-container">
           <Input
+            ref={urlInputRef}
             placeholder="Digite uma URL ou pesquise..."
             value={url}
             onChange={(e) => setUrl(e.target.value)}
@@ -176,6 +180,8 @@ const ControlsBar = ({
             shortcutModifiers={shortcutModifiers}
             onToggleShortcuts={onToggleShortcuts}
             onModifiersChange={onShortcutModifiersChange}
+            showOverlay={showShortcutsOverlay}
+            onToggleShowOverlay={onToggleShortcutsOverlay}
           >
             <Tooltip
               title={

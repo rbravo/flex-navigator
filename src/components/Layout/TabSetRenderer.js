@@ -31,7 +31,7 @@ const TabSetRenderer = ({ model }) => {
     renderValues.leading = (
       <button
         key="toggle-navbar"
-        className="tabset-button tabset-button-navbar"
+        className="tabset-button tabset-button-navbar button-hidenavbar"
         title={hideNavBar ? "Mostrar barra de navegação" : "Esconder barra de navegação"}
         onClick={(e) => {
           e.preventDefault();

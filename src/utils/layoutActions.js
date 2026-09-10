@@ -34,7 +34,7 @@ export const addNewTab = (model, url = null, name = null) => {
   const targetUrl = url || getDefaultHomePage();
   
   // Encontrar o primeiro tabset disponível
-  const root = model.getRoot();
+  const root = model.getRootRow();
   const findFirstTabSet = (node) => {
     if (node.getType() === 'tabset') {
       return node;
@@ -68,7 +68,9 @@ export const addNewTab = (model, url = null, name = null) => {
  * Divide um painel horizontalmente
  */
 export const splitPanelHorizontal = (model, tabSetId) => {
-  // 1. Criar a nova tab no tabset atual
+  // 1. Criar a nova tab no tabset atual (sem selecioná-la: ela vai ser movida
+  // para o novo tabset já em seguida, então selecionar aqui só desfocaria a
+  // tab original por um instante à toa)
   const newTabJson = {
     type: "tab",
     name: "Nova Página",
@@ -77,10 +79,10 @@ export const splitPanelHorizontal = (model, tabSetId) => {
       url: getDefaultHomePage()
     }
   };
-  
-  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1, true);
+
+  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1, false);
   const newTab = model.doAction(addTabAction);
-  
+
   // 2. Mover a tab para um novo tabset à direita
   if (newTab) {
     const moveAction = Actions.moveNode(newTab.getId(), tabSetId, DockLocation.RIGHT, -1, true);
@@ -94,7 +96,9 @@ export const splitPanelHorizontal = (model, tabSetId) => {
  * Divide um painel verticalmente
  */
 export const splitPanelVertical = (model, tabSetId) => {
-  // 1. Criar a nova tab no tabset atual
+  // 1. Criar a nova tab no tabset atual (sem selecioná-la: ela vai ser movida
+  // para o novo tabset já em seguida, então selecionar aqui só desfocaria a
+  // tab original por um instante à toa)
   const newTabJson = {
     type: "tab",
     name: "Nova Página",
@@ -103,8 +107,8 @@ export const splitPanelVertical = (model, tabSetId) => {
       url: getDefaultHomePage()
     }
   };
-  
-  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1, true);
+
+  const addTabAction = Actions.addNode(newTabJson, tabSetId, DockLocation.CENTER, -1, false);
   const newTab = model.doAction(addTabAction);
   
   // 2. Mover a tab para um novo tabset abaixo
@@ -181,7 +185,7 @@ export const toggleNavigationBar = (model, tabSetId) => {
  * Encontra todos os tabsets no modelo
  */
 export const findAllTabsets = (model) => {
-  const rootNode = model.getRoot();
+  const rootNode = model.getRootRow();
   const tabsets = [];
   
   function findTabsets(node) {
@@ -210,6 +214,31 @@ export const findTabsetContainingTab = (model, tabId) => {
     }
   }
   return null;
+};
+
+/**
+ * Move a seleção para a próxima (direction=1) ou anterior (direction=-1) aba
+ * do tabset informado, com wraparound (Ctrl+Tab / Ctrl+Shift+Tab, como no
+ * Chrome). Fica só dentro do tabset atual - trocar de painel é feito pelo
+ * atalho de navegação entre painéis já existente.
+ */
+export const cycleTabInTabset = (model, tabsetId, direction) => {
+  const tabset = model.getNodeById(tabsetId);
+  if (!tabset) return;
+
+  const children = tabset.getChildren();
+  if (children.length === 0) return;
+
+  const selectedNode = tabset.getSelectedNode();
+  const currentIndex = selectedNode
+    ? children.findIndex(child => child.getId() === selectedNode.getId())
+    : -1;
+
+  const nextIndex = currentIndex === -1
+    ? 0
+    : (currentIndex + direction + children.length) % children.length;
+
+  model.doAction(Actions.selectTab(children[nextIndex].getId()));
 };
 
 /**

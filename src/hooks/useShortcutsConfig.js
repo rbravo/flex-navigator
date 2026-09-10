@@ -15,6 +15,7 @@ const STORAGE_KEY = 'shortcuts-config';
 const useShortcutsConfig = () => {
   const [isShortcutsEnabled, setIsShortcutsEnabled] = useState(true);
   const [shortcutModifiers, setShortcutModifiers] = useState('Ctrl+Shift');
+  const [showOverlay, setShowOverlay] = useState(true);
 
   // Carregar configurações salvas do localStorage
   useEffect(() => {
@@ -24,6 +25,7 @@ const useShortcutsConfig = () => {
         const config = JSON.parse(savedConfig);
         setIsShortcutsEnabled(config.enabled ?? true);
         setShortcutModifiers(config.modifiers ?? 'Ctrl+Shift');
+        setShowOverlay(config.showOverlay ?? true);
       }
     } catch (error) {
       console.error('Erro ao carregar configurações de shortcuts:', error);
@@ -35,6 +37,7 @@ const useShortcutsConfig = () => {
     const handleConfigChanged = (config) => {
       setIsShortcutsEnabled(config.enabled);
       setShortcutModifiers(config.modifiers);
+      setShowOverlay(config.showOverlay ?? true);
     };
 
     layoutEventEmitter.on(LAYOUT_EVENTS.SHORTCUTS_CONFIG_CHANGED, handleConfigChanged);
@@ -44,9 +47,9 @@ const useShortcutsConfig = () => {
   }, []);
 
   // Salvar configurações no localStorage e notificar outras instâncias do hook
-  const saveConfig = useCallback((enabled, modifiers) => {
+  const saveConfig = useCallback((enabled, modifiers, overlayVisible) => {
     try {
-      const config = { enabled, modifiers, updatedAt: new Date().toISOString() };
+      const config = { enabled, modifiers, showOverlay: overlayVisible, updatedAt: new Date().toISOString() };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
       layoutEventEmitter.emit(LAYOUT_EVENTS.SHORTCUTS_CONFIG_CHANGED, config);
     } catch (error) {
@@ -56,19 +59,26 @@ const useShortcutsConfig = () => {
 
   const toggleShortcuts = useCallback((enabled) => {
     setIsShortcutsEnabled(enabled);
-    saveConfig(enabled, shortcutModifiers);
-  }, [shortcutModifiers, saveConfig]);
+    saveConfig(enabled, shortcutModifiers, showOverlay);
+  }, [shortcutModifiers, showOverlay, saveConfig]);
 
   const updateModifiers = useCallback((modifiers) => {
     setShortcutModifiers(modifiers);
-    saveConfig(isShortcutsEnabled, modifiers);
-  }, [isShortcutsEnabled, saveConfig]);
+    saveConfig(isShortcutsEnabled, modifiers, showOverlay);
+  }, [isShortcutsEnabled, showOverlay, saveConfig]);
+
+  const toggleShowOverlay = useCallback((enabled) => {
+    setShowOverlay(enabled);
+    saveConfig(isShortcutsEnabled, shortcutModifiers, enabled);
+  }, [isShortcutsEnabled, shortcutModifiers, saveConfig]);
 
   return {
     isShortcutsEnabled,
     shortcutModifiers,
+    showOverlay,
     toggleShortcuts,
-    updateModifiers
+    updateModifiers,
+    toggleShowOverlay
   };
 };
 

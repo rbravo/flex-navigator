@@ -24,7 +24,6 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
-      enableRemoteModule: true,
       webSecurity: false, // Permite carregar qualquer URL
       webviewTag: true // Habilita a tag webview
     },
