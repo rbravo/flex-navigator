@@ -116,6 +116,16 @@ export const NotificationProvider = ({ children }) => {
     //console.log('🔕 Notificação removida:', id);
   };
 
+  // Atualiza o conteúdo de uma notificação já exibida, em vez de criar outra
+  // (usado pelo progresso de download, que dispara muitas vezes por segundo)
+  const updateNotification = (id, config) => {
+    setNotifications(prev => prev.map(n => (
+      n.id === id
+        ? { ...n, message: config.description ?? config.content ?? n.message }
+        : n
+    )));
+  };
+
   const closeAllNotifications = () => {
     setNotifications([]);
     //console.log('🔕 Todas as notificações removidas');
@@ -131,6 +141,7 @@ export const NotificationProvider = ({ children }) => {
   const contextValue = {
     notifications,
     showNotification,
+    updateNotification,
     closeNotification,
     closeAllNotifications,
     success,
@@ -383,22 +394,29 @@ export class CustomNotificationManager {
   }
 
   showDownloadProgress(progress) {
-    this.closeNotification('available');
-    
     if (!CustomNotificationManager.notificationAPI) return null;
-    
-    console.log('📢 Mostrando progresso do download:', progress);
-    
-    const progressPercent = Math.round(progress.percent || 0);
-    const transferredMB = Math.round((progress.transferred || 0) / 1024 / 1024);
-    const totalMB = Math.round((progress.total || 0) / 1024 / 1024);
-    
+
+    const progressPercent = Math.round(progress?.percent || 0);
+    const transferredMB = Math.round((progress?.transferred || 0) / 1024 / 1024);
+    const totalMB = Math.round((progress?.total || 0) / 1024 / 1024);
+    const description = `Progresso: ${progressPercent}% (${transferredMB}MB / ${totalMB}MB)`;
+
+    // Já existe uma notificação de download em andamento: só atualizar o
+    // texto dela, em vez de empilhar uma nova a cada tick de progresso
+    const existingId = this.activeNotifications.get('downloading');
+    if (existingId) {
+      CustomNotificationManager.notificationAPI.updateNotification(existingId, { description });
+      return existingId;
+    }
+
+    this.closeNotification('available');
+
     const id = CustomNotificationManager.notificationAPI.download({
       title: 'Baixando Atualização',
-      description: `Progresso: ${progressPercent}% (${transferredMB}MB / ${totalMB}MB)`,
+      description,
       duration: 0
     });
-    
+
     this.activeNotifications.set('downloading', id);
     return id;
   }

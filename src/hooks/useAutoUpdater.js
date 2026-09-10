@@ -38,7 +38,7 @@ export const useAutoUpdater = () => {
       }));
     };
 
-    const handleUpdateAvailable = (info) => {
+    const handleUpdateAvailable = (event, info) => {
       setUpdateInfo(prev => ({
         ...prev,
         checking: false,
@@ -59,7 +59,7 @@ export const useAutoUpdater = () => {
       }));
     };
 
-    const handleUpdateError = (error) => {
+    const handleUpdateError = (event, error) => {
       setUpdateInfo(prev => ({
         ...prev,
         checking: false,
@@ -69,14 +69,14 @@ export const useAutoUpdater = () => {
       }));
     };
 
-    const handleDownloadProgress = (progress) => {
+    const handleDownloadProgress = (event, progress) => {
       setUpdateInfo(prev => ({
         ...prev,
         progress: progress
       }));
     };
 
-    const handleUpdateDownloaded = (info) => {
+    const handleUpdateDownloaded = (event, info) => {
       setUpdateInfo(prev => ({
         ...prev,
         downloaded: true,

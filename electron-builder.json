@@ -19,7 +19,7 @@
     "private": false
   },
   "win": {
-    "icon": "icon.png",
+    "icon": "favicon.ico",
     "target": [
       {
         "target": "portable",
@@ -36,7 +36,7 @@
     ]
   },
   "mac": {
-    "icon": "icon.png",
+    "icon": "public/logo1024.icns",
     "category": "public.app-category.productivity",
     "target": [
       {
