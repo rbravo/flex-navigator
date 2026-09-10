@@ -3,7 +3,7 @@ const { printDebugInfo } = require('./src/electron/utils/config');
 const { createWindow, getMainWindow } = require('./src/electron/window/mainWindow');
 const { createMenu, setAutoUpdaterManager } = require('./src/electron/menu/applicationMenu');
 const { setupIpcHandlers } = require('./src/electron/ipc/ipcHandlers');
-const { setupWebContentsHandlers } = require('./src/electron/utils/webContentsSetup');
+const { setupWebContentsHandlers, setupPermissionHandler, setupSiteInfoHandlers } = require('./src/electron/utils/webContentsSetup');
 const { AutoUpdaterManager } = require('./src/electron/utils/autoUpdater');
 
 // Imprimir informações de debug
@@ -30,6 +30,13 @@ app.whenReady().then(() => {
   
   // Configurar manipuladores de web contents
   setupWebContentsHandlers(mainWindow);
+
+  // Configurar prompt de permissões (câmera/mic, localização, notificações...)
+  setupPermissionHandler(mainWindow);
+
+  // Configurar captura de certificado TLS + consulta/edição de permissões
+  // por site (popover de informações do site na barra de URL)
+  setupSiteInfoHandlers();
 
   // Verificar por atualizações após 3 segundos (se habilitado)
   setTimeout(async () => {

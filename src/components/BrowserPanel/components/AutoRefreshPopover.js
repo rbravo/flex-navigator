@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Popover, Switch, InputNumber, Space, Typography, Divider, Select } from 'antd';
 import { ClockCircleOutlined } from '@ant-design/icons';
+import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -17,6 +18,9 @@ const AutoRefreshPopover = ({
 }) => {
   const [localInterval, setLocalInterval] = useState(refreshInterval);
   const [timeUnit, setTimeUnit] = useState('segundos');
+  const [open, setOpen] = useState(false);
+
+  useCloseOnWebviewFocus(open, () => setOpen(false));
 
   useEffect(() => {
     setLocalInterval(refreshInterval);
@@ -141,6 +145,8 @@ const AutoRefreshPopover = ({
       title={title}
       trigger="click"
       placement="bottomRight"
+      open={open}
+      onOpenChange={setOpen}
       overlayStyle={{
         backgroundColor: '#2d2d30',
       }}

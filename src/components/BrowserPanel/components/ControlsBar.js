@@ -10,10 +10,12 @@ import {
   ClockCircleOutlined,
   ControlOutlined,
   SettingOutlined,
-  AppstoreAddOutlined
+  AppstoreAddOutlined,
+  ControlFilled
 } from '@ant-design/icons';
 import AutoRefreshPopover from './AutoRefreshPopover';
 import ShortcutsConfigPopover from './ShortcutsConfigPopover';
+import SiteInfoPopover from './SiteInfoPopover';
 
 /**
  * Barra de controles de navegação
@@ -24,6 +26,7 @@ const ControlsBar = ({
   isLoading,
   url,
   setUrl,
+  currentUrl,
   onBack,
   onForward,
   onRefresh,
@@ -109,7 +112,11 @@ const ControlsBar = ({
             prefix={
               isLoading ?
                 <ReloadOutlined spin style={{ color: '#007acc' }} /> :
-                <GlobalOutlined style={{ color: '#999999' }} />
+                <SiteInfoPopover currentUrl={currentUrl}>
+                  <span style={{ cursor: 'pointer', display: 'inline-flex' }}>
+                    <ControlFilled style={{ color: '#999999', fontSize: 18, marginRight: 2, marginLeft: -4 }} />
+                  </span>
+                </SiteInfoPopover>
             }
             suffix={
               !isLoading && (

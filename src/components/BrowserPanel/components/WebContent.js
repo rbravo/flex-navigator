@@ -36,7 +36,7 @@ const WebContent = ({
         }}
         allowpopups="true"
         nodeintegration="false"
-        webpreferences="allowRunningInsecureContent=false, javascript=true, webSecurity=true, contextIsolation=true"
+        webpreferences="allowRunningInsecureContent=false, javascript=true, webSecurity=true, contextIsolation=true, sandbox=true"
         useragent={userAgent}
         partition="persist:webview"
         enableremotemodule="false"

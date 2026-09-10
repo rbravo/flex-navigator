@@ -33,6 +33,9 @@ import CustomNotificationManager from './components/Updates/CustomNotificationSy
 // Componente de atualizações
 import UpdateManager from './components/Updates/UpdateManager';
 
+// Prompt de permissões pedidas por sites (câmera/mic, localização, etc.)
+import PermissionRequestManager from './components/PermissionRequest';
+
 // Utilitários para ações de tabs
 import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWebviewListeners } from './utils/tabActions';
 
@@ -455,6 +458,9 @@ const AppContent = () => {
 
         {/* Gerenciador de atualizações */}
         <UpdateManager />
+
+        {/* Prompt de permissões pedidas por sites nas abas */}
+        <PermissionRequestManager />
       </div>
     </ConfigProvider>
   );

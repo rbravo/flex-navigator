@@ -317,6 +317,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             isLoading={isLoading}
             url={url}
             setUrl={setUrl}
+            currentUrl={currentUrl}
             onBack={handleBack}
             onForward={handleForward}
             onRefresh={handleRefreshClick}

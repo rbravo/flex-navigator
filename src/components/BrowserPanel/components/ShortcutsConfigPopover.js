@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Popover, Switch, Select, Space, Typography, Divider, Button } from 'antd';
 import { ControlOutlined, SettingOutlined } from '@ant-design/icons';
+import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -20,6 +21,9 @@ const ShortcutsConfigPopover = ({
   const [localEnabled, setLocalEnabled] = useState(isShortcutsEnabled);
   const [localModifiers, setLocalModifiers] = useState(shortcutModifiers);
   const [localShowOverlay, setLocalShowOverlay] = useState(showOverlay);
+  const [open, setOpen] = useState(false);
+
+  useCloseOnWebviewFocus(open, () => setOpen(false));
 
   useEffect(() => {
     setLocalEnabled(isShortcutsEnabled);
@@ -220,6 +224,8 @@ const ShortcutsConfigPopover = ({
       title={title}
       trigger="click"
       placement="bottomRight"
+      open={open}
+      onOpenChange={setOpen}
       overlayStyle={{
         backgroundColor: '#2d2d30',
       }}

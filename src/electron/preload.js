@@ -30,6 +30,19 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Barra de título customizada
   popupAppMenu: (label, x, y) => ipcRenderer.send('popup-app-menu', { label, x, y }),
 
+  // Permissões pedidas por sites (câmera/mic, localização, notificações...)
+  respondToPermissionRequest: (requestId, granted) =>
+    ipcRenderer.send('permission-response', { requestId, granted }),
+
+  // Popover de informações do site (certificado + permissões por origem)
+  getSiteInfo: (url) => ipcRenderer.invoke('get-site-info', url),
+  setSitePermission: (origin, permission, granted) =>
+    ipcRenderer.send('set-site-permission', { origin, permission, granted }),
+
+  // Tela de gerenciamento de permissões (Configurações > Permissões)
+  listSitePermissions: () => ipcRenderer.invoke('list-site-permissions'),
+  removeSitePermissions: (origin) => ipcRenderer.send('remove-site-permissions', origin),
+
   // Auto-updater
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
@@ -61,5 +74,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUpdateNotAvailable: (callback) => subscribe('update-not-available', callback),
   onUpdateError: (callback) => subscribe('update-error', callback),
   onUpdateDownloadProgress: (callback) => subscribe('update-download-progress', callback),
-  onUpdateDownloaded: (callback) => subscribe('update-downloaded', callback)
+  onUpdateDownloaded: (callback) => subscribe('update-downloaded', callback),
+  onPermissionRequest: (callback) => subscribe('permission-request', callback)
 });
