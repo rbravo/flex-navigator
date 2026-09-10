@@ -63,15 +63,25 @@ function createWindow() {
     console.error('❌ Erro ao carregar URL:', error);
   });
 
+  const showMainWindow = () => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    if (!mainWindow.isVisible()) mainWindow.show();
+  };
+
   // Show window when ready to prevent visual flash
   mainWindow.once('ready-to-show', () => {
     console.log('🎉 Janela pronta para mostrar');
-    mainWindow.show();
+    showMainWindow();
     
     // Open DevTools only in development
     if (isDev) {
       mainWindow.webContents.openDevTools({ mode: 'detach' });
     }
+  });
+
+  // Fallback for pages that never emit ready-to-show.
+  mainWindow.webContents.once('did-finish-load', () => {
+    showMainWindow();
   });
 
   // Add error handling
