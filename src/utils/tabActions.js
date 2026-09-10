@@ -1,4 +1,5 @@
 import { Actions, DockLocation } from 'flexlayout-react';
+import { createNewTab } from './layoutActions';
 
 /**
  * Utilitários para ações específicas das tabs
@@ -28,9 +29,8 @@ export const refreshTab = (model, tabId) => {
     const tabNode = model.getNodeById(tabId);
     if (tabNode && tabNode.getComponent() === 'browser') {
       // Enviar evento para recarregar a webview
-      if (window.require) {
-        const { ipcRenderer } = window.require('electron');
-        ipcRenderer.send('refresh-webview', { tabId });
+      if (window.electronAPI) {
+        window.electronAPI.refreshWebview(tabId);
       } else {
         // No desenvolvimento, apenas fazer log
         console.log('Refresh tab:', tabId);
@@ -135,12 +135,8 @@ export const toggleTabMute = (model, tabId) => {
       const newConfig = { ...config, muted: !currentMuteState };
       
       // Enviar comando para o Electron
-      if (window.require) {
-        const { ipcRenderer } = window.require('electron');
-        ipcRenderer.send('toggle-webview-mute', { 
-          tabId, 
-          muted: !currentMuteState 
-        });
+      if (window.electronAPI) {
+        window.electronAPI.toggleWebviewMute(tabId, !currentMuteState);
       } else {
         console.log('Toggle mute tab:', tabId, 'new state:', !currentMuteState);
       }
@@ -159,6 +155,17 @@ export const toggleTabMute = (model, tabId) => {
  */
 export const closeTab = (model, tabId) => {
   try {
+    const tabNode = model.getNodeById(tabId);
+    const tabSetNode = tabNode?.getParent();
+    const countTabs = (node) => {
+      if (node.getType() === 'tab') return 1;
+      return node.getChildren().reduce((count, child) => count + countTabs(child), 0);
+    };
+
+    if (tabSetNode?.getType() === 'tabset' && countTabs(model.getRootRow()) === 1) {
+      createNewTab(model, tabSetNode.getId());
+    }
+
     const action = Actions.deleteTab(tabId);
     return model.doAction(action);
   } catch (error) {
@@ -280,19 +287,17 @@ export const updateTabFavicon = (model, tabId, faviconUrl) => {
  * Verifica periodicamente o estado de áudio de todas as tabs
  */
 export const startAudioStateMonitoring = (model) => {
-  if (!window.require) return null;
-  
-  const { ipcRenderer } = window.require('electron');
-  
+  if (!window.electronAPI) return null;
+
   const checkAudioStates = () => {
     try {
       // Obter todas as webviews ativas diretamente do DOM
       const allWebviews = document.querySelectorAll('webview[data-tab-id]');
-      
+
       allWebviews.forEach(webview => {
         const tabId = webview.getAttribute('data-tab-id');
         if (tabId) {
-          ipcRenderer.send('check-webview-audio-state', { tabId });
+          window.electronAPI.checkWebviewAudioState(tabId);
         }
       });
       

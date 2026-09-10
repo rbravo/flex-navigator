@@ -75,7 +75,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
 
   // Detecta se está rodando no Electron
   useEffect(() => {
-    setIsElectron(window.require !== undefined);
+    setIsElectron(typeof window.electronAPI !== 'undefined');
   }, []);
 
   // Função para atualizar o estado de navegação
@@ -159,9 +159,8 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
           console.log('Link solicitado para abrir em nova janela:', e.url);
           
           // Enviar para o processo principal para criar nova aba
-          if (window.require) {
-            const { ipcRenderer } = window.require('electron');
-            ipcRenderer.send('open-in-new-tab', e.url);
+          if (window.electronAPI) {
+            window.electronAPI.openInNewTab(e.url);
           }
         });
       };

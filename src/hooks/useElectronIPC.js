@@ -42,14 +42,14 @@ const getActiveTabId = (model) => {
  */
 const useElectronIPC = (model) => {
   useEffect(() => {
-    if (window.require) {
+    if (window.electronAPI) {
       try {
-        const { ipcRenderer } = window.require('electron');
+        const api = window.electronAPI;
 
         // Listener para abrir link em nova aba (vindo do context menu)
-        const handleAddNewTab = (event, data) => {
+        const handleAddNewTab = (data) => {
           console.log('Recebido evento para adicionar nova aba:', data);
-          
+
           if (data.sourceTabId) {
             // Se temos o ID da tab source, adicionar no mesmo tabset
             console.log('Adicionando nova aba no mesmo tabset da tab:', data.sourceTabId);
@@ -62,8 +62,8 @@ const useElectronIPC = (model) => {
         };
 
         // Listener para comandos do context menu
-        const handleOpenInNewTab = (event, url) => {
-          handleAddNewTab(event, { url });
+        const handleOpenInNewTab = (url) => {
+          handleAddNewTab({ url });
         };
 
         // Listeners para novos eventos dos modais
@@ -76,7 +76,7 @@ const useElectronIPC = (model) => {
           window.dispatchEvent(new CustomEvent('show-settings-dialog'));
         };
 
-        const handleOpenUrl = (event, url) => {
+        const handleOpenUrl = (url) => {
           window.dispatchEvent(new CustomEvent('open-url', { detail: url }));
         };
 
@@ -132,7 +132,7 @@ const useElectronIPC = (model) => {
         // Listener para teclas de atalho de navegação capturadas dentro de
         // uma webview (o keydown do host não dispara nesse caso, então o
         // processo principal repassa o evento via before-input-event)
-        const handleWebviewNavigationKeyEvent = (event, data) => {
+        const handleWebviewNavigationKeyEvent = (data) => {
           window.dispatchEvent(new CustomEvent('webview-navigation-key-event', { detail: data }));
         };
 
@@ -179,7 +179,7 @@ const useElectronIPC = (model) => {
         document.addEventListener('keydown', handleBrowserShortcutKeyDown, true);
 
         // Listener para atualizações de estado de áudio
-        const handleAudioStateUpdate = (event, data) => {
+        const handleAudioStateUpdate = (data) => {
           //console.log('Recebido update de áudio:', data);
           if (data.tabId) {
             if (typeof data.isAudible === 'boolean') {
@@ -192,45 +192,36 @@ const useElectronIPC = (model) => {
 
         // Ctrl+Tab / Ctrl+Shift+Tab repassado pelo processo principal quando
         // o foco está numa webview (mesmo caminho do menu-new-tab/etc.)
-        const handleCycleTabEvent = (event, { direction }) => {
+        const handleCycleTabEvent = ({ direction }) => {
           handleCycleTab(direction);
         };
 
-        // Registrar listeners
-        ipcRenderer.on('add-new-tab', handleAddNewTab);
-        ipcRenderer.on('open-in-new-tab', handleOpenInNewTab);
-        ipcRenderer.on('audio-state-update', handleAudioStateUpdate);
-        ipcRenderer.on('show-clear-session-dialog', handleShowClearSessionDialog);
-        ipcRenderer.on('show-settings-dialog', handleShowSettingsDialog);
-        ipcRenderer.on('open-url', handleOpenUrl);
-        ipcRenderer.on('test-notifications', handleTestNotifications);
-        ipcRenderer.on('navigation-webview-key-event', handleWebviewNavigationKeyEvent);
-        ipcRenderer.on('menu-new-tab', handleMenuNewTab);
-        ipcRenderer.on('menu-split-horizontal', handleMenuSplitHorizontal);
-        ipcRenderer.on('menu-split-vertical', handleMenuSplitVertical);
-        ipcRenderer.on('menu-close-tab', handleMenuCloseTab);
-        ipcRenderer.on('menu-focus-url-bar', handleMenuFocusUrlBar);
-        ipcRenderer.on('cycle-tab', handleCycleTabEvent);
+        // Registrar listeners - cada um retorna sua própria função de
+        // unsubscribe (contextBridge não usa mais o event do IPC no lado do
+        // renderer)
+        const unsubscribers = [
+          api.onAddNewTab(handleAddNewTab),
+          api.onOpenInNewTab(handleOpenInNewTab),
+          api.onAudioStateUpdate(handleAudioStateUpdate),
+          api.onShowClearSessionDialog(handleShowClearSessionDialog),
+          api.onShowSettingsDialog(handleShowSettingsDialog),
+          api.onOpenUrl(handleOpenUrl),
+          api.onTestNotifications(handleTestNotifications),
+          api.onNavigationWebviewKeyEvent(handleWebviewNavigationKeyEvent),
+          api.onMenuNewTab(handleMenuNewTab),
+          api.onMenuSplitHorizontal(handleMenuSplitHorizontal),
+          api.onMenuSplitVertical(handleMenuSplitVertical),
+          api.onMenuCloseTab(handleMenuCloseTab),
+          api.onMenuFocusUrlBar(handleMenuFocusUrlBar),
+          api.onCycleTab(handleCycleTabEvent)
+        ];
 
         // Iniciar monitoramento de áudio
         const stopAudioMonitoring = startAudioStateMonitoring(model);
 
         // Cleanup ao desmontar o componente
         return () => {
-          ipcRenderer.removeListener('add-new-tab', handleAddNewTab);
-          ipcRenderer.removeListener('open-in-new-tab', handleOpenInNewTab);
-          ipcRenderer.removeListener('audio-state-update', handleAudioStateUpdate);
-          ipcRenderer.removeListener('show-clear-session-dialog', handleShowClearSessionDialog);
-          ipcRenderer.removeListener('show-settings-dialog', handleShowSettingsDialog);
-          ipcRenderer.removeListener('open-url', handleOpenUrl);
-          ipcRenderer.removeListener('test-notifications', handleTestNotifications);
-          ipcRenderer.removeListener('navigation-webview-key-event', handleWebviewNavigationKeyEvent);
-          ipcRenderer.removeListener('menu-new-tab', handleMenuNewTab);
-          ipcRenderer.removeListener('menu-split-horizontal', handleMenuSplitHorizontal);
-          ipcRenderer.removeListener('menu-split-vertical', handleMenuSplitVertical);
-          ipcRenderer.removeListener('menu-close-tab', handleMenuCloseTab);
-          ipcRenderer.removeListener('menu-focus-url-bar', handleMenuFocusUrlBar);
-          ipcRenderer.removeListener('cycle-tab', handleCycleTabEvent);
+          unsubscribers.forEach((unsubscribe) => unsubscribe());
           document.removeEventListener('keydown', handleBrowserShortcutKeyDown, true);
 
           // Parar monitoramento de áudio

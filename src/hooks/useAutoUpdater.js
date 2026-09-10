@@ -11,22 +11,10 @@ export const useAutoUpdater = () => {
     isManualCheck: false
   });
 
-  const [ipcRenderer, setIpcRenderer] = useState(null);
+  const api = typeof window.electronAPI !== 'undefined' ? window.electronAPI : null;
 
   useEffect(() => {
-    // Verificar se estamos no ambiente Electron
-    if (window.require) {
-      try {
-        const { ipcRenderer: electronIpc } = window.require('electron');
-        setIpcRenderer(electronIpc);
-      } catch (error) {
-        console.error('Erro ao acessar ipcRenderer:', error);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!ipcRenderer) return;
+    if (!api) return;
 
     // Listeners para eventos do auto-updater
     const handleUpdateChecking = () => {
@@ -38,7 +26,7 @@ export const useAutoUpdater = () => {
       }));
     };
 
-    const handleUpdateAvailable = (event, info) => {
+    const handleUpdateAvailable = (info) => {
       setUpdateInfo(prev => ({
         ...prev,
         checking: false,
@@ -59,7 +47,7 @@ export const useAutoUpdater = () => {
       }));
     };
 
-    const handleUpdateError = (event, error) => {
+    const handleUpdateError = (error) => {
       setUpdateInfo(prev => ({
         ...prev,
         checking: false,
@@ -69,14 +57,14 @@ export const useAutoUpdater = () => {
       }));
     };
 
-    const handleDownloadProgress = (event, progress) => {
+    const handleDownloadProgress = (progress) => {
       setUpdateInfo(prev => ({
         ...prev,
         progress: progress
       }));
     };
 
-    const handleUpdateDownloaded = (event, info) => {
+    const handleUpdateDownloaded = (info) => {
       setUpdateInfo(prev => ({
         ...prev,
         downloaded: true,
@@ -86,35 +74,32 @@ export const useAutoUpdater = () => {
     };
 
     // Registrar listeners
-    ipcRenderer.on('update-checking', handleUpdateChecking);
-    ipcRenderer.on('update-available', handleUpdateAvailable);
-    ipcRenderer.on('update-not-available', handleUpdateNotAvailable);
-    ipcRenderer.on('update-error', handleUpdateError);
-    ipcRenderer.on('update-download-progress', handleDownloadProgress);
-    ipcRenderer.on('update-downloaded', handleUpdateDownloaded);
+    const unsubscribers = [
+      api.onUpdateChecking(handleUpdateChecking),
+      api.onUpdateAvailable(handleUpdateAvailable),
+      api.onUpdateNotAvailable(handleUpdateNotAvailable),
+      api.onUpdateError(handleUpdateError),
+      api.onUpdateDownloadProgress(handleDownloadProgress),
+      api.onUpdateDownloaded(handleUpdateDownloaded)
+    ];
 
     // Cleanup
     return () => {
-      ipcRenderer.removeListener('update-checking', handleUpdateChecking);
-      ipcRenderer.removeListener('update-available', handleUpdateAvailable);
-      ipcRenderer.removeListener('update-not-available', handleUpdateNotAvailable);
-      ipcRenderer.removeListener('update-error', handleUpdateError);
-      ipcRenderer.removeListener('update-download-progress', handleDownloadProgress);
-      ipcRenderer.removeListener('update-downloaded', handleUpdateDownloaded);
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
     };
-  }, [ipcRenderer]);
+  }, [api]);
 
   const checkForUpdates = async () => {
-    if (!ipcRenderer) {
-      console.error('ipcRenderer não disponível');
+    if (!api) {
+      console.error('electronAPI não disponível');
       return;
     }
-    
+
     try {
       console.log('🎯 React: Solicitando verificação de updates...');
-      const response = await ipcRenderer.invoke('check-for-updates');
+      const response = await api.checkForUpdates();
       console.log('🎯 React: Resposta recebida:', response);
-      
+
       if (!response.success) {
         console.error('🎯 React: Erro na verificação:', response.error);
         setUpdateInfo(prev => ({
@@ -123,7 +108,7 @@ export const useAutoUpdater = () => {
           error: response.error
         }));
       }
-      
+
       return response;
     } catch (error) {
       console.error('🎯 React: Erro ao verificar atualizações:', error);
@@ -136,19 +121,19 @@ export const useAutoUpdater = () => {
   };
 
   const downloadUpdate = () => {
-    if (!ipcRenderer) return;
-    ipcRenderer.send('download-update');
+    if (!api) return;
+    api.downloadUpdate();
   };
 
   const installUpdate = () => {
-    if (!ipcRenderer) return;
-    ipcRenderer.send('install-update');
+    if (!api) return;
+    api.installUpdate();
   };
 
   const getAppVersion = async () => {
-    if (!ipcRenderer) return null;
+    if (!api) return null;
     try {
-      return await ipcRenderer.invoke('get-app-version');
+      return await api.getAppVersion();
     } catch (error) {
       console.error('Erro ao obter versão:', error);
       return null;

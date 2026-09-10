@@ -8,17 +8,16 @@ const useSessionManager = (model, loadConfiguration) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Verificar se está no Electron
-  const isElectron = window.require !== undefined;
+  const isElectron = typeof window.electronAPI !== 'undefined';
 
   // Carregar sessões do armazenamento
   const loadSessions = useCallback(async () => {
     if (!isElectron) return;
-    
+
     setIsLoading(true);
     try {
-      const electron = window.require('electron');
-      const result = await electron.ipcRenderer.invoke('load-sessions');
-      
+      const result = await window.electronAPI.loadSessions();
+
       if (result.success) {
         console.log('✅ Sessões carregadas:', result.sessions.length);
         setSessions(result.sessions);
@@ -35,11 +34,11 @@ const useSessionManager = (model, loadConfiguration) => {
   // Salvar sessão atual
   const saveSession = useCallback(async (sessionName) => {
     if (!isElectron || !model) return;
-    
+
     console.log('💾 Salvando sessão:', sessionName);
     try {
       const layoutConfig = model.toJson();
-      
+
       // Função para adicionar índices originais às tabs se não existirem
       const addOriginalIndexes = (node) => {
         if (node.type === 'tabset' && node.children) {
@@ -50,29 +49,25 @@ const useSessionManager = (model, loadConfiguration) => {
             }
           });
         }
-        
+
         if (node.children) {
           node.children.forEach(child => addOriginalIndexes(child));
         }
       };
-      
+
       // Criar cópia e adicionar índices
       const configToSave = JSON.parse(JSON.stringify(layoutConfig));
       addOriginalIndexes(configToSave.layout);
-      
-      const electron = window.require('electron');
-      const result = await electron.ipcRenderer.invoke('save-session', {
-        sessionName,
-        layoutConfig: configToSave
-      });
-      
+
+      const result = await window.electronAPI.saveSession(sessionName, configToSave);
+
       if (result.success) {
         console.log('✅ Sessão salva com sucesso:', result.session);
         await loadSessions(); // Recarregar lista de sessões
-        
+
         // Atualizar menu da aplicação
-        electron.ipcRenderer.send('update-sessions-menu');
-        
+        window.electronAPI.updateSessionsMenu();
+
         return { success: true, session: result.session };
       } else {
         console.error('❌ Erro ao salvar sessão:', result.error);
@@ -87,21 +82,20 @@ const useSessionManager = (model, loadConfiguration) => {
   // Carregar sessão específica
   const loadSession = useCallback(async (sessionId, replaceCurrentLayout = true) => {
     if (!isElectron || !model || !loadConfiguration) return;
-    
+
     try {
-      const electron = window.require('electron');
-      const result = await electron.ipcRenderer.invoke('load-session', sessionId);
-      
+      const result = await window.electronAPI.loadSession(sessionId);
+
       if (result.success && result.session) {
         if (replaceCurrentLayout) {
           // Usar a função loadConfiguration do hook
           const success = loadConfiguration(result.session.config);
-          
+
           if (!success) {
             return { success: false, error: 'Erro ao aplicar configuração da sessão' };
           }
         }
-        
+
         return { success: true, session: result.session };
       } else {
         return { success: false, error: result.error };
@@ -115,17 +109,16 @@ const useSessionManager = (model, loadConfiguration) => {
   // Deletar sessão
   const deleteSession = useCallback(async (sessionId) => {
     if (!isElectron) return;
-    
+
     try {
-      const electron = window.require('electron');
-      const result = await electron.ipcRenderer.invoke('delete-session', sessionId);
-      
+      const result = await window.electronAPI.deleteSession(sessionId);
+
       if (result.success) {
         await loadSessions(); // Recarregar lista de sessões
-        
+
         // Atualizar menu da aplicação
-        electron.ipcRenderer.send('update-sessions-menu');
-        
+        window.electronAPI.updateSessionsMenu();
+
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -139,30 +132,28 @@ const useSessionManager = (model, loadConfiguration) => {
   // Configurar listeners do IPC
   useEffect(() => {
     if (!isElectron) return;
-    
-    const electron = window.require('electron');
-    
+
     // Listener para carregar sessão na janela atual
-    const handleLoadSessionInCurrentWindow = async (event, sessionId) => {
+    const handleLoadSessionInCurrentWindow = async (sessionId) => {
       await loadSession(sessionId, true);
     };
-    
+
     // Listener para mostrar dialog de salvar sessão
     const handleShowSaveSessionDialog = () => {
       // Este evento será capturado pelo componente que gerencia o modal
       window.dispatchEvent(new CustomEvent('show-save-session-dialog'));
     };
-    
+
     // Listener para confirmar deleção de sessão
-    const handleConfirmDeleteSession = (event, sessionId, sessionName) => {
+    const handleConfirmDeleteSession = (sessionId, sessionName) => {
       // Este evento será capturado pelo componente que gerencia o modal
       window.dispatchEvent(new CustomEvent('confirm-delete-session', {
         detail: { sessionId, sessionName }
       }));
     };
-    
+
     // Listener para carregar configuração de sessão em nova janela
-    const handleLoadSessionConfig = async (event, layoutConfig) => {
+    const handleLoadSessionConfig = async (layoutConfig) => {
       if (loadConfiguration && layoutConfig) {
         try {
           loadConfiguration(layoutConfig);
@@ -171,18 +162,17 @@ const useSessionManager = (model, loadConfiguration) => {
         }
       }
     };
-    
-    electron.ipcRenderer.on('load-session-in-current-window', handleLoadSessionInCurrentWindow);
-    electron.ipcRenderer.on('show-save-session-dialog', handleShowSaveSessionDialog);
-    electron.ipcRenderer.on('confirm-delete-session', handleConfirmDeleteSession);
-    electron.ipcRenderer.on('load-session-config', handleLoadSessionConfig);
-    
+
+    const unsubscribers = [
+      window.electronAPI.onLoadSessionInCurrentWindow(handleLoadSessionInCurrentWindow),
+      window.electronAPI.onShowSaveSessionDialog(handleShowSaveSessionDialog),
+      window.electronAPI.onConfirmDeleteSession(handleConfirmDeleteSession),
+      window.electronAPI.onLoadSessionConfig(handleLoadSessionConfig)
+    ];
+
     // Cleanup
     return () => {
-      electron.ipcRenderer.removeListener('load-session-in-current-window', handleLoadSessionInCurrentWindow);
-      electron.ipcRenderer.removeListener('show-save-session-dialog', handleShowSaveSessionDialog);
-      electron.ipcRenderer.removeListener('confirm-delete-session', handleConfirmDeleteSession);
-      electron.ipcRenderer.removeListener('load-session-config', handleLoadSessionConfig);
+      unsubscribers.forEach((unsubscribe) => unsubscribe());
     };
   }, [isElectron, loadSession, model, loadConfiguration]);
 

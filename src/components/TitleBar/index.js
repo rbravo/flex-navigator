@@ -11,22 +11,17 @@ const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Sessão', 'D
  */
 const TitleBar = () => {
   const handleMenuClick = (label, event) => {
-    if (!window.require) return;
+    if (!window.electronAPI) return;
 
     try {
-      const { ipcRenderer } = window.require('electron');
       const rect = event.currentTarget.getBoundingClientRect();
-      ipcRenderer.send('popup-app-menu', {
-        label,
-        x: Math.round(rect.left),
-        y: Math.round(rect.bottom)
-      });
+      window.electronAPI.popupAppMenu(label, Math.round(rect.left), Math.round(rect.bottom));
     } catch (error) {
       console.log('IPC não disponível para abrir o menu:', error);
     }
   };
 
-  const isMac = process.platform === 'darwin';
+  const isMac = window.electronAPI?.platform === 'darwin';
 
   return (
     <div className={`app-titlebar${isMac ? ' app-titlebar-mac' : ''}`}>

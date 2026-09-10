@@ -22,8 +22,9 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      preload: path.join(__dirname, '../preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
       webviewTag: true // Habilita a tag webview
     },
     // Esconde a barra de título nativa e sobrepõe apenas os botões de

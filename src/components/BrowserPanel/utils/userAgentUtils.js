@@ -18,8 +18,8 @@ export const USER_AGENTS = {
  * @returns {string} User agent apropriado
  */
 export const getDefaultUserAgent = () => {
-  const platform = process.platform;
-  
+  const platform = window.electronAPI?.platform;
+
   switch (platform) {
     case 'darwin':
       return USER_AGENTS.CHROME_MAC;

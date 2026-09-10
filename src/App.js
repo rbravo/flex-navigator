@@ -271,26 +271,24 @@ const AppContent = () => {
   const handleSaveSession = async (sessionName) => {
     const result = await saveSession(sessionName);
     setSaveSessionModalVisible(false);
-    
+
     // Atualizar menu da aplicação
-    if (window.require) {
-      const electron = window.require('electron');
-      electron.ipcRenderer.send('update-sessions-menu');
+    if (window.electronAPI) {
+      window.electronAPI.updateSessionsMenu();
     }
-    
+
     return result;
   };
 
   const handleDeleteSession = async () => {
     const result = await deleteSession(deleteSessionModal.sessionId);
     setDeleteSessionModal({ visible: false, sessionId: null, sessionName: '' });
-    
+
     // Atualizar menu da aplicação
-    if (window.require) {
-      const electron = window.require('electron');
-      electron.ipcRenderer.send('update-sessions-menu');
+    if (window.electronAPI) {
+      window.electronAPI.updateSessionsMenu();
     }
-    
+
     return result;
   };
 

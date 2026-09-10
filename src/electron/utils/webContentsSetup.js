@@ -81,8 +81,9 @@ function setupWebContentsHandlers(mainWindow) {
                   // URL da página vem de um site arbitrário (não confiável),
                   // então NUNCA deve ser interpolada crua num template de
                   // script: uma URL malformada de propósito poderia escapar
-                  // da string literal e injetar JS no contexto do main
-                  // window, que tem nodeIntegration habilitado.
+                  // da string literal e injetar JS no main world do main
+                  // window (mesmo com contextIsolation, executeJavaScript
+                  // roda nesse mundo, que enxerga window.electronAPI).
                   const currentContentsUrl = JSON.stringify(contents.getURL());
                   mainWindow.webContents.executeJavaScript(`
                     (function() {
