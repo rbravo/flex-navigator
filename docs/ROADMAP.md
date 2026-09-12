@@ -214,8 +214,33 @@ tem uma linha de contexto explicando o porquê.
       (`webview.getZoomFactor() === 1.2`) e persiste no localStorage
       corretamente por origem (`{"www.google.com":1.2}`).
 
-- [ ] **Histórico de navegação** — lista pesquisável de URLs visitadas, com
-      opção de limpar.
+- [x] **Histórico de navegação** — lista pesquisável de URLs visitadas, com
+      opção de limpar. Cada visita em qualquer webview/aba é gravada no
+      processo principal (`HistoryManager.js`, disco em
+      `userData/history.json`, limite de 5000 entradas) - centralizado ali
+      porque é o único lugar que enxerga toda webview de qualquer
+      aba/painel, sem duplicar a lógica em cada `BrowserPanel`. Escuta
+      `did-navigate` (grava a entrada), `page-title-updated` e
+      `page-favicon-updated` (completam a mesma entrada depois, via um id
+      guardado em closure - título e favicon chegam em eventos separados,
+      alguns instantes depois da navegação em si). UI: `HistoryModal.js`,
+      acessível pelo item "Histórico" (Ctrl+H) na mesma dropdown de
+      Zoom/Buscar/Configurações do `ControlsBar.js`, com busca com debounce,
+      abrir em nova aba, remover uma entrada ou limpar tudo (com
+      confirmação). Ctrl+H segue o mesmo caminho de relay dos outros
+      atalhos de navegador (`navigationShortcuts.js` + `useElectronIPC.js`),
+      necessário porque o accelerator nativo do Menu do Electron não
+      dispara de forma confiável com uma `<webview>` focada.
+
+      Testado de ponta a ponta com a UI real: carregar a página inicial já
+      grava 1 entrada; navegar a webview pra uma segunda URL adiciona uma
+      nova entrada no topo da lista; buscar por um termo filtra
+      corretamente (e um termo que não bate em nada retorna vazio);
+      remover uma entrada específica a tira da lista sem afetar as demais;
+      abrir "Histórico" pela dropdown mostra o modal de verdade; o botão
+      "Limpar histórico" (com Popconfirm) esvazia a lista e mostra o estado
+      vazio do antd; o atalho Ctrl+H (com o foco fora da webview) também
+      abre o modal.
 - [ ] **Favoritos/bookmarks** — salvar, organizar e abrir favoritos rápido.
 - [ ] **Modo privado/anônimo** — aba com partition temporária (não
       `persist:webview`), sem histórico nem cookies persistidos.

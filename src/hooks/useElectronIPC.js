@@ -76,6 +76,10 @@ const useElectronIPC = (model) => {
           window.dispatchEvent(new CustomEvent('show-settings-dialog'));
         };
 
+        const handleShowHistoryDialog = () => {
+          window.dispatchEvent(new CustomEvent('show-history-dialog'));
+        };
+
         const handleOpenUrl = (url) => {
           window.dispatchEvent(new CustomEvent('open-url', { detail: url }));
         };
@@ -197,6 +201,10 @@ const useElectronIPC = (model) => {
               e.preventDefault();
               handleMenuFindInPage();
               break;
+            case 'h':
+              e.preventDefault();
+              handleShowHistoryDialog();
+              break;
             case '=':
             case '+':
               e.preventDefault();
@@ -243,6 +251,8 @@ const useElectronIPC = (model) => {
           api.onAudioStateUpdate(handleAudioStateUpdate),
           api.onShowClearSessionDialog(handleShowClearSessionDialog),
           api.onShowSettingsDialog(handleShowSettingsDialog),
+          api.onShowHistoryDialog(handleShowHistoryDialog),
+          api.onMenuShowHistory(handleShowHistoryDialog),
           api.onOpenUrl(handleOpenUrl),
           api.onTestNotifications(handleTestNotifications),
           api.onNavigationWebviewKeyEvent(handleWebviewNavigationKeyEvent),

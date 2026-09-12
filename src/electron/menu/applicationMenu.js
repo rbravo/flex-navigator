@@ -228,6 +228,19 @@ function createMenuTemplate(mainWindow, sessions) {
         {
           label: 'Gerenciar Sessões',
           submenu: buildSessionsSubmenu(sessions, mainWindow)
+        },
+        { type: 'separator' },
+        {
+          // Sem "accelerator": Ctrl+H, assim como Ctrl+T/W/L/F, é tratado
+          // pelo renderer/webview (ver navigationShortcuts.js /
+          // useElectronIPC.js) - o accelerator nativo não dispara de forma
+          // confiável com uma <webview> focada.
+          label: 'Histórico...',
+          click: () => {
+            if (mainWindow && mainWindow.webContents) {
+              mainWindow.webContents.send('show-history-dialog');
+            }
+          }
         }
       ]
     },

@@ -29,6 +29,7 @@ const BROWSER_SHORTCUT_CHANNELS = {
   w: 'menu-close-tab',
   l: 'menu-focus-url-bar',
   f: 'menu-find-in-page',
+  h: 'menu-show-history',
   '=': 'menu-zoom-in',
   '+': 'menu-zoom-in',
   '-': 'menu-zoom-out',

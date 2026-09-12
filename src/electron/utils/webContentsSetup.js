@@ -2,6 +2,7 @@ const { app, ipcMain, session } = require('electron');
 const { isDev } = require('./config');
 const { attachShortcutInterception } = require('./navigationShortcuts');
 const PermissionManager = require('./PermissionManager');
+const { getHistoryManager } = require('./HistoryManager');
 
 // Permissões que fazem sentido perguntar ao usuário para um navegador de
 // propósito geral. Qualquer outra (hid, usb, serial, window-management...)
@@ -241,6 +242,33 @@ function setupWebContentsHandlers(mainWindow) {
       // Permite que os atalhos de navegação entre painéis funcionem mesmo
       // com o foco dentro da webview
       attachShortcutInterception(contents, mainWindow);
+
+      // Histórico de navegação: grava cada visita no processo principal
+      // (não no renderer) porque aqui é o único lugar que enxerga toda
+      // webview de qualquer aba/painel, sem depender de cada BrowserPanel
+      // reimplementar a mesma lógica. Título e favicon chegam em eventos
+      // separados, geralmente alguns instantes depois - guardamos o id da
+      // entrada recém-criada pra atualizá-la em vez de duplicar.
+      let lastHistoryEntryId = null;
+      contents.on('did-navigate', (event, url) => {
+        if (!isWebviewNavigationAllowed(url) || url === 'about:blank') {
+          lastHistoryEntryId = null;
+          return;
+        }
+        lastHistoryEntryId = getHistoryManager().addEntry({ url, title: url });
+      });
+
+      contents.on('page-title-updated', (event, title) => {
+        if (lastHistoryEntryId) {
+          getHistoryManager().updateEntry(lastHistoryEntryId, { title });
+        }
+      });
+
+      contents.on('page-favicon-updated', (event, favicons) => {
+        if (lastHistoryEntryId && favicons && favicons.length > 0) {
+          getHistoryManager().updateEntry(lastHistoryEntryId, { faviconUrl: favicons[0] });
+        }
+      });
 
       console.log('Configurando context menu para webview:', contents.getURL());
       

@@ -26,6 +26,9 @@ import ClearSessionModal from './components/Session/ClearSessionModal';
 // Componentes de configurações
 import SettingsModal from './components/Settings/SettingsModal';
 
+// Modal de histórico de navegação
+import HistoryModal from './components/History/HistoryModal';
+
 // Sistema de notificação customizado
 import { NotificationProvider, useNotification } from './components/Updates/CustomNotificationSystem';
 import CustomNotificationManager from './components/Updates/CustomNotificationSystem';
@@ -88,6 +91,7 @@ const AppContent = () => {
 
   // Estados para novos modais
   const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [historyModalVisible, setHistoryModalVisible] = useState(false);
 
   // Configurar event delegation para context menu das tabs
   useEffect(() => {
@@ -218,6 +222,10 @@ const AppContent = () => {
       setSettingsModalVisible(true);
     };
 
+    const handleShowHistoryDialog = () => {
+      setHistoryModalVisible(true);
+    };
+
     const handleOpenUrl = (event) => {
       const url = event.detail;
       // Adicionar uma nova tab com a URL
@@ -235,14 +243,16 @@ const AppContent = () => {
     window.addEventListener('confirm-delete-session', handleConfirmDeleteSession);
     window.addEventListener('show-clear-session-dialog', handleShowClearSessionDialog);
     window.addEventListener('show-settings-dialog', handleShowSettingsDialog);
+    window.addEventListener('show-history-dialog', handleShowHistoryDialog);
     window.addEventListener('open-url', handleOpenUrl);
     window.addEventListener('test-notifications', handleTestNotifications);
-    
+
     return () => {
       window.removeEventListener('show-save-session-dialog', handleShowSaveSessionDialog);
       window.removeEventListener('confirm-delete-session', handleConfirmDeleteSession);
       window.removeEventListener('show-clear-session-dialog', handleShowClearSessionDialog);
       window.removeEventListener('show-settings-dialog', handleShowSettingsDialog);
+      window.removeEventListener('show-history-dialog', handleShowHistoryDialog);
       window.removeEventListener('open-url', handleOpenUrl);
       window.removeEventListener('test-notifications', handleTestNotifications);
     };
@@ -454,6 +464,12 @@ const AppContent = () => {
           visible={settingsModalVisible}
           onClose={() => setSettingsModalVisible(false)}
           onSave={handleSaveSettings}
+        />
+
+        {/* Modal de histórico de navegação */}
+        <HistoryModal
+          visible={historyModalVisible}
+          onClose={() => setHistoryModalVisible(false)}
         />
 
         {/* Gerenciador de atualizações */}

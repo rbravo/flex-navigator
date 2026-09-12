@@ -43,6 +43,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
   listSitePermissions: () => ipcRenderer.invoke('list-site-permissions'),
   removeSitePermissions: (origin) => ipcRenderer.send('remove-site-permissions', origin),
 
+  // Histórico de navegação
+  listHistory: (query) => ipcRenderer.invoke('list-history', query),
+  removeHistoryEntry: (id) => ipcRenderer.send('remove-history-entry', id),
+  clearHistory: () => ipcRenderer.send('clear-history'),
+
   // Downloads
   listDownloads: () => ipcRenderer.invoke('list-downloads'),
   pauseDownload: (id) => ipcRenderer.send('pause-download', id),
@@ -73,6 +78,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuCloseTab: (callback) => subscribe('menu-close-tab', callback),
   onMenuFocusUrlBar: (callback) => subscribe('menu-focus-url-bar', callback),
   onMenuFindInPage: (callback) => subscribe('menu-find-in-page', callback),
+  onMenuShowHistory: (callback) => subscribe('menu-show-history', callback),
+  onShowHistoryDialog: (callback) => subscribe('show-history-dialog', callback),
   onMenuZoomIn: (callback) => subscribe('menu-zoom-in', callback),
   onMenuZoomOut: (callback) => subscribe('menu-zoom-out', callback),
   onMenuZoomReset: (callback) => subscribe('menu-zoom-reset', callback),

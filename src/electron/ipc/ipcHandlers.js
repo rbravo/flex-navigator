@@ -1,5 +1,6 @@
 const { ipcMain } = require('electron');
 const SessionManager = require('../utils/SessionManager');
+const { getHistoryManager } = require('../utils/HistoryManager');
 const { popupMenuItem } = require('../menu/applicationMenu');
 
 /**
@@ -7,6 +8,7 @@ const { popupMenuItem } = require('../menu/applicationMenu');
  */
 function setupIpcHandlers(mainWindow) {
   const sessionManager = new SessionManager();
+  const historyManager = getHistoryManager();
   // Handle IPC events
   ipcMain.on('open-webview-devtools', (event, data) => {
     console.log('Abrindo DevTools para webview da tab:', data.tabId);
@@ -300,6 +302,23 @@ function setupIpcHandlers(mainWindow) {
   // Abre o submenu nativo correspondente a um item da barra de título customizada
   ipcMain.on('popup-app-menu', (event, { label, x, y }) => {
     popupMenuItem(mainWindow, label, x, y);
+  });
+
+  // Handlers para a tela de Histórico de navegação
+  ipcMain.handle('list-history', (event, query) => historyManager.list(query));
+
+  ipcMain.on('remove-history-entry', (event, id) => {
+    historyManager.removeEntry(id);
+  });
+
+  ipcMain.on('clear-history', () => {
+    historyManager.clear();
+  });
+
+  ipcMain.on('show-history-dialog', () => {
+    if (mainWindow && mainWindow.webContents) {
+      mainWindow.webContents.send('show-history-dialog');
+    }
   });
 }
 

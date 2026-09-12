@@ -17,7 +17,8 @@ import {
   MinusOutlined,
   SearchOutlined,
   MoreOutlined,
-  ZoomInOutlined
+  ZoomInOutlined,
+  HistoryOutlined
 } from '@ant-design/icons';
 import AutoRefreshSettings from './AutoRefreshSettings';
 import ShortcutsSettings from './ShortcutsSettings';
@@ -243,6 +244,20 @@ const ControlsBar = ({
                     </div>
                   ),
                   onClick: () => { setMenuOpen(false); onOpenFind?.(); }
+                },
+                {
+                  key: 'history',
+                  icon: <HistoryOutlined />,
+                  label: (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+                      <span>Histórico</span>
+                      <span style={{ opacity: 0.5 }}>Ctrl+H</span>
+                    </div>
+                  ),
+                  onClick: () => {
+                    setMenuOpen(false);
+                    window.dispatchEvent(new CustomEvent('show-history-dialog'));
+                  }
                 },
                 { type: 'divider' },
                 {
