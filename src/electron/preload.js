@@ -20,12 +20,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   checkWebviewAudioState: (tabId) => ipcRenderer.send('check-webview-audio-state', { tabId }),
   openInNewTab: (url) => ipcRenderer.send('open-in-new-tab', url),
 
-  // Sessões
+  // Painéis (salvar/restaurar o layout de abas e painéis abertos)
   loadSessions: () => ipcRenderer.invoke('load-sessions'),
   saveSession: (sessionName, layoutConfig) => ipcRenderer.invoke('save-session', { sessionName, layoutConfig }),
   loadSession: (sessionId) => ipcRenderer.invoke('load-session', sessionId),
   deleteSession: (sessionId) => ipcRenderer.invoke('delete-session', sessionId),
-  updateSessionsMenu: () => ipcRenderer.send('update-sessions-menu'),
+  openSessionInNewWindow: (sessionId) => ipcRenderer.send('open-session-new-window', sessionId),
 
   // Barra de título customizada
   popupAppMenu: (label, x, y) => ipcRenderer.send('popup-app-menu', { label, x, y }),
@@ -67,7 +67,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onAddNewTab: (callback) => subscribe('add-new-tab', callback),
   onOpenInNewTab: (callback) => subscribe('open-in-new-tab', callback),
   onAudioStateUpdate: (callback) => subscribe('audio-state-update', callback),
-  onShowClearSessionDialog: (callback) => subscribe('show-clear-session-dialog', callback),
   onShowSettingsDialog: (callback) => subscribe('show-settings-dialog', callback),
   onOpenUrl: (callback) => subscribe('open-url', callback),
   onTestNotifications: (callback) => subscribe('test-notifications', callback),
@@ -84,9 +83,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuZoomOut: (callback) => subscribe('menu-zoom-out', callback),
   onMenuZoomReset: (callback) => subscribe('menu-zoom-reset', callback),
   onCycleTab: (callback) => subscribe('cycle-tab', callback),
-  onLoadSessionInCurrentWindow: (callback) => subscribe('load-session-in-current-window', callback),
-  onShowSaveSessionDialog: (callback) => subscribe('show-save-session-dialog', callback),
-  onConfirmDeleteSession: (callback) => subscribe('confirm-delete-session', callback),
   onLoadSessionConfig: (callback) => subscribe('load-session-config', callback),
   onUpdateChecking: (callback) => subscribe('update-checking', callback),
   onUpdateAvailable: (callback) => subscribe('update-available', callback),

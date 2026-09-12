@@ -3,21 +3,21 @@ import { Modal, message } from 'antd';
 import { Trash2, AlertTriangle } from 'lucide-react';
 
 /**
- * Modal para confirmar deleção de sessão
+ * Modal para confirmar remoção de painéis salvos
  */
 const DeleteSessionModal = ({ isVisible, sessionName, onConfirm, onCancel }) => {
   const handleDelete = async () => {
     try {
       const result = await onConfirm();
-      
+
       if (result.success) {
-        message.success(`Sessão "${sessionName}" removida com sucesso!`);
+        message.success(`Painéis "${sessionName}" removidos com sucesso!`);
       } else {
-        message.error(`Erro ao remover sessão: ${result.error}`);
+        message.error(`Erro ao remover painéis: ${result.error}`);
       }
     } catch (error) {
-      console.error('Erro ao deletar sessão:', error);
-      message.error('Erro inesperado ao remover sessão');
+      console.error('Erro ao remover painéis:', error);
+      message.error('Erro inesperado ao remover painéis');
     }
   };
 
@@ -48,11 +48,11 @@ const DeleteSessionModal = ({ isVisible, sessionName, onConfirm, onCancel }) => 
           <AlertTriangle size={20} color="#faad14" style={{ marginTop: '2px' }} />
           <div>
             <p style={{ margin: 0, fontWeight: 500 }}>
-              Tem certeza que deseja remover a sessão "<strong>{sessionName}</strong>"?
+              Tem certeza que deseja remover os painéis "<strong>{sessionName}</strong>"?
             </p>
             <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '14px' }}>
-              Esta ação não pode ser desfeita. Todas as configurações de layout 
-              desta sessão serão perdidas permanentemente.
+              Esta ação não pode ser desfeita. Todas as configurações de layout
+              destes painéis serão perdidas permanentemente.
             </p>
           </div>
         </div>

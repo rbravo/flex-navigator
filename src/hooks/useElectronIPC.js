@@ -67,11 +67,6 @@ const useElectronIPC = (model) => {
         };
 
         // Listeners para novos eventos dos modais
-        const handleShowClearSessionDialog = () => {
-          console.log('🔔 IPC: Evento show-clear-session-dialog recebido');
-          window.dispatchEvent(new CustomEvent('show-clear-session-dialog'));
-        };
-
         const handleShowSettingsDialog = () => {
           window.dispatchEvent(new CustomEvent('show-settings-dialog'));
         };
@@ -249,7 +244,6 @@ const useElectronIPC = (model) => {
           api.onAddNewTab(handleAddNewTab),
           api.onOpenInNewTab(handleOpenInNewTab),
           api.onAudioStateUpdate(handleAudioStateUpdate),
-          api.onShowClearSessionDialog(handleShowClearSessionDialog),
           api.onShowSettingsDialog(handleShowSettingsDialog),
           api.onShowHistoryDialog(handleShowHistoryDialog),
           api.onMenuShowHistory(handleShowHistoryDialog),

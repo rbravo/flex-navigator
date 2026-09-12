@@ -65,9 +65,6 @@ const useSessionManager = (model, loadConfiguration) => {
         console.log('✅ Sessão salva com sucesso:', result.session);
         await loadSessions(); // Recarregar lista de sessões
 
-        // Atualizar menu da aplicação
-        window.electronAPI.updateSessionsMenu();
-
         return { success: true, session: result.session };
       } else {
         console.error('❌ Erro ao salvar sessão:', result.error);
@@ -116,9 +113,6 @@ const useSessionManager = (model, loadConfiguration) => {
       if (result.success) {
         await loadSessions(); // Recarregar lista de sessões
 
-        // Atualizar menu da aplicação
-        window.electronAPI.updateSessionsMenu();
-
         return { success: true };
       } else {
         return { success: false, error: result.error };
@@ -129,30 +123,26 @@ const useSessionManager = (model, loadConfiguration) => {
     }
   }, [isElectron, loadSessions]);
 
-  // Configurar listeners do IPC
+  // Listener para carregar um painel salvo na janela atual, acionado
+  // diretamente pelo dropdown do ControlsBar (renderer-only - ao contrário
+  // do antigo menu nativo, não precisa mais de um IPC round-trip: quem
+  // dispara e quem escuta já estão do mesmo lado)
+  useEffect(() => {
+    const handlePanelsLoadSession = (event) => {
+      const { sessionId } = event.detail || {};
+      if (sessionId) loadSession(sessionId, true);
+    };
+
+    window.addEventListener('panels-load-session', handlePanelsLoadSession);
+    return () => window.removeEventListener('panels-load-session', handlePanelsLoadSession);
+  }, [loadSession]);
+
+  // Listener para carregar configuração de painéis vinda de outra janela
+  // (ver "Abrir em nova janela" - aqui sim precisa de IPC, já que quem
+  // dispara está no processo principal e quem escuta é a nova janela)
   useEffect(() => {
     if (!isElectron) return;
 
-    // Listener para carregar sessão na janela atual
-    const handleLoadSessionInCurrentWindow = async (sessionId) => {
-      await loadSession(sessionId, true);
-    };
-
-    // Listener para mostrar dialog de salvar sessão
-    const handleShowSaveSessionDialog = () => {
-      // Este evento será capturado pelo componente que gerencia o modal
-      window.dispatchEvent(new CustomEvent('show-save-session-dialog'));
-    };
-
-    // Listener para confirmar deleção de sessão
-    const handleConfirmDeleteSession = (sessionId, sessionName) => {
-      // Este evento será capturado pelo componente que gerencia o modal
-      window.dispatchEvent(new CustomEvent('confirm-delete-session', {
-        detail: { sessionId, sessionName }
-      }));
-    };
-
-    // Listener para carregar configuração de sessão em nova janela
     const handleLoadSessionConfig = async (layoutConfig) => {
       if (loadConfiguration && layoutConfig) {
         try {
@@ -163,18 +153,9 @@ const useSessionManager = (model, loadConfiguration) => {
       }
     };
 
-    const unsubscribers = [
-      window.electronAPI.onLoadSessionInCurrentWindow(handleLoadSessionInCurrentWindow),
-      window.electronAPI.onShowSaveSessionDialog(handleShowSaveSessionDialog),
-      window.electronAPI.onConfirmDeleteSession(handleConfirmDeleteSession),
-      window.electronAPI.onLoadSessionConfig(handleLoadSessionConfig)
-    ];
-
-    // Cleanup
-    return () => {
-      unsubscribers.forEach((unsubscribe) => unsubscribe());
-    };
-  }, [isElectron, loadSession, model, loadConfiguration]);
+    const unsubscribe = window.electronAPI.onLoadSessionConfig(handleLoadSessionConfig);
+    return unsubscribe;
+  }, [isElectron, loadConfiguration]);
 
   // Carregar sessões na inicialização
   useEffect(() => {

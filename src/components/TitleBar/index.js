@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Sessão', 'Dev', 'Ajuda'];
+const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Dev', 'Ajuda'];
 
 /**
  * Barra de título customizada: substitui a barra de título nativa + a barra

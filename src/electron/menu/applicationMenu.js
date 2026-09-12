@@ -1,18 +1,16 @@
 const { Menu, app } = require('electron');
 const { executeOnActiveWebview, executeZoomCommand } = require('../utils/webviewUtils');
-const SessionManager = require('../utils/SessionManager');
 const { isDev } = require('../utils/config');
 
 let autoUpdaterManager = null;
 
 
 let currentMenu = null;
-const sessionManager = new SessionManager();
 
 /**
  * Cria o template base do menu
  */
-function createMenuTemplate(mainWindow, sessions) {
+function createMenuTemplate(mainWindow) {
   return [
     {
       label: 'Arquivo',
@@ -205,46 +203,6 @@ function createMenuTemplate(mainWindow, sessions) {
       ]
     },
     {
-      label: 'Sessão',
-      submenu: [
-        {
-          label: 'Salvar Sessão Atual...',
-          accelerator: 'CmdOrCtrl+S',
-          click: () => {
-            if (mainWindow && mainWindow.webContents) {
-              mainWindow.webContents.send('show-save-session-dialog');
-            }
-          }
-        },
-        {
-          label: 'Limpar Sessão Atual...',
-          click: () => {
-            if (mainWindow && mainWindow.webContents) {
-              mainWindow.webContents.send('show-clear-session-dialog');
-            }
-          }
-        },
-        { type: 'separator' },
-        {
-          label: 'Gerenciar Sessões',
-          submenu: buildSessionsSubmenu(sessions, mainWindow)
-        },
-        { type: 'separator' },
-        {
-          // Sem "accelerator": Ctrl+H, assim como Ctrl+T/W/L/F, é tratado
-          // pelo renderer/webview (ver navigationShortcuts.js /
-          // useElectronIPC.js) - o accelerator nativo não dispara de forma
-          // confiável com uma <webview> focada.
-          label: 'Histórico...',
-          click: () => {
-            if (mainWindow && mainWindow.webContents) {
-              mainWindow.webContents.send('show-history-dialog');
-            }
-          }
-        }
-      ]
-    },
-    {
       label: 'Dev',
       submenu: [
         { role: 'reload', label: 'Recarregar App' },
@@ -305,8 +263,7 @@ function createMenuTemplate(mainWindow, sessions) {
  * Cria o menu da aplicação
  */
 function createMenu(mainWindow) {
-  const sessions = sessionManager.loadSessions();
-  const template = createMenuTemplate(mainWindow, sessions);
+  const template = createMenuTemplate(mainWindow);
 
   if (process.platform === 'darwin') {
     template.unshift({
@@ -335,49 +292,6 @@ function createMenu(mainWindow) {
 }
 
 /**
- * Atualiza dinamicamente o submenu de sessões
- */
-function updateSessionsMenu(mainWindow) {
-  if (!currentMenu) {
-    console.log('Menu atual não encontrado, criando menu...');
-    createMenu(mainWindow);
-    return;
-  }
-
-  console.log('🔄 Atualizando menu de sessões...');
-  const sessions = sessionManager.loadSessions();
-  console.log('📋 Sessões encontradas para o menu:', sessions.length);
-
-  // Usar o template centralizado
-  const template = createMenuTemplate(mainWindow, sessions);
-
-  if (process.platform === 'darwin') {
-    template.unshift({
-      label: app.getName(),
-      submenu: [
-        { role: 'about', label: 'Sobre' },
-        { type: 'separator' },
-        { role: 'services', label: 'Serviços', submenu: [] },
-        { type: 'separator' },
-        { role: 'hide', label: 'Esconder' },
-        { role: 'hideothers', label: 'Esconder Outros' },
-        { role: 'unhide', label: 'Mostrar Todos' },
-        { type: 'separator' },
-        { role: 'quit', label: 'Sair' }
-      ]
-    });
-  }
-
-  // Reconstruir e aplicar o menu completo
-  const menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu);
-  currentMenu = menu;
-  mainWindow.setMenuBarVisibility(false);
-
-  console.log('✅ Menu de sessões atualizado com sucesso!');
-}
-
-/**
  * Exibe o submenu de um item de topo (ex.: "Arquivo") na posição informada.
  * Usado pela barra de título customizada, já que a barra de menu nativa
  * fica oculta.
@@ -396,49 +310,6 @@ function popupMenuItem(mainWindow, label, x, y) {
 }
 
 /**
- * Constrói o submenu de sessões
- */
-function buildSessionsSubmenu(sessions, mainWindow) {
-  if (sessions.length === 0) {
-    return [{
-      label: 'Nenhuma sessão salva',
-      enabled: false
-    }];
-  }
-
-  return sessions.map(session => ({
-    label: session.name,
-    submenu: [
-      {
-        label: 'Abrir nesta janela',
-        click: () => {
-          if (mainWindow && mainWindow.webContents) {
-            mainWindow.webContents.send('load-session-in-current-window', session.id);
-          }
-        }
-      },
-      {
-        label: 'Abrir em nova janela',
-        click: () => {
-          if (mainWindow && mainWindow.webContents) {
-            mainWindow.webContents.send('open-session-new-window', session.id);
-          }
-        }
-      },
-      { type: 'separator' },
-      {
-        label: 'Apagar sessão',
-        click: () => {
-          if (mainWindow && mainWindow.webContents) {
-            mainWindow.webContents.send('confirm-delete-session', session.id, session.name);
-          }
-        }
-      }
-    ]
-  }));
-}
-
-/**
  * Define a instância do AutoUpdaterManager
  */
 function setAutoUpdaterManager(updaterManager) {
@@ -447,7 +318,6 @@ function setAutoUpdaterManager(updaterManager) {
 
 module.exports = {
   createMenu,
-  updateSessionsMenu,
   setAutoUpdaterManager,
   popupMenuItem
 };

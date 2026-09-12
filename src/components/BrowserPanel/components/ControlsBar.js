@@ -18,7 +18,12 @@ import {
   SearchOutlined,
   MoreOutlined,
   ZoomInOutlined,
-  HistoryOutlined
+  HistoryOutlined,
+  LayoutOutlined,
+  SaveOutlined,
+  ClearOutlined,
+  FolderOpenOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 import AutoRefreshSettings from './AutoRefreshSettings';
 import ShortcutsSettings from './ShortcutsSettings';
@@ -63,7 +68,84 @@ const ControlsBar = ({
 }) => {
   const { Text } = Typography;
   const [menuOpen, setMenuOpen] = useState(false);
+  const [savedPanels, setSavedPanels] = useState([]);
   useCloseOnWebviewFocus(menuOpen, () => setMenuOpen(false));
+
+  // Busca a lista de painéis salvos sempre que o dropdown abre - a mesma
+  // ideia do menu nativo antigo, que recarregava a lista a cada clique, só
+  // que agora direto do renderer (sem precisar reconstruir um Menu nativo).
+  const handleMenuOpenChange = (open) => {
+    setMenuOpen(open);
+    if (open && window.electronAPI) {
+      window.electronAPI.loadSessions().then((result) => {
+        if (result.success) setSavedPanels(result.sessions);
+      });
+    }
+  };
+
+  const panelsMenuItems = [
+    {
+      key: 'panels-save',
+      icon: <SaveOutlined />,
+      label: 'Salvar painéis atuais...',
+      onClick: () => {
+        setMenuOpen(false);
+        window.dispatchEvent(new CustomEvent('show-save-session-dialog'));
+      }
+    },
+    {
+      key: 'panels-clear',
+      icon: <ClearOutlined />,
+      label: 'Limpar painéis atuais...',
+      onClick: () => {
+        setMenuOpen(false);
+        window.dispatchEvent(new CustomEvent('show-clear-session-dialog'));
+      }
+    },
+    { type: 'divider' },
+    ...(savedPanels.length === 0
+      ? [{ key: 'panels-empty', label: 'Nenhum painel salvo', disabled: true }]
+      : savedPanels.map((panel) => ({
+          key: `panel-${panel.id}`,
+          icon: <FolderOpenOutlined />,
+          label: panel.name,
+          children: [
+            {
+              key: `panel-${panel.id}-open-here`,
+              label: 'Abrir nesta janela',
+              onClick: () => {
+                setMenuOpen(false);
+                window.dispatchEvent(
+                  new CustomEvent('panels-load-session', { detail: { sessionId: panel.id } })
+                );
+              }
+            },
+            {
+              key: `panel-${panel.id}-open-new`,
+              label: 'Abrir em nova janela',
+              onClick: () => {
+                setMenuOpen(false);
+                window.electronAPI?.openSessionInNewWindow(panel.id);
+              }
+            },
+            { type: 'divider' },
+            {
+              key: `panel-${panel.id}-delete`,
+              icon: <DeleteOutlined />,
+              danger: true,
+              label: 'Apagar painéis',
+              onClick: () => {
+                setMenuOpen(false);
+                window.dispatchEvent(
+                  new CustomEvent('confirm-delete-session', {
+                    detail: { sessionId: panel.id, sessionName: panel.name }
+                  })
+                );
+              }
+            }
+          ]
+        })))
+  ];
 
   const borderlessButtonStyle = {
     borderColor: '#3e3e42',
@@ -195,7 +277,7 @@ const ControlsBar = ({
             trigger={['click']}
             placement="bottomRight"
             open={menuOpen}
-            onOpenChange={setMenuOpen}
+            onOpenChange={handleMenuOpenChange}
             menu={{
               items: [
                 {
@@ -317,6 +399,12 @@ const ControlsBar = ({
                       )
                     }
                   ]
+                },
+                {
+                  key: 'panels',
+                  icon: <LayoutOutlined />,
+                  label: 'Painéis',
+                  children: panelsMenuItems
                 },
                 { type: 'divider' },
                 {

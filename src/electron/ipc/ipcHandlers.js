@@ -232,13 +232,6 @@ function setupIpcHandlers(mainWindow) {
     }
   });
 
-  // Handler para atualizar menu de sessões
-  ipcMain.on('update-sessions-menu', () => {
-    console.log('🔄 Recebido evento para atualizar menu de sessões...');
-    const { updateSessionsMenu } = require('../menu/applicationMenu');
-    updateSessionsMenu(mainWindow);
-  });
-
   // Novos handlers para os modais
   ipcMain.on('show-clear-session-dialog', () => {
     if (mainWindow && mainWindow.webContents) {

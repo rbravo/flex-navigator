@@ -280,28 +280,16 @@ const AppContent = () => {
   const handleToggleMute = () => toggleTabMute(model, contextMenu.tabId);
   const handleCloseTab = () => closeTab(model, contextMenu.tabId);
 
-  // Handlers para sessões
+  // Handlers para painéis (salvar/restaurar o layout de abas e painéis)
   const handleSaveSession = async (sessionName) => {
     const result = await saveSession(sessionName);
     setSaveSessionModalVisible(false);
-
-    // Atualizar menu da aplicação
-    if (window.electronAPI) {
-      window.electronAPI.updateSessionsMenu();
-    }
-
     return result;
   };
 
   const handleDeleteSession = async () => {
     const result = await deleteSession(deleteSessionModal.sessionId);
     setDeleteSessionModal({ visible: false, sessionId: null, sessionName: '' });
-
-    // Atualizar menu da aplicação
-    if (window.electronAPI) {
-      window.electronAPI.updateSessionsMenu();
-    }
-
     return result;
   };
 
