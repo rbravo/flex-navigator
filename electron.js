@@ -4,6 +4,8 @@ const { createWindow, getMainWindow } = require('./src/electron/window/mainWindo
 const { createMenu, setAutoUpdaterManager } = require('./src/electron/menu/applicationMenu');
 const { setupIpcHandlers } = require('./src/electron/ipc/ipcHandlers');
 const { setupWebContentsHandlers, setupPermissionHandler, setupSiteInfoHandlers } = require('./src/electron/utils/webContentsSetup');
+const { setupDownloadHandler } = require('./src/electron/utils/downloadManager');
+const { setupContentSecurityPolicy } = require('./src/electron/utils/csp');
 const { AutoUpdaterManager } = require('./src/electron/utils/autoUpdater');
 
 // Imprimir informações de debug
@@ -15,7 +17,11 @@ const autoUpdaterManager = new AutoUpdaterManager();
 // This method will be called when Electron has finished initialization
 app.whenReady().then(() => {
   console.log('🎯 Electron está pronto, criando janela...');
-  
+
+  // Configurar CSP do shell do app (defesa em profundidade, só em produção -
+  // precisa ser registrado antes de criar a janela)
+  setupContentSecurityPolicy();
+
   // Criar janela principal
   const mainWindow = createWindow();
   
@@ -37,6 +43,10 @@ app.whenReady().then(() => {
   // Configurar captura de certificado TLS + consulta/edição de permissões
   // por site (popover de informações do site na barra de URL)
   setupSiteInfoHandlers();
+
+  // Configurar gerenciamento de downloads (salvar automaticamente + UI de
+  // progresso/controles na barra de URL)
+  setupDownloadHandler(mainWindow);
 
   // Verificar por atualizações após 3 segundos (se habilitado)
   setTimeout(async () => {

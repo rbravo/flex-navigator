@@ -1,5 +1,18 @@
 /* Estilos específicos do BrowserPanel com Ant Design - SEM Tailwind */
 
+/* Sem escopo de propósito (não usar ".browser-panel" como prefixo aqui): o
+   Dropdown do antd (ControlsBar.js) renderiza seu menu num portal anexado
+   directamente ao <body>, fora da árvore do .browser-panel - um seletor
+   escopado nunca alcançaria esse conteúdo. Usado nos itens do menu que são
+   painéis inteiros (auto-atualizar, atalhos), não opções clicáveis simples -
+   o hover clareando o fundo por baixo desses painéis os deixava difíceis de
+   ler. */
+.flexnav-menu-item-no-hover:hover,
+.flexnav-menu-item-no-hover.ant-dropdown-menu-item-active,
+.flexnav-menu-item-no-hover.ant-dropdown-menu-submenu-active {
+  background-color: transparent !important;
+}
+
 /* Cores customizadas */
 :root {
   --nav-dark: #1e1e1e;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Space, Tooltip, Badge } from 'antd';
+import { Button, Input, Space, Tooltip, Dropdown, Typography } from 'antd';
 import {
   LeftOutlined,
   RightOutlined,
@@ -11,11 +11,19 @@ import {
   ControlOutlined,
   SettingOutlined,
   AppstoreAddOutlined,
-  ControlFilled
+  ControlFilled,
+  DownloadOutlined,
+  PlusOutlined,
+  MinusOutlined,
+  SearchOutlined,
+  MoreOutlined,
+  ZoomInOutlined
 } from '@ant-design/icons';
-import AutoRefreshPopover from './AutoRefreshPopover';
-import ShortcutsConfigPopover from './ShortcutsConfigPopover';
+import AutoRefreshSettings from './AutoRefreshSettings';
+import ShortcutsSettings from './ShortcutsSettings';
 import SiteInfoPopover from './SiteInfoPopover';
+import DownloadsPopover from './DownloadsPopover';
+import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
 
 /**
  * Barra de controles de navegação
@@ -44,8 +52,24 @@ const ControlsBar = ({
   onToggleShortcuts,
   onShortcutModifiersChange,
   showShortcutsOverlay = true,
-  onToggleShortcutsOverlay
+  onToggleShortcutsOverlay,
+  // Props para zoom e busca na página
+  zoomFactor = 1,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
+  onOpenFind
 }) => {
+  const { Text } = Typography;
+  const [menuOpen, setMenuOpen] = useState(false);
+  useCloseOnWebviewFocus(menuOpen, () => setMenuOpen(false));
+
+  const borderlessButtonStyle = {
+    borderColor: '#3e3e42',
+    backgroundColor: '#2d2d30',
+    border: '1px solid transparent'
+  }
+
   // Formatar o tempo restante para exibição
   const formatTimeRemaining = (seconds) => {
     if (seconds <= 0) return '';
@@ -57,7 +81,7 @@ const ControlsBar = ({
   return (
     <div className="controls-bar">
       <Space size="small">
-        <Tooltip title="Voltar">
+        <Tooltip title="Voltar" placement={'bottom'}>
           <Button
             type="text"
             icon={<LeftOutlined />}
@@ -66,13 +90,13 @@ const ControlsBar = ({
             onClick={onBack}
             style={{
               color: canGoBack ? '#cccccc' : '#666666',
-              borderColor: '#3e3e42',
-              backgroundColor: '#383838'
+              ...borderlessButtonStyle,
+              marginLeft: -2
             }}
           />
         </Tooltip>
 
-        <Tooltip title="Avançar">
+        <Tooltip title="Avançar" placement={'bottom'}>
           <Button
             type="text"
             icon={<RightOutlined />}
@@ -81,13 +105,12 @@ const ControlsBar = ({
             onClick={onForward}
             style={{
               color: canGoForward ? '#cccccc' : '#666666',
-              borderColor: '#3e3e42',
-              backgroundColor: '#383838'
+              ...borderlessButtonStyle
             }}
           />
         </Tooltip>
 
-        <Tooltip title={isLoading ? "Parar carregamento" : "Atualizar página"}>
+        <Tooltip title={isLoading ? "Parar carregamento" : "Atualizar página"} placement={'bottom'}>
           <Button
             type="text"
             icon={isLoading ? <StopOutlined /> : <ReloadOutlined />}
@@ -95,8 +118,7 @@ const ControlsBar = ({
             onClick={onRefresh}
             style={{
               color: isLoading ? '#ff6b6b' : '#cccccc',
-              borderColor: '#3e3e42',
-              backgroundColor: '#383838'
+              ...borderlessButtonStyle
             }}
           />
         </Tooltip>
@@ -113,9 +135,11 @@ const ControlsBar = ({
               isLoading ?
                 <ReloadOutlined spin style={{ color: '#007acc' }} /> :
                 <SiteInfoPopover currentUrl={currentUrl}>
-                  <span style={{ cursor: 'pointer', display: 'inline-flex' }}>
-                    <ControlFilled style={{ color: '#999999', fontSize: 18, marginRight: 2, marginLeft: -4 }} />
-                  </span>
+                  <Tooltip title="Informações do site" placement={'bottom'}>
+                    <span style={{ cursor: 'pointer', display: 'inline-flex' }}>
+                      <ControlFilled style={{ color: '#999999', fontSize: 18, marginRight: 2, marginLeft: -4 }} />
+                    </span>
+                  </Tooltip>
                 </SiteInfoPopover>
             }
             suffix={
@@ -149,88 +173,163 @@ const ControlsBar = ({
       {/* Seção de Extensions */}
       <div className="extensions-section">
         <Space size="small">
-          <AutoRefreshPopover
-            isAutoRefreshEnabled={isAutoRefreshEnabled}
-            refreshInterval={refreshInterval}
-            onToggleAutoRefresh={onToggleAutoRefresh}
-            onIntervalChange={onIntervalChange}
-          >
-            <Tooltip
-              title={
-                isAutoRefreshEnabled
-                  ? `Auto-refresh ativo${timeRemaining > 0 ? ` - próximo em ${formatTimeRemaining(timeRemaining)}` : ''}`
-                  : "Configurar auto-refresh"
-              }
-            >
-              <Badge
-                dot={isAutoRefreshEnabled}
-                color="#007acc"
-                offset={[-2, 2]}
-              >
-                <Button
-                  type="text"
-                  icon={<ClockCircleOutlined />}
-                  size="small"
-                  style={{
-                    color: isAutoRefreshEnabled ? '#007acc' : '#cccccc',
-                    borderColor: '#3e3e42',
-                    backgroundColor: isAutoRefreshEnabled ? '#383838' : '#2d2d30',
-                    border: isAutoRefreshEnabled ? '1px solid #007acc' : '1px solid transparent'
-                  }}
-                />
-              </Badge>
-            </Tooltip>
-          </AutoRefreshPopover>
 
-          <ShortcutsConfigPopover
-            isShortcutsEnabled={isShortcutsEnabled}
-            shortcutModifiers={shortcutModifiers}
-            onToggleShortcuts={onToggleShortcuts}
-            onModifiersChange={onShortcutModifiersChange}
-            showOverlay={showShortcutsOverlay}
-            onToggleShowOverlay={onToggleShortcutsOverlay}
-          >
-            <Tooltip
-              title={
-                isShortcutsEnabled
-                  ? `Atalhos ativos - ${shortcutModifiers} + tecla`
-                  : "Configurar atalhos de navegação"
-              }
-            >
-              <Badge
-                dot={isShortcutsEnabled}
-                color="#007acc"
-                offset={[-2, 2]}
-              >
-                <Button
-                  type="text"
-                  icon={<AppstoreAddOutlined />}
-                  size="small"
-                  style={{
-                    color: isShortcutsEnabled ? '#007acc' : '#cccccc',
-                    borderColor: '#3e3e42',
-                    backgroundColor: isShortcutsEnabled ? '#383838' : '#2d2d30',
-                    border: isShortcutsEnabled ? '1px solid #007acc' : '1px solid transparent'
-                  }}
-                />
-              </Badge>
+          <DownloadsPopover>
+            <Tooltip title="Downloads" placement={'bottom'}>
+              <Button
+                type="text"
+                icon={<DownloadOutlined />}
+                size="small"
+                style={{
+                  color: '#cccccc',
+                  borderColor: '#3e3e42',
+                  backgroundColor: '#2d2d30',
+                  border: '1px solid transparent'
+                }}
+              />
             </Tooltip>
-          </ShortcutsConfigPopover>
+          </DownloadsPopover>
 
-          <Tooltip title={"Configurações"}>
-            <Button
-              type="text"
-              icon={<SettingOutlined />}
-              size="small"
-              onClick={() => window.dispatchEvent(new CustomEvent('show-settings-dialog'))}
-              style={{
-                color: '#cccccc',
-                borderColor: '#3e3e42',
-                backgroundColor: '#2d2d30',
-                border: '1px solid transparent'
-              }}
-            />
-          </Tooltip>
+          <Dropdown
+            trigger={['click']}
+            placement="bottomRight"
+            open={menuOpen}
+            onOpenChange={setMenuOpen}
+            menu={{
+              items: [
+                {
+                  key: 'zoom',
+                  icon: <ZoomInOutlined />,
+                  label: (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 0' }}
+                    >
+                      <Text
+                        style={{ flex: 1, textAlign: 'left', cursor: 'pointer' }}
+                        onClick={(e) => { e.stopPropagation(); }}
+                      >
+                        Zoom
+                      </Text>
+                      <Button
+                        size="small"
+                        type="text"
+                        icon={<MinusOutlined />}
+                        onClick={(e) => { e.stopPropagation(); onZoomOut?.(); }}
+                      />
+                      <Text
+                        style={{ width: 44, textAlign: 'center', cursor: 'pointer' }}
+                        onClick={(e) => { e.stopPropagation(); onZoomReset?.(); }}
+                      >
+                        {Math.round(zoomFactor * 100)}%
+                      </Text>
+                      <Button
+                        size="small"
+                        type="text"
+                        icon={<PlusOutlined />}
+                        onClick={(e) => { e.stopPropagation(); onZoomIn?.(); }}
+                      />
+                    </div>
+                  )
+                },
+                { type: 'divider' },
+                {
+                  key: 'find',
+                  icon: <SearchOutlined />,
+                  label: (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+                      <span>Buscar na página</span>
+                      <span style={{ opacity: 0.5 }}>Ctrl+F</span>
+                    </div>
+                  ),
+                  onClick: () => { setMenuOpen(false); onOpenFind?.(); }
+                },
+                { type: 'divider' },
+                {
+                  key: 'autorefresh',
+                  icon: <ClockCircleOutlined style={{ color: isAutoRefreshEnabled ? '#007acc' : undefined }} />,
+                  label: (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+                      <span>Auto-atualizar</span>
+                      {isAutoRefreshEnabled && (
+                        <span style={{ opacity: 0.6, fontSize: 12 }}>
+                          {timeRemaining > 0 ? formatTimeRemaining(timeRemaining) : 'Ativo'}
+                        </span>
+                      )}
+                    </div>
+                  ),
+                  children: [
+                    {
+                      key: 'autorefresh-panel',
+                      className: 'flexnav-menu-item-no-hover',
+                      label: (
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <AutoRefreshSettings
+                            isAutoRefreshEnabled={isAutoRefreshEnabled}
+                            refreshInterval={refreshInterval}
+                            onToggleAutoRefresh={onToggleAutoRefresh}
+                            onIntervalChange={onIntervalChange}
+                          />
+                        </div>
+                      )
+                    }
+                  ]
+                },
+                {
+                  key: 'shortcuts',
+                  icon: <AppstoreAddOutlined style={{ color: isShortcutsEnabled ? '#007acc' : undefined }} />,
+                  label: (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+                      <span>Atalhos de navegação</span>
+                      {isShortcutsEnabled && <span style={{ opacity: 0.6, fontSize: 12 }}>{shortcutModifiers}</span>}
+                    </div>
+                  ),
+                  children: [
+                    {
+                      key: 'shortcuts-panel',
+                      className: 'flexnav-menu-item-no-hover',
+                      label: (
+                        <div onClick={(e) => e.stopPropagation()}>
+                          <ShortcutsSettings
+                            isShortcutsEnabled={isShortcutsEnabled}
+                            shortcutModifiers={shortcutModifiers}
+                            onToggleShortcuts={onToggleShortcuts}
+                            onModifiersChange={onShortcutModifiersChange}
+                            showOverlay={showShortcutsOverlay}
+                            onToggleShowOverlay={onToggleShortcutsOverlay}
+                          />
+                        </div>
+                      )
+                    }
+                  ]
+                },
+                { type: 'divider' },
+                {
+                  key: 'settings',
+                  icon: <SettingOutlined />,
+                  label: 'Configurações',
+                  onClick: () => {
+                    setMenuOpen(false);
+                    window.dispatchEvent(new CustomEvent('show-settings-dialog'));
+                  }
+                }
+              ]
+            }}
+          >
+            <Tooltip title="Menu" placement={'bottom'}>
+              <Button
+                type="text"
+                icon={<MoreOutlined />}
+                size="small"
+                style={{
+                  color: '#cccccc',
+                  borderColor: '#3e3e42',
+                  backgroundColor: '#2d2d30',
+                  border: '1px solid transparent'
+                }}
+              />
+            </Tooltip>
+          </Dropdown>
 
         </Space>
       </div>

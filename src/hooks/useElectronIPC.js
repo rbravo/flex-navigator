@@ -121,6 +121,27 @@ const useElectronIPC = (model) => {
           }
         };
 
+        // Ctrl+F: abre a busca na página da aba ativa. Ctrl+/Ctrl-/Ctrl+0:
+        // zoom in/out/reset da aba ativa - mesmo critério de "aba atual" do
+        // Ctrl+L acima.
+        const handleMenuFindInPage = () => {
+          const tabId = getActiveTabId(model);
+          if (tabId) {
+            window.dispatchEvent(new CustomEvent('find-in-page-shortcut', { detail: { tabId } }));
+          }
+        };
+
+        const dispatchZoomShortcut = (action) => {
+          const tabId = getActiveTabId(model);
+          if (tabId) {
+            window.dispatchEvent(new CustomEvent('zoom-shortcut', { detail: { tabId, action } }));
+          }
+        };
+
+        const handleMenuZoomIn = () => dispatchZoomShortcut('in');
+        const handleMenuZoomOut = () => dispatchZoomShortcut('out');
+        const handleMenuZoomReset = () => dispatchZoomShortcut('reset');
+
         // Ctrl+Tab / Ctrl+Shift+Tab: navega entre as abas do painel (tabset)
         // ativo, com wraparound - como no Chrome. Trocar de painel continua
         // sendo o atalho de navegação entre painéis já existente.
@@ -172,6 +193,23 @@ const useElectronIPC = (model) => {
               e.preventDefault();
               handleMenuFocusUrlBar();
               break;
+            case 'f':
+              e.preventDefault();
+              handleMenuFindInPage();
+              break;
+            case '=':
+            case '+':
+              e.preventDefault();
+              handleMenuZoomIn();
+              break;
+            case '-':
+              e.preventDefault();
+              handleMenuZoomOut();
+              break;
+            case '0':
+              e.preventDefault();
+              handleMenuZoomReset();
+              break;
             default:
               break;
           }
@@ -213,6 +251,10 @@ const useElectronIPC = (model) => {
           api.onMenuSplitVertical(handleMenuSplitVertical),
           api.onMenuCloseTab(handleMenuCloseTab),
           api.onMenuFocusUrlBar(handleMenuFocusUrlBar),
+          api.onMenuFindInPage(handleMenuFindInPage),
+          api.onMenuZoomIn(handleMenuZoomIn),
+          api.onMenuZoomOut(handleMenuZoomOut),
+          api.onMenuZoomReset(handleMenuZoomReset),
           api.onCycleTab(handleCycleTabEvent)
         ];
 

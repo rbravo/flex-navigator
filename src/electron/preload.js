@@ -43,6 +43,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   listSitePermissions: () => ipcRenderer.invoke('list-site-permissions'),
   removeSitePermissions: (origin) => ipcRenderer.send('remove-site-permissions', origin),
 
+  // Downloads
+  listDownloads: () => ipcRenderer.invoke('list-downloads'),
+  pauseDownload: (id) => ipcRenderer.send('pause-download', id),
+  resumeDownload: (id) => ipcRenderer.send('resume-download', id),
+  cancelDownload: (id) => ipcRenderer.send('cancel-download', id),
+  openDownloadFile: (id) => ipcRenderer.send('open-download-file', id),
+  showDownloadInFolder: (id) => ipcRenderer.send('show-download-in-folder', id),
+
   // Auto-updater
   checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
@@ -64,6 +72,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onMenuSplitVertical: (callback) => subscribe('menu-split-vertical', callback),
   onMenuCloseTab: (callback) => subscribe('menu-close-tab', callback),
   onMenuFocusUrlBar: (callback) => subscribe('menu-focus-url-bar', callback),
+  onMenuFindInPage: (callback) => subscribe('menu-find-in-page', callback),
+  onMenuZoomIn: (callback) => subscribe('menu-zoom-in', callback),
+  onMenuZoomOut: (callback) => subscribe('menu-zoom-out', callback),
+  onMenuZoomReset: (callback) => subscribe('menu-zoom-reset', callback),
   onCycleTab: (callback) => subscribe('cycle-tab', callback),
   onLoadSessionInCurrentWindow: (callback) => subscribe('load-session-in-current-window', callback),
   onShowSaveSessionDialog: (callback) => subscribe('show-save-session-dialog', callback),
@@ -75,5 +87,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUpdateError: (callback) => subscribe('update-error', callback),
   onUpdateDownloadProgress: (callback) => subscribe('update-download-progress', callback),
   onUpdateDownloaded: (callback) => subscribe('update-downloaded', callback),
-  onPermissionRequest: (callback) => subscribe('permission-request', callback)
+  onPermissionRequest: (callback) => subscribe('permission-request', callback),
+  onDownloadStarted: (callback) => subscribe('download-started', callback),
+  onDownloadUpdated: (callback) => subscribe('download-updated', callback),
+  onDownloadDone: (callback) => subscribe('download-done', callback)
 });

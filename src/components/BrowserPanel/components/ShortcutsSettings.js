@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Popover, Switch, Select, Space, Typography, Divider, Button } from 'antd';
-import { ControlOutlined, SettingOutlined } from '@ant-design/icons';
-import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
+import { Switch, Select, Space, Typography, Divider } from 'antd';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 /**
- * Popover para configurar atalhos de navegação
+ * Conteúdo de configuração de atalhos de navegação - vive dentro do menu
+ * unificado da barra de URL (ver ControlsBar.js), não é mais um Popover
+ * próprio.
  */
-const ShortcutsConfigPopover = ({
-  children,
+const ShortcutsSettings = ({
   isShortcutsEnabled = true,
   shortcutModifiers = 'Ctrl+Shift',
   onToggleShortcuts,
@@ -21,9 +20,6 @@ const ShortcutsConfigPopover = ({
   const [localEnabled, setLocalEnabled] = useState(isShortcutsEnabled);
   const [localModifiers, setLocalModifiers] = useState(shortcutModifiers);
   const [localShowOverlay, setLocalShowOverlay] = useState(showOverlay);
-  const [open, setOpen] = useState(false);
-
-  useCloseOnWebviewFocus(open, () => setOpen(false));
 
   useEffect(() => {
     setLocalEnabled(isShortcutsEnabled);
@@ -68,12 +64,8 @@ const ShortcutsConfigPopover = ({
     { keys: `${localModifiers}+Enter`, action: 'Focar no painel' }
   ];
 
-  const content = (
-    <div style={{
-      width: '320px',
-      backgroundColor: '#2d2d30',
-      border: 'none'
-    }}>
+  return (
+    <div style={{ width: '320px' }}>
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Toggle principal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -138,9 +130,7 @@ const ShortcutsConfigPopover = ({
             Atalhos disponíveis:
           </Text>
 
-          <div style={{
-            //maxHeight: '180px', overflowY: 'auto'
-          }}>
+          <div>
             {shortcuts.map((shortcut, index) => (
               <div
                 key={index}
@@ -158,8 +148,7 @@ const ShortcutsConfigPopover = ({
                 <div style={{
                   backgroundColor: '#383838',
                   padding: '2px 6px',
-                  borderRadius: '3px',
-                  //border: '1px solid #3e3e42'
+                  borderRadius: '3px'
                 }}>
                   <Text style={{ color: '#999999', fontSize: '10px', fontFamily: 'monospace' }}>
                     {shortcut.keys}
@@ -206,38 +195,9 @@ const ShortcutsConfigPopover = ({
             }}
           />
         </div>
-        
       </Space>
     </div>
   );
-
-  const title = (
-    <Space>
-      <ControlOutlined style={{ color: '#007acc' }} />
-      <Text style={{ color: '#cccccc' }}>Configurar Atalhos</Text>
-    </Space>
-  );
-
-  return (
-    <Popover
-      content={content}
-      title={title}
-      trigger="click"
-      placement="bottomRight"
-      open={open}
-      onOpenChange={setOpen}
-      overlayStyle={{
-        backgroundColor: '#2d2d30',
-      }}
-      overlayInnerStyle={{
-        backgroundColor: '#2d2d30',
-        border: '1px solid #3e3e42',
-        borderRadius: '6px'
-      }}
-    >
-      {children}
-    </Popover>
-  );
 };
 
-export default ShortcutsConfigPopover;
+export default ShortcutsSettings;

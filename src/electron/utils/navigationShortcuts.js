@@ -27,7 +27,12 @@ const isReservedModifierComboHeld = (input) =>
 const BROWSER_SHORTCUT_CHANNELS = {
   t: 'menu-new-tab',
   w: 'menu-close-tab',
-  l: 'menu-focus-url-bar'
+  l: 'menu-focus-url-bar',
+  f: 'menu-find-in-page',
+  '=': 'menu-zoom-in',
+  '+': 'menu-zoom-in',
+  '-': 'menu-zoom-out',
+  '0': 'menu-zoom-reset'
 };
 
 const isPlainCmdOrCtrlHeld = (input) =>

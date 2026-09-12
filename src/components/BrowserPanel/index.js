@@ -5,12 +5,23 @@ import { darkTheme } from './utils/theme';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
 import { consumeUrlBarFocusRequest } from '../../utils/tabActions';
 import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
+import { getZoomForOrigin, saveZoomForOrigin, clampZoom, ZOOM_STEP, ZOOM_DEFAULT } from '../../utils/zoomLevels';
+import { buildSearchScript, buildNextScript, buildPreviousScript, buildClearScript } from './utils/findInPageScript';
 import useAutoRefresh from '../../hooks/useAutoRefresh';
 import useShortcutsConfig from '../../hooks/useShortcutsConfig';
 import ControlsBar from './components/ControlsBar';
 import WebContent from './components/WebContent';
 import LoadingBar from './components/LoadingBar';
+import FindInPageBar from './components/FindInPageBar';
 import './BrowserPanel.css';
+
+const getHostname = (urlString) => {
+  try {
+    return new URL(urlString).hostname;
+  } catch (error) {
+    return null;
+  }
+};
 
 /**
  * Componente principal do painel de navegação
@@ -25,7 +36,10 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
   const [hideNavigationBar, setHideNavigationBar] = useState(false);
-  
+  const [zoomFactor, setZoomFactor] = useState(ZOOM_DEFAULT);
+  const [findBarVisible, setFindBarVisible] = useState(false);
+  const [findMatches, setFindMatches] = useState({ activeMatchOrdinal: 0, matches: 0 });
+
   const webviewRef = useRef(null);
   const iframeRef = useRef(null);
   const urlInputRef = useRef(null);
@@ -102,7 +116,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
         // Aguardar um pequeno delay para garantir que tudo está pronto
         setTimeout(() => {
           updateNavigationState();
-          
+
           // Tentar obter URL atual de forma segura
           try {
             if (webview.getURL && typeof webview.getURL === 'function') {
@@ -115,13 +129,29 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
           } catch (error) {
             console.log('Ainda não é possível obter URL da webview:', error.message);
           }
+
+          // Aplica o zoom salvo pra essa origem (se houver) assim que a
+          // webview está pronta - antes disso setZoomFactor não tem efeito
+          try {
+            const savedZoom = getZoomForOrigin(getHostname(webview.getURL()));
+            webview.setZoomFactor(savedZoom);
+            setZoomFactor(savedZoom);
+          } catch (error) {
+            console.log('Erro ao aplicar zoom salvo:', error.message);
+          }
         }, 100);
-        
+
         // Adicionar listener para mudanças de navegação
         webview.addEventListener('did-navigate', (e) => {
           setCurrentUrl(e.url);
           setUrl(e.url);
           updateNavigationState();
+
+          // Cada origem pode ter seu próprio zoom salvo (como no Chrome) -
+          // reaplica ao trocar de site na mesma aba
+          const savedZoom = getZoomForOrigin(getHostname(e.url));
+          webview.setZoomFactor(savedZoom);
+          setZoomFactor(savedZoom);
         });
         
         webview.addEventListener('did-navigate-in-page', (e) => {
@@ -212,6 +242,62 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
     }
   }, [isElectron]);
 
+  // Zoom por site (Ctrl+/Ctrl-/Ctrl+0, como no Chrome) - o nível fica salvo
+  // por origem (ver zoomLevels.js) e é reaplicado automaticamente sempre
+  // que essa origem for carregada de novo, em qualquer aba.
+  const applyZoom = useCallback((factor) => {
+    const clamped = clampZoom(factor);
+    setZoomFactor(clamped);
+    if (isElectron && webviewRef.current) {
+      webviewRef.current.setZoomFactor(clamped);
+    }
+    saveZoomForOrigin(getHostname(currentUrl), clamped);
+  }, [isElectron, currentUrl]);
+
+  const handleZoomIn = useCallback(() => applyZoom(zoomFactor + ZOOM_STEP), [applyZoom, zoomFactor]);
+  const handleZoomOut = useCallback(() => applyZoom(zoomFactor - ZOOM_STEP), [applyZoom, zoomFactor]);
+  const handleZoomReset = useCallback(() => applyZoom(ZOOM_DEFAULT), [applyZoom]);
+
+  // Busca na página (Ctrl+F), implementada via DOM (destaca ocorrências com
+  // <mark>, injetado na webview via executeJavaScript). A API nativa
+  // `webContents.findInPage()` se mostrou pouco confiável pra conteúdo de
+  // <webview> nesta versão do Electron - testado isoladamente (evento DOM na
+  // tag e via webContents.fromId() no processo principal, ambos sem
+  // resultado, mesmo a chamada idêntica funcionando perfeitamente no
+  // webContents da janela principal) antes de trocar de abordagem. Ver
+  // src/components/BrowserPanel/utils/findInPageScript.js.
+  const handleFind = useCallback(async (text, forward, findNext) => {
+    if (!isElectron || !webviewRef.current) return;
+    try {
+      let script;
+      if (!text) {
+        script = buildClearScript();
+      } else if (findNext) {
+        script = forward ? buildNextScript() : buildPreviousScript();
+      } else {
+        script = buildSearchScript(text);
+      }
+      const result = await webviewRef.current.executeJavaScript(script);
+      setFindMatches(result);
+    } catch (error) {
+      console.error('Erro ao buscar na página:', error.message);
+    }
+  }, [isElectron]);
+
+  const handleOpenFind = useCallback(() => setFindBarVisible(true), []);
+
+  const handleCloseFind = useCallback(async () => {
+    setFindBarVisible(false);
+    setFindMatches({ activeMatchOrdinal: 0, matches: 0 });
+    if (isElectron && webviewRef.current) {
+      try {
+        await webviewRef.current.executeJavaScript(buildClearScript());
+      } catch (error) {
+        console.error('Erro ao limpar busca na página:', error.message);
+      }
+    }
+  }, [isElectron]);
+
   // Atualiza o título da tab com base na URL
   useEffect(() => {
     if (node && currentUrl) {
@@ -231,6 +317,31 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
 
     window.addEventListener('focus-url-bar', handleFocusUrlBar);
     return () => window.removeEventListener('focus-url-bar', handleFocusUrlBar);
+  }, [node]);
+
+  // Atalhos Ctrl+/Ctrl-/Ctrl+0 (zoom) e Ctrl+F (busca): mesmo critério das
+  // outras aba - só a aba ativa reage
+  useEffect(() => {
+    const handleZoomShortcut = (event) => {
+      if (!node || event.detail?.tabId !== node.getId()) return;
+      if (event.detail.action === 'in') handleZoomIn();
+      else if (event.detail.action === 'out') handleZoomOut();
+      else if (event.detail.action === 'reset') handleZoomReset();
+    };
+
+    window.addEventListener('zoom-shortcut', handleZoomShortcut);
+    return () => window.removeEventListener('zoom-shortcut', handleZoomShortcut);
+  }, [node, handleZoomIn, handleZoomOut, handleZoomReset]);
+
+  useEffect(() => {
+    const handleFindShortcut = (event) => {
+      if (node && event.detail?.tabId === node.getId()) {
+        setFindBarVisible(true);
+      }
+    };
+
+    window.addEventListener('find-in-page-shortcut', handleFindShortcut);
+    return () => window.removeEventListener('find-in-page-shortcut', handleFindShortcut);
   }, [node]);
 
   // Uma aba em branco recém-criada (botão "+", Ctrl+T, menu "Nova Aba") já
@@ -334,13 +445,18 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             onShortcutModifiersChange={updateModifiers}
             showShortcutsOverlay={showOverlay}
             onToggleShortcutsOverlay={toggleShowOverlay}
+            zoomFactor={zoomFactor}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onZoomReset={handleZoomReset}
+            onOpenFind={handleOpenFind}
           />
         )}
-        
+
         <div className="content-area">
-          <LoadingBar 
-            isLoading={isLoading} 
-            loadingComplete={loadingComplete} 
+          <LoadingBar
+            isLoading={isLoading}
+            loadingComplete={loadingComplete}
           />
           <WebContent
             isElectron={isElectron}
@@ -350,6 +466,12 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             nodeId={node.getId()}
             setIsLoading={setIsLoading}
             setLoadingComplete={setLoadingComplete}
+          />
+          <FindInPageBar
+            visible={findBarVisible}
+            onClose={handleCloseFind}
+            onFind={handleFind}
+            matches={findMatches}
           />
         </div>
       </div>

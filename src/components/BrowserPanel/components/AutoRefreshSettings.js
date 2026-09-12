@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Popover, Switch, InputNumber, Space, Typography, Divider, Select } from 'antd';
-import { ClockCircleOutlined } from '@ant-design/icons';
-import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
+import { Switch, InputNumber, Space, Typography, Divider, Select } from 'antd';
 
 const { Text } = Typography;
 const { Option } = Select;
 
 /**
- * Popover para configurar auto-refresh da página
+ * Conteúdo de configuração de auto-refresh - vive dentro do menu unificado
+ * da barra de URL (ver ControlsBar.js), não é mais um Popover próprio.
  */
-const AutoRefreshPopover = ({
-  children,
+const AutoRefreshSettings = ({
   isAutoRefreshEnabled,
   refreshInterval,
   onToggleAutoRefresh,
@@ -18,18 +16,10 @@ const AutoRefreshPopover = ({
 }) => {
   const [localInterval, setLocalInterval] = useState(refreshInterval);
   const [timeUnit, setTimeUnit] = useState('segundos');
-  const [open, setOpen] = useState(false);
-
-  useCloseOnWebviewFocus(open, () => setOpen(false));
 
   useEffect(() => {
     setLocalInterval(refreshInterval);
   }, [refreshInterval]);
-
-  const handleIntervalChange = (value) => {
-    setLocalInterval(value);
-    onIntervalChange(value);
-  };
 
   const handleUnitChange = (unit) => {
     setTimeUnit(unit);
@@ -61,12 +51,8 @@ const AutoRefreshPopover = ({
     onIntervalChange(actualValue);
   };
 
-  const content = (
-    <div style={{
-      width: '280px',
-      backgroundColor: '#2d2d30',
-      border: 'none'
-    }}>
+  return (
+    <div style={{ width: '280px' }}>
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Toggle principal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -131,34 +117,6 @@ const AutoRefreshPopover = ({
       </Space>
     </div>
   );
-
-  const title = (
-    <Space>
-      <ClockCircleOutlined style={{ color: '#007acc' }} />
-      <Text style={{ color: '#cccccc' }}>Auto Atualizar</Text>
-    </Space>
-  );
-
-  return (
-    <Popover
-      content={content}
-      title={title}
-      trigger="click"
-      placement="bottomRight"
-      open={open}
-      onOpenChange={setOpen}
-      overlayStyle={{
-        backgroundColor: '#2d2d30',
-      }}
-      overlayInnerStyle={{
-        backgroundColor: '#2d2d30',
-        border: '1px solid #3e3e42',
-        borderRadius: '6px'
-      }}
-    >
-      {children}
-    </Popover>
-  );
 };
 
-export default AutoRefreshPopover;
+export default AutoRefreshSettings;
