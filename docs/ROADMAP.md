@@ -150,11 +150,34 @@ tem uma linha de contexto explicando o porquê.
 
 ### 🔜 Próximos passos
 
-- [ ] **Confirmar assinatura de código nos instaladores** — verificar se o
-      `electron-builder` está configurado para assinar o build de
-      Windows/macOS. Um updater (`electron-updater`) rodando sem assinatura
-      é superfície de ataque (supply chain) num navegador que se atualiza
-      sozinho.
+- [ ] **Confirmar assinatura de código nos instaladores** — verificado:
+      `electron-builder.json` não tem NENHUMA configuração de assinatura
+      hoje (sem `win.certificateFile`/`CSC_LINK`, sem `mac.identity`/
+      notarização, sem `forceCodeSigning`). Os builds de Windows e macOS
+      saem 100% sem assinar, e o `electron-updater` aplica atualizações a
+      partir desses artefatos sem nenhuma verificação de identidade além do
+      hash - superfície de ataque real (supply chain) num navegador que se
+      atualiza sozinho.
+
+      Isso não é algo que dá pra simplesmente "ligar" no código - exige
+      obter uma identidade de assinatura de verdade, o que custa dinheiro e
+      passa por verificação de identidade:
+      - **Windows**: certificado de assinatura de código OV/EV de uma CA
+        (~$200-400+/ano), ou a **Azure Trusted Signing** da Microsoft
+        (mais barata, baseada em nuvem, sem token de hardware).
+      - **macOS**: conta paga no Apple Developer Program ($99/ano) + gerar
+        um certificado "Developer ID Application" + notarização via
+        notary service da Apple.
+      - **Linux** (AppImage): não existe uma cadeia de confiança no nível
+        do SO pra configurar aqui - o equivalente seria assinar os
+        releases com GPG, à parte do `electron-builder`.
+
+      Quando o certificado existir, o trabalho de código é: configurar
+      `win.certificateFile`/`CSC_KEY_PASSWORD` (ou as variáveis da Azure
+      Trusted Signing) e `mac.hardenedRuntime` + um hook `afterSign` com
+      `@electron/notarize` pra notarização, além de `forceCodeSigning: true`
+      dos dois lados pra o build falhar alto em vez de sair sem assinar por
+      engano.
 
 ## Completude como navegador
 
@@ -241,11 +264,44 @@ tem uma linha de contexto explicando o porquê.
       "Limpar histórico" (com Popconfirm) esvazia a lista e mostra o estado
       vazio do antd; o atalho Ctrl+H (com o foco fora da webview) também
       abre o modal.
+
+- [x] **Bloqueio de pop-ups configurável** — antes, TODO pop-up
+      (`window.open`/`target=_blank`) virava navegação forçada na mesma aba
+      (`contents.loadURL()` dentro do `setWindowOpenHandler`), destruindo a
+      página atual do usuário sem aviso - pior que simplesmente bloquear ou
+      abrir uma aba nova. Agora, por padrão (nenhuma decisão salva) o
+      pop-up é bloqueado silenciosamente, igual ao comportamento padrão do
+      Chrome; o usuário pode permitir pop-ups por site direto no popover de
+      informações do site (ícone de globo na barra de URL,
+      `SiteInfoPopover.js`) ou em Configurações > Permissões
+      (`PermissionsSettingsTab.js`) - reaproveitando 100% a UI de permissões
+      já existente pra câmera/mic/localização/etc., já que "popups" é só
+      mais uma entrada no mesmo armazenamento (origem, permissão) ->
+      decisão do `PermissionManager`. Quando permitido, o pop-up abre como
+      uma nova aba do próprio Flex Navigator (não uma janela nativa do SO),
+      no mesmo tabset da aba que o originou. Nota: como bloqueio de pop-up
+      não é uma permissão nativa do Chromium (não existe um
+      `setPermissionRequestHandler` pra isso), a opção "Perguntar sempre"
+      não abre um prompt de verdade - só mantém o padrão seguro de
+      bloquear.
+
+      Refatoração incidental: extraída a lógica de "achar a aba de origem
+      de um `webContents`" (antes duplicada dentro do handler de "abrir
+      link em nova aba" do menu de contexto) pra uma função compartilhada
+      `findSourceTabId()`, reaproveitada também pelo novo fluxo de pop-up
+      permitido.
+
+      Testado de ponta a ponta com a UI real: `getSiteInfo()` já retorna a
+      permissão "popups" pra qualquer origem; sem decisão salva, chamar
+      `window.open()` de dentro da webview não cria nenhuma aba nova E não
+      navega a aba atual pra outro lugar (a regressão do comportamento
+      antigo); depois de permitir pop-ups pra aquela origem via
+      `setSitePermission`, o mesmo `window.open()` abre uma segunda aba de
+      verdade com a URL do pop-up.
+
 - [ ] **Favoritos/bookmarks** — salvar, organizar e abrir favoritos rápido.
 - [ ] **Modo privado/anônimo** — aba com partition temporária (não
       `persist:webview`), sem histórico nem cookies persistidos.
-- [ ] **Bloqueio de pop-ups configurável** — hoje todo pop-up vira navegação
-      na mesma aba; decidir se isso deve ser configurável por site.
 - [ ] **Importar/exportar favoritos e histórico** — interoperabilidade com
       outros navegadores (formato HTML de bookmarks é o padrão de facto).
 

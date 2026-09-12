@@ -8,7 +8,11 @@ export const PERMISSION_LABELS = {
   geolocation: 'Localização',
   notifications: 'Notificações',
   midiSysex: 'Dispositivos MIDI',
-  'clipboard-read': 'Área de transferência'
+  'clipboard-read': 'Área de transferência',
+  // Não é uma permissão nativa do Electron (não existe um pedido do
+  // Chromium pra isso) - por isso "Perguntar sempre" aqui não abre um
+  // prompt de verdade, apenas mantém o comportamento padrão de bloquear.
+  popups: 'Pop-ups'
 };
 
 // null = nunca perguntado (ou decisão esquecida) - o site pode perguntar de

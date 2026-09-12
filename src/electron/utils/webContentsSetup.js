@@ -16,6 +16,13 @@ const PROMPTABLE_PERMISSIONS = new Set([
   'clipboard-read'
 ]);
 
+// Permissões editáveis na tela de permissões do site (SiteInfoPopover /
+// PermissionsSettingsTab): as nativas do Chromium acima, mais o bloqueio de
+// pop-ups. "popups" nunca passa por setPermissionRequestHandler (não é uma
+// permissão real do Electron/Chromium) - mora aqui só porque reaproveita o
+// mesmo armazenamento (origem, nome) -> decisão do PermissionManager.
+const SITE_PERMISSION_TYPES = new Set([...PROMPTABLE_PERMISSIONS, 'popups']);
+
 // Lembra a decisão do usuário por (origem, permissão), persistido em disco
 // (ver PermissionManager) - sobrevive a reiniciar o app. Instanciado só na
 // primeira vez que é preciso (o construtor chama app.getPath, que precisa do
@@ -52,6 +59,47 @@ const isWebviewNavigationAllowed = (url) => {
     return false;
   }
 };
+
+/**
+ * Encontra o data-tab-id da <webview> cujo conteúdo corresponde à URL dada,
+ * procurando no DOM do renderer - usado tanto pelo "abrir link em nova aba"
+ * do menu de contexto quanto pelo bloqueio de pop-ups (quando o usuário
+ * permite pop-ups pra um site, o pop-up abre como uma nova aba no mesmo
+ * tabset da aba que o originou, em vez de uma janela nativa de verdade).
+ */
+function findSourceTabId(mainWindow, contentsUrl) {
+  if (!mainWindow || !mainWindow.webContents) return Promise.resolve(null);
+
+  const currentUrlJson = JSON.stringify(contentsUrl);
+  return mainWindow.webContents.executeJavaScript(`
+    (function() {
+      const webviews = document.querySelectorAll('webview');
+      const currentUrl = ${currentUrlJson};
+      for (let i = 0; i < webviews.length; i++) {
+        const webview = webviews[i];
+        const tabId = webview.getAttribute('data-tab-id');
+        if (webview.src === currentUrl || (webview.getURL && webview.getURL() === currentUrl)) {
+          return tabId;
+        }
+      }
+      return null;
+    })();
+  `).catch((error) => {
+    console.error('Erro ao localizar aba de origem:', error);
+    return null;
+  });
+}
+
+/**
+ * Abre um pop-up permitido pelo usuário como uma nova aba do próprio Flex
+ * Navigator, em vez de uma janela nativa do SO (consistente com o resto do
+ * app, que não usa BrowserWindow para abas).
+ */
+async function openPopupAsNewTab(mainWindow, contents, url) {
+  if (!mainWindow || !mainWindow.webContents) return;
+  const sourceTabId = await findSourceTabId(mainWindow, contents.getURL());
+  mainWindow.webContents.send('add-new-tab', sourceTabId ? { url, sourceTabId } : { url });
+}
 
 /**
  * Intercepta pedidos de permissão (câmera/mic, geolocalização, notificações
@@ -158,7 +206,7 @@ function setupSiteInfoHandlers() {
       return { url: urlString, origin: null, hostname: null, protocol: null, certificate: null, permissions: [] };
     }
 
-    const permissions = Array.from(PROMPTABLE_PERMISSIONS).map((permission) => ({
+    const permissions = Array.from(SITE_PERMISSION_TYPES).map((permission) => ({
       permission,
       granted: permissionManager.getDecision(parsed.origin, permission)
     }));
@@ -174,7 +222,7 @@ function setupSiteInfoHandlers() {
   });
 
   ipcMain.on('set-site-permission', (event, { origin, permission, granted }) => {
-    if (!origin || !PROMPTABLE_PERMISSIONS.has(permission)) return;
+    if (!origin || !SITE_PERMISSION_TYPES.has(permission)) return;
     if (granted === null) {
       // "Esquecer" a decisão - o site volta a poder perguntar normalmente.
       permissionManager.resetDecision(origin, permission);
@@ -191,11 +239,35 @@ function setupWebContentsHandlers(mainWindow) {
   // Allow loading any external URLs and enable webviews
   app.on('web-contents-created', async (event, contents) => {
     contents.setWindowOpenHandler(({ url }) => {
-      // `contents.loadURL` chamado pelo processo principal não passa pelo
-      // handler de 'will-navigate' abaixo (esse evento só dispara para
-      // navegação iniciada pelo próprio renderer), então o pop-up de um
-      // site malicioso pedindo `window.open('file://...')` precisa ser
-      // barrado aqui também.
+      if (contents.getType() === 'webview') {
+        // Bloqueio de pop-ups configurável por site (estilo Chrome): por
+        // padrão (nenhuma decisão salva) um pop-up é bloqueado
+        // silenciosamente. O usuário pode permitir sempre um site
+        // específico no popover de informações do site (ícone de globo) ou
+        // em Configurações > Permissões - nesse caso o pop-up abre como
+        // uma nova aba do próprio Flex Navigator.
+        if (!isWebviewNavigationAllowed(url)) {
+          console.warn('Pop-up bloqueado (protocolo não permitido):', url);
+          return { action: 'deny' };
+        }
+
+        const origin = safeOrigin(contents.getURL());
+        const popupsAllowed = getPermissionManager().getDecision(origin, 'popups') === true;
+
+        if (popupsAllowed) {
+          openPopupAsNewTab(mainWindow, contents, url);
+        } else {
+          console.warn('Pop-up bloqueado (bloqueio de pop-ups ativo para', origin + '):', url);
+        }
+        return { action: 'deny' };
+      }
+
+      // Contents que não são webview (ex.: a própria janela principal) não
+      // deveriam abrir pop-ups de verdade; navega no lugar se o protocolo
+      // for seguro, só por segurança (`contents.loadURL` chamado pelo
+      // processo principal não passa pelo handler de 'will-navigate'
+      // abaixo, que só dispara para navegação iniciada pelo próprio
+      // renderer).
       if (isWebviewNavigationAllowed(url)) {
         contents.loadURL(url);
       } else {
@@ -311,62 +383,12 @@ function setupWebContentsHandlers(mainWindow) {
               label: 'Open link in a new tab',
               visible: !!parameters.linkURL,
               click: () => {
-                // Executar script no main window para encontrar a tab source
                 if (mainWindow && mainWindow.webContents) {
-                  // JSON.stringify escapa aspas/backslashes com segurança - a
-                  // URL da página vem de um site arbitrário (não confiável),
-                  // então NUNCA deve ser interpolada crua num template de
-                  // script: uma URL malformada de propósito poderia escapar
-                  // da string literal e injetar JS no main world do main
-                  // window (mesmo com contextIsolation, executeJavaScript
-                  // roda nesse mundo, que enxerga window.electronAPI).
-                  const currentContentsUrl = JSON.stringify(contents.getURL());
-                  mainWindow.webContents.executeJavaScript(`
-                    (function() {
-                      // Procurar pela webview que corresponde a este contents
-                      const webviews = document.querySelectorAll('webview');
-                      const currentUrl = ${currentContentsUrl};
-                      console.log('Procurando webview source, total webviews:', webviews.length);
-                      console.log('URL do contents que acionou context menu:', currentUrl);
-
-                      for (let i = 0; i < webviews.length; i++) {
-                        const webview = webviews[i];
-                        const webviewUrl = webview.src;
-                        const tabId = webview.getAttribute('data-tab-id');
-
-                        console.log('Webview', i, '- URL:', webviewUrl, '- TabId:', tabId);
-
-                        // Comparar a URL da webview com a URL atual do contents
-                        // Usar também getURL() se disponível na webview
-                        if (webviewUrl === currentUrl ||
-                            (webview.getURL && webview.getURL() === currentUrl)) {
-                          console.log('✅ Encontrada webview correspondente! TabId:', tabId);
-                          return tabId;
-                        }
-                      }
-                      
-                      console.log('❌ Nenhuma webview correspondente encontrada');
-                      return null;
-                    })();
-                  `).then(tabId => {
-                    console.log('Resultado da busca por tab source:', tabId);
-                    
-                    // Enviar evento para o processo principal para criar nova aba no tabset correto
-                    if (tabId) {
-                      console.log('Enviando add-new-tab com sourceTabId:', tabId);
-                      mainWindow.webContents.send('add-new-tab', { 
-                        url: parameters.linkURL,
-                        sourceTabId: tabId
-                      });
-                    } else {
-                      // Fallback para o método antigo se não conseguir encontrar a tab
-                      console.log('Usando fallback - enviando add-new-tab sem sourceTabId');
-                      mainWindow.webContents.send('add-new-tab', { url: parameters.linkURL });
-                    }
-                  }).catch(error => {
-                    console.error('Erro ao executar script para encontrar tab source:', error);
-                    // Fallback para o método antigo
-                    mainWindow.webContents.send('add-new-tab', { url: parameters.linkURL });
+                  findSourceTabId(mainWindow, contents.getURL()).then((tabId) => {
+                    mainWindow.webContents.send(
+                      'add-new-tab',
+                      tabId ? { url: parameters.linkURL, sourceTabId: tabId } : { url: parameters.linkURL }
+                    );
                   });
                 }
               }
