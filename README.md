@@ -10,13 +10,21 @@
 
 ### 🚀 Features
 
-- **🔄 Flexible Layout**: Use FlexLayout React to organize multiple browser instances in any configuration
-- **🌐 Real Web Navigation**: Each panel supports complete web navigation with back/forward/refresh controls
-- **📑 Dynamic Tabs**: Add as many tabs as you want in each panel
-- **🎯 Context Menu**: Right-click for navigation controls, link opening, and developer tools
-- **🖥️ Cross-Platform**: Works on Windows, macOS and Linux through Electron
-- **🌙 Dark Theme**: Modern interface with dark theme
-- **📦 Portable Build**: Generate standalone executable files for easy sharing
+- **🔄 Flexible Layout**: Organize multiple browser panels horizontally, vertically, or in complex grids
+- **🌐 Real Web Navigation**: Browse real websites in sandboxed Electron webviews with URL, back, forward, refresh, and loading controls
+- **📑 Dynamic Tabs**: Create, close, rename, duplicate, mute, and rearrange tabs in each panel
+- **🎯 Context Menu**: Access navigation actions, link opening, tab controls, and developer tools
+- **🔍 Find in Page**: Search inside the current page with match count and previous/next navigation
+- **🔎 Per-Site Zoom**: Zoom levels from 25% to 500%, persisted independently for each origin
+- **🕘 Browsing History**: Search, open, remove, and clear navigation history stored locally
+- **⬇️ Download Manager**: Save downloads with a native dialog, track progress, pause, resume, cancel, or reveal files
+- **📱 Device Dimensions**: Emulate phone and tablet viewport sizes, including custom presets and visual fit zoom
+- **🛡️ Site Permissions**: Manage camera, microphone, geolocation, notifications, MIDI, clipboard, and pop-up permissions per origin
+- **🚫 Pop-up Control**: Block pop-ups by default or allow them per site as new tabs
+- **🎨 Adaptive Themes**: Choose Automatic, Light, or Dark; the app, Ant Design controls, native title bar, and native menus follow the selection
+- **🔐 Secure Shell**: Context isolation, disabled Node integration, sandboxed webviews, navigation filtering, and production CSP
+- **🖥️ Cross-Platform**: Works on Windows, macOS, and Linux through Electron
+- **📦 Portable Build**: Generate standalone installer and portable packages with electron-builder
 
 ### 📋 Prerequisites
 
@@ -54,10 +62,10 @@ To build the application for distribution:
 npm run dist
 ```
 
-This generates distributable files:
-- **Windows**: `dist/Flex Navigator Setup 1.0.0.exe` (installer) and `dist/Flex Navigator 1.0.0.exe` (portable)
-- **macOS**: `dist/Flex Navigator-1.0.0.dmg`
-- **Linux**: `dist/Flex Navigator-1.0.0.AppImage`
+This generates distributable files under `dist/` for the current package version (`1.0.6`), including:
+- **Windows**: installer and portable executable
+- **macOS**: DMG package
+- **Linux**: AppImage package
 
 ### 🎯 Key Features
 
@@ -66,7 +74,8 @@ This generates distributable files:
 - **Navigation Controls**: Persistent back, forward, and refresh buttons
 - **Integrated Search**: Non-URL terms are automatically searched on Google
 - **Context Menus**: Right-click for advanced navigation options and DevTools
-- **Keyboard Shortcuts**: Full support for standard browser shortcuts
+- **Keyboard Shortcuts**: Browser shortcuts for tabs, navigation, zoom, history, and find in page
+- **Site Information**: Inspect HTTPS status, certificate details, and permissions for the current origin
 
 #### 📱 Flexible Layout System
 - **Resizable Panels**: Drag panel borders to customize layout
@@ -74,12 +83,25 @@ This generates distributable files:
 - **Visual Focus Indicator**: Active panels highlighted with blue borders
 - **Free Organization**: Arrange panels horizontally, vertically, or in complex grids
 - **Persistent Layout**: Your layout configuration is automatically saved
+- **Session Management**: Save, restore, clear, and delete browser sessions
+- **Panel Navigation**: Quickly cycle through panels with a visible focus indicator
 
 #### ⚡ Quick Access Controls
 - **New Tab Button**: Instantly add tabs to any panel
 - **Preset Shortcuts**: One-click access to Google, GitHub, YouTube, Stack Overflow
 - **Panel Management**: Easy creation and deletion of browser panels
 - **Webview Integration**: Full web browsing capabilities in each panel
+
+#### 🧰 Browser Tools
+- **History Modal**: Searchable navigation history with debounce, opening in a new tab, entry removal, and clear-all confirmation
+- **Download Popover**: Live download progress with pause, resume, cancel, open, and show-in-folder actions
+- **Device Toolbar**: Change emulated device and visual zoom without reopening the dimensions popover
+- **Configurable Permissions**: Change or forget saved site decisions immediately from Settings
+
+#### 🎨 Themes
+- **Automatic**: Follows the operating system's light/dark preference and reacts to OS changes while the app is running
+- **Light** and **Dark**: Explicitly force the complete application theme
+- Native Windows title-bar controls and Electron application menus update without restarting the executable
 
 ### 🏗️ Project Architecture
 
@@ -95,7 +117,7 @@ src/
 │   │   ├── WebContent.js     # Webview management and tab handling
 │   │   └── LoadingBar.js     # Loading progress indicator
 │   └── utils/                # Shared utilities and helpers
-│       ├── theme.js          # Dark theme configuration for Ant Design
+│       ├── theme.js          # Light and dark Ant Design theme configurations
 │       └── urlUtils.js       # URL validation and processing utilities
 ├── electron/                 # Electron main process modules
 │   ├── window/               # Window creation and management
@@ -104,6 +126,7 @@ src/
 │   └── utils/                # Electron-specific utilities
 ├── App.js                    # Root React component with FlexLayout setup
 ├── App.css                   # Global application styles
+├── context/                  # Shared React contexts, including theme state
 └── index.js                  # React application entry point
 electron.js                   # Electron main process entry point
 ```
@@ -137,10 +160,10 @@ electron.js                   # Electron main process entry point
 ### 📦 Tech Stack
 
 #### Core Technologies
-- **[Electron 32.0.1 LTS](https://electronjs.org/)** - Cross-platform desktop application framework
-- **[React 19.1.0](https://react.dev/)** - Modern UI library with hooks and components
-- **[FlexLayout React 0.8.17](https://github.com/caplin/FlexLayout)** - Advanced docking layout manager
-- **[Ant Design 5.26.4](https://ant.design/)** - Enterprise-class UI design language and components
+- **[Electron 41.7.1](https://electronjs.org/)** - Cross-platform desktop application framework
+- **[React 19.3.0](https://react.dev/)** - Modern UI library with hooks and components
+- **[FlexLayout React 0.10.8](https://github.com/caplin/FlexLayout)** - Advanced docking layout manager
+- **[Ant Design 5.29.3](https://ant.design/)** - Enterprise-class UI design language and components
 
 #### Build & Development Tools
 - **[electron-builder](https://www.electron.build/)** - Complete solution to package and build Electron apps
@@ -173,16 +196,18 @@ We welcome contributions! Here's how you can help:
 ### 🚀 Roadmap
 
 #### Planned Features
-- **Session Management**: Save and restore browser sessions
-- **Themes**: Light theme and custom theme support
 - **Extensions**: Basic plugin system for additional functionality
-- **History**: Browse through navigation history
-- **Downloads**: Built-in download manager
+- **Bookmarks**: Save, organize, and open favorite pages quickly
+- **Private Browsing**: Temporary webview partition without persisted history or cookies
+- **Import/Export**: Interoperate with other browsers using standard bookmark and history formats
+- **Code Signing**: Sign Windows/macOS installers and configure release verification
 
 #### Version History
 - **v1.0.0**: Initial release with core browsing functionality
-- **v1.1.0** (Planned): Bookmarks and session management
-- **v1.2.0** (Planned): Themes and customization options
+- **v1.0.3**: Latest published tag with the security, permissions, downloads, history, and browser tooling work documented in the repository history
+- **1.0.6**: Current development package version, including adaptive themes, native title-bar/menu theme synchronization, device dimensions, configurable pop-ups, and expanded browser controls
+
+> The package version (`1.0.6`) is ahead of the latest Git tag (`v1.0.3`) in the current development tree. A release entry should be created before presenting `1.0.6` as a published download.
 
 ### 📄 License
 
