@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Modal, Input, Button, Typography, Empty, Spin, Space, Popconfirm, List, Avatar } from 'antd';
+import { ConfigProvider, Modal, Input, Button, Typography, Empty, Spin, Space, Popconfirm, List, Avatar } from 'antd';
 import { SearchOutlined, DeleteOutlined, GlobalOutlined, ClearOutlined } from '@ant-design/icons';
+import { darkTheme } from '../BrowserPanel/utils/theme';
 
 const { Text } = Typography;
 
@@ -75,12 +76,13 @@ const HistoryModal = ({ visible, onClose }) => {
   };
 
   return (
-    <Modal
-      title="Histórico de navegação"
-      open={visible}
-      onCancel={onClose}
-      width={640}
-      footer={[
+    <ConfigProvider theme={darkTheme}>
+      <Modal
+        title="Histórico de navegação"
+        open={visible}
+        onCancel={onClose}
+        width={640}
+        footer={[
         <Popconfirm
           key="clear"
           title="Limpar todo o histórico?"
@@ -97,8 +99,8 @@ const HistoryModal = ({ visible, onClose }) => {
         <Button key="close" type="primary" onClick={onClose}>
           Fechar
         </Button>
-      ]}
-    >
+        ]}
+      >
       <Input
         placeholder="Pesquisar no histórico..."
         prefix={<SearchOutlined />}
@@ -163,7 +165,8 @@ const HistoryModal = ({ visible, onClose }) => {
           )}
         />
       )}
-    </Modal>
+      </Modal>
+    </ConfigProvider>
   );
 };
 

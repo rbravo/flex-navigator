@@ -83,7 +83,7 @@ const PermissionsSettingsTab = () => {
         {sites.map((site) => (
           <div
             key={site.origin}
-            style={{ border: '1px solid #d9d9d9', borderRadius: 6, padding: 12 }}
+            style={{ border: '1px solid var(--nav-border)', borderRadius: 6, padding: 12 }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <Text strong>{site.origin}</Text>

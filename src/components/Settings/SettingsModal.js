@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Button, Typography, Switch, Divider, Space, Tabs } from 'antd';
+import { ConfigProvider, Modal, Form, Input, Button, Typography, Switch, Divider, Space, Tabs } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { getUserSettings, saveUserSettings } from '../../utils/userSettings';
 import { useAutoUpdater } from '../../hooks/useAutoUpdater';
+import { darkTheme } from '../BrowserPanel/utils/theme';
 import PermissionsSettingsTab from './PermissionsSettingsTab';
 import DimensionsSettingsTab from './DimensionsSettingsTab';
 
@@ -91,20 +92,21 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
   };
 
   return (
-    <Modal
-      title="Configurações"
-      open={visible}
-      onCancel={handleCancel}
-      width={560}
-      footer={[
+    <ConfigProvider theme={darkTheme}>
+      <Modal
+        title="Configurações"
+        open={visible}
+        onCancel={handleCancel}
+        width={560}
+        footer={[
         <Button key="cancel" onClick={handleCancel}>
           Cancelar
         </Button>,
         <Button key="save" type="primary" loading={loading} onClick={handleSave}>
           Salvar
         </Button>
-      ]}
-    >
+        ]}
+      >
       <Tabs
         items={[
           {
@@ -160,7 +162,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
                 </Form.Item>
 
                 <div style={{
-                  background: '#f5f5f5',
+                  background: 'var(--nav-hover)',
                   padding: '12px',
                   borderRadius: '6px',
                   marginBottom: '16px'
@@ -196,7 +198,8 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
           }
         ]}
       />
-    </Modal>
+      </Modal>
+    </ConfigProvider>
   );
 };
 

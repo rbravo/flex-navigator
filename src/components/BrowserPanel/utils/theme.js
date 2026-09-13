@@ -7,7 +7,7 @@ export const darkTheme = {
     colorBgContainer: '#2d2d30',
     colorBgElevated: '#383838',
     colorBorder: '#3e3e42',
-    colorPrimary: '#cccccc',
+    colorPrimary: '#1677ff',
     colorText: '#cccccc',
     colorTextSecondary: '#999999',
     colorBgLayout: '#1e1e1e',
