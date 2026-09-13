@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ConfigProvider, Modal, Form, Input, Button, Typography, Switch, Divider, Space, Tabs } from 'antd';
+import { Modal, Form, Input, Button, Typography, Switch, Divider, Space, Tabs, Select } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import { getUserSettings, saveUserSettings } from '../../utils/userSettings';
 import { useAutoUpdater } from '../../hooks/useAutoUpdater';
-import { darkTheme } from '../BrowserPanel/utils/theme';
+import { useTheme } from '../../context/ThemeContext';
 import PermissionsSettingsTab from './PermissionsSettingsTab';
 import DimensionsSettingsTab from './DimensionsSettingsTab';
 
@@ -22,6 +22,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
   // como `key` da aba de Permissões força uma remontagem completa, evitando
   // depender desse update.
   const [openCount, setOpenCount] = useState(0);
+  const { setThemeMode } = useTheme();
 
   const { checkForUpdates, getAppVersion } = useAutoUpdater();
 
@@ -62,6 +63,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
       const success = saveUserSettings(values);
       
       if (success) {
+        setThemeMode(values.themeMode);
         // Chamar callback se fornecido
         if (onSave) {
           onSave(values);
@@ -92,8 +94,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
   };
 
   return (
-    <ConfigProvider theme={darkTheme}>
-      <Modal
+    <Modal
         title="Configurações"
         open={visible}
         onCancel={handleCancel}
@@ -136,6 +137,20 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
                   <Input
                     placeholder="https://www.google.com"
                     prefix="🌐"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  name="themeMode"
+                  label="Tema"
+                  extra="Automático acompanha o tema do sistema operacional"
+                >
+                  <Select
+                    options={[
+                      { value: 'auto', label: 'Automático' },
+                      { value: 'light', label: 'Light' },
+                      { value: 'dark', label: 'Dark' }
+                    ]}
                   />
                 </Form.Item>
 
@@ -198,8 +213,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
           }
         ]}
       />
-      </Modal>
-    </ConfigProvider>
+    </Modal>
   );
 };
 

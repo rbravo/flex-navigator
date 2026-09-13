@@ -39,20 +39,23 @@ export const saveUserSettings = (settings) => {
  * @returns {object} As configurações do usuário
  */
 export const getUserSettings = () => {
+  const defaults = {
+    defaultHomePage: 'https://www.google.com',
+    autoUpdate: true,
+    autoDownload: true,
+    themeMode: 'auto'
+  };
+
   try {
     const savedSettings = localStorage.getItem('flex-navigator-settings');
     if (savedSettings) {
-      return JSON.parse(savedSettings);
+      return { ...defaults, ...JSON.parse(savedSettings) };
     }
   } catch (error) {
     console.error('Erro ao carregar configurações:', error);
   }
   
-  return {
-    defaultHomePage: 'https://www.google.com',
-    autoUpdate: true,
-    autoDownload: true
-  };
+  return defaults;
 };
 
 /**

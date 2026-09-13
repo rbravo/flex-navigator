@@ -154,8 +154,8 @@ const ControlsBar = ({
   ];
 
   const borderlessButtonStyle = {
-    borderColor: '#3e3e42',
-    backgroundColor: '#2d2d30',
+    borderColor: 'var(--nav-border)',
+    backgroundColor: 'var(--nav-panel)',
     border: '1px solid transparent'
   }
 
@@ -178,7 +178,7 @@ const ControlsBar = ({
             disabled={!canGoBack}
             onClick={onBack}
             style={{
-              color: canGoBack ? '#cccccc' : '#666666',
+              color: canGoBack ? 'var(--nav-text)' : '#666666',
               ...borderlessButtonStyle,
               marginLeft: -2
             }}
@@ -193,7 +193,7 @@ const ControlsBar = ({
             disabled={!canGoForward}
             onClick={onForward}
             style={{
-              color: canGoForward ? '#cccccc' : '#666666',
+              color: canGoForward ? 'var(--nav-text)' : '#666666',
               ...borderlessButtonStyle
             }}
           />
@@ -206,7 +206,7 @@ const ControlsBar = ({
             size="small"
             onClick={onRefresh}
             style={{
-              color: isLoading ? '#ff6b6b' : '#cccccc',
+              color: isLoading ? '#ff6b6b' : 'var(--nav-text)',
               ...borderlessButtonStyle
             }}
           />
@@ -226,7 +226,8 @@ const ControlsBar = ({
                 <SiteInfoPopover currentUrl={currentUrl}>
                   <Tooltip title="Informações do site" placement={'bottom'}>
                     <span style={{ cursor: 'pointer', display: 'inline-flex' }}>
-                      <ControlFilled style={{ color: '#999999', fontSize: 18, marginRight: 2, marginLeft: -4 }} />
+                      <ControlFilled className="control-filled"
+                        style={{ color: '#999999', fontSize: 18, marginRight: 2, marginLeft: -4 }} />
                     </span>
                   </Tooltip>
                 </SiteInfoPopover>
@@ -235,12 +236,13 @@ const ControlsBar = ({
               !isLoading && (
                 <Button
                   type="default"
+                  className='buttonSend'
                   icon={<SendOutlined />}
                   size="small"
                   htmlType="submit"
                   style={{
-                    backgroundColor: '#007acc',
-                    borderColor: '#007acc',
+                    // backgroundColor: '#007acc',
+                    // borderColor: '#007acc',
                     borderWidth: 0,
                     height: '24px',
                     minWidth: '28px',
@@ -250,9 +252,9 @@ const ControlsBar = ({
               )
             }
             style={{
-              backgroundColor: '#383838',
+              backgroundColor: 'var(--nav-hover)',
               borderWidth: 0,
-              color: '#cccccc'
+              color: 'var(--nav-text)'
             }}
             onPressEnter={onUrlSubmit}
           />
@@ -274,9 +276,9 @@ const ControlsBar = ({
                 icon={<MobileOutlined />}
                 size="small"
                 style={{
-                  color: deviceDimensions ? '#007acc' : '#cccccc',
-                  borderColor: '#3e3e42',
-                  backgroundColor: '#2d2d30',
+                  color: deviceDimensions ? 'var(--nav-accent)' : 'var(--nav-text)',
+                  borderColor: 'var(--nav-border)',
+                  backgroundColor: 'var(--nav-panel)',
                   border: '1px solid transparent'
                 }}
               />
@@ -290,9 +292,9 @@ const ControlsBar = ({
                 icon={<DownloadOutlined />}
                 size="small"
                 style={{
-                  color: '#cccccc',
-                  borderColor: '#3e3e42',
-                  backgroundColor: '#2d2d30',
+                  color: 'var(--nav-text)',
+                  borderColor: 'var(--nav-border)',
+                  backgroundColor: 'var(--nav-panel)',
                   border: '1px solid transparent'
                 }}
               />
@@ -451,9 +453,9 @@ const ControlsBar = ({
                 icon={<MoreOutlined />}
                 size="small"
                 style={{
-                  color: '#cccccc',
-                  borderColor: '#3e3e42',
-                  backgroundColor: '#2d2d30',
+                  color: 'var(--nav-text)',
+                  borderColor: 'var(--nav-border)',
+                  backgroundColor: 'var(--nav-panel)',
                   border: '1px solid transparent'
                 }}
               />

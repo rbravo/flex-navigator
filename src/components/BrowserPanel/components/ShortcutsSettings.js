@@ -69,7 +69,7 @@ const ShortcutsSettings = ({
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Toggle principal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ color: '#cccccc' }}>Ativar atalhos de navegação</Text>
+          <Text style={{ color: 'var(--nav-text)' }}>Ativar atalhos de navegação</Text>
           <Switch
             checked={localEnabled}
             onChange={handleToggleChange}
@@ -79,11 +79,11 @@ const ShortcutsSettings = ({
           />
         </div>
 
-        <Divider style={{ margin: '0px 0', backgroundColor: '#3e3e42' }} />
+        <Divider style={{ margin: '0px 0', backgroundColor: 'var(--nav-border)' }} />
 
         {/* Configuração das teclas modificadoras */}
         <div style={{ opacity: localEnabled ? 1 : 0.5 }}>
-          <Text style={{ color: '#cccccc', fontSize: '14px' }}>
+          <Text style={{ color: 'var(--nav-text)', fontSize: '14px' }}>
             Teclas modificadoras
           </Text>
 
@@ -96,8 +96,8 @@ const ShortcutsSettings = ({
               styles={{
                 popup: {
                   root: {
-                    backgroundColor: '#383838',
-                    border: '1px solid #3e3e42'
+                    backgroundColor: 'var(--nav-hover)',
+                    border: '1px solid var(--nav-border)'
                   }
                 }
               }}
@@ -107,8 +107,8 @@ const ShortcutsSettings = ({
                   key={option.value}
                   value={option.value}
                   style={{
-                    backgroundColor: '#383838',
-                    color: '#cccccc'
+                    backgroundColor: 'var(--nav-hover)',
+                    color: 'var(--nav-text)'
                   }}
                 >
                   {option.label}
@@ -122,11 +122,11 @@ const ShortcutsSettings = ({
           </Text>
         </div>
 
-        <Divider style={{ margin: '0px 0', backgroundColor: '#3e3e42' }} />
+        <Divider style={{ margin: '0px 0', backgroundColor: 'var(--nav-border)' }} />
 
         {/* Lista de atalhos */}
         <div style={{ opacity: localEnabled ? 1 : 0.3 }}>
-          <Text style={{ color: '#cccccc', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
+          <Text style={{ color: 'var(--nav-text)', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
             Atalhos disponíveis:
           </Text>
 
@@ -139,14 +139,14 @@ const ShortcutsSettings = ({
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '4px 0',
-                  borderBottom: index < shortcuts.length - 1 ? '1px solid #3e3e42' : 'none'
+                  borderBottom: index < shortcuts.length - 1 ? '1px solid var(--nav-border)' : 'none'
                 }}
               >
                 <Text style={{ color: '#999999', fontSize: '11px', flex: 1 }}>
                   {shortcut.action}
                 </Text>
                 <div style={{
-                  backgroundColor: '#383838',
+                  backgroundColor: 'var(--nav-hover)',
                   padding: '2px 6px',
                   borderRadius: '3px'
                 }}>
@@ -161,7 +161,7 @@ const ShortcutsSettings = ({
 
         {/* Info sobre funcionamento */}
         <div style={{
-          backgroundColor: '#383838',
+          backgroundColor: 'var(--nav-hover)',
           padding: '8px',
           borderRadius: '4px',
           marginTop: '8px'
@@ -181,7 +181,7 @@ const ShortcutsSettings = ({
           opacity: localEnabled ? 1 : 0.5
         }}>
           <div>
-            <Text style={{ color: '#cccccc' }}>Mostrar overlay ao usar os atalhos</Text>
+            <Text style={{ color: 'var(--nav-text)' }}>Mostrar overlay ao usar os atalhos</Text>
             <Text style={{ color: '#666666', fontSize: '11px', display: 'block' }}>
               Desative se você já souber os atalhos de cor
             </Text>

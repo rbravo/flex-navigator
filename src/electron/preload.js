@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Barra de título customizada
   popupAppMenu: (label, x, y) => ipcRenderer.send('popup-app-menu', { label, x, y }),
+  setTitleBarTheme: (theme) => ipcRenderer.send('set-title-bar-theme', theme),
 
   // Permissões pedidas por sites (câmera/mic, localização, notificações...)
   respondToPermissionRequest: (requestId, granted) =>

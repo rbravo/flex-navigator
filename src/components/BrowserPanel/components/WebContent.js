@@ -1,6 +1,4 @@
 import React, { useMemo } from 'react';
-import { ConfigProvider } from 'antd';
-import { darkTheme } from '../utils/theme';
 import { canUseIframe } from '../utils/urlUtils';
 import { getDefaultUserAgent } from '../utils/userAgentUtils';
 import FallbackContent from './FallbackContent';
@@ -61,7 +59,7 @@ const WebContent = ({
               width: '100%',
               height: '100%',
               border: 'none',
-              backgroundColor: 'white'
+              backgroundColor: 'var(--nav-content)'
             }}
             onLoad={() => {
               setLoadingComplete(true);
@@ -85,13 +83,11 @@ const WebContent = ({
       
       // Fallback: mostra simulação melhorada com Ant Design
       return (
-        <ConfigProvider theme={darkTheme}>
-          <FallbackContent 
-            currentUrl={currentUrl}
-            isElectron={isElectron}
-            canUseIframeForUrl={canUseIframeForUrl}
-          />
-        </ConfigProvider>
+        <FallbackContent
+          currentUrl={currentUrl}
+          isElectron={isElectron}
+          canUseIframeForUrl={canUseIframeForUrl}
+        />
       );
     }
   };

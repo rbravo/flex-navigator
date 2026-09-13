@@ -1,4 +1,4 @@
-const { ipcMain } = require('electron');
+const { ipcMain, nativeTheme } = require('electron');
 const SessionManager = require('../utils/SessionManager');
 const { getHistoryManager } = require('../utils/HistoryManager');
 const { popupMenuItem } = require('../menu/applicationMenu');
@@ -9,6 +9,21 @@ const { popupMenuItem } = require('../menu/applicationMenu');
 function setupIpcHandlers(mainWindow) {
   const sessionManager = new SessionManager();
   const historyManager = getHistoryManager();
+
+  ipcMain.on('set-title-bar-theme', (event, themeConfig) => {
+    if (process.platform === 'darwin' || !mainWindow || mainWindow.isDestroyed()) return;
+
+    const mode = themeConfig?.mode;
+    const resolvedTheme = themeConfig?.resolvedTheme === 'dark' ? 'dark' : 'light';
+    const isDark = resolvedTheme === 'dark';
+    nativeTheme.themeSource = mode === 'auto' ? 'system' : resolvedTheme;
+    mainWindow.setTitleBarOverlay({
+      color: isDark ? '#1e1e1e' : '#ffffff',
+      symbolColor: isDark ? '#cccccc' : '#1f1f1f',
+      height: 40
+    });
+  });
+
   // Handle IPC events
   ipcMain.on('open-webview-devtools', (event, data) => {
     console.log('Abrindo DevTools para webview da tab:', data.tabId);

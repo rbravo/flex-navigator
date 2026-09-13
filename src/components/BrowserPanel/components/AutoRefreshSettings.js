@@ -56,7 +56,7 @@ const AutoRefreshSettings = ({
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Toggle principal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ color: '#cccccc' }}>Ativar auto atualização</Text>
+          <Text style={{ color: 'var(--nav-text)' }}>Ativar auto atualização</Text>
           <Switch
             checked={isAutoRefreshEnabled}
             onChange={onToggleAutoRefresh}
@@ -68,11 +68,11 @@ const AutoRefreshSettings = ({
 
         <p style={{ color: '#a0a0a0', fontSize: 11, marginTop: -5, marginBottom: -5 }}>Atualizar aba automaticamente no intervalo definido</p>
 
-        <Divider style={{ margin: '0 0 0 0', backgroundColor: '#3e3e42' }} />
+        <Divider style={{ margin: '0 0 0 0', backgroundColor: 'var(--nav-border)' }} />
 
         {/* Configuração do intervalo */}
         <div style={{ opacity: isAutoRefreshEnabled ? 1 : 0.5 }}>
-          <Text style={{ color: '#cccccc', fontSize: '14px' }}>
+          <Text style={{ color: 'var(--nav-text)', fontSize: '14px' }}>
             Intervalo de atualização
           </Text>
 
@@ -84,15 +84,15 @@ const AutoRefreshSettings = ({
               onChange={handleValueChange}
               disabled={!isAutoRefreshEnabled}
               style={{
-                backgroundColor: '#383838',
-                borderColor: '#3e3e42',
-                color: '#cccccc',
+                backgroundColor: 'var(--nav-hover)',
+                borderColor: 'var(--nav-border)',
+                color: 'var(--nav-text)',
                 width: '80px'
               }}
               styles={{
                 input: {
-                  backgroundColor: '#383838',
-                  color: '#cccccc'
+                  backgroundColor: 'var(--nav-hover)',
+                  color: 'var(--nav-text)'
                 }
               }}
             />
@@ -104,8 +104,8 @@ const AutoRefreshSettings = ({
                 width: '100px'
               }}
               dropdownStyle={{
-                backgroundColor: '#2d2d30',
-                border: '1px solid #3e3e42'
+                backgroundColor: 'var(--nav-panel)',
+                border: '1px solid var(--nav-border)'
               }}
               popupClassName="dark-select-dropdown"
             >

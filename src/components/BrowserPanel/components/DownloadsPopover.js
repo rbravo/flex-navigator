@@ -108,7 +108,7 @@ const DownloadsPopover = ({ children }) => {
   };
 
   const content = (
-    <div style={{ width: '320px', backgroundColor: '#2d2d30', maxHeight: 360, overflowY: 'auto' }}>
+    <div style={{ width: '320px', backgroundColor: 'var(--nav-panel)', maxHeight: 360, overflowY: 'auto' }}>
       {downloads.length === 0 ? (
         <Empty description="Nenhum download nesta sessão" image={Empty.PRESENTED_IMAGE_SIMPLE} />
       ) : (
@@ -117,7 +117,7 @@ const DownloadsPopover = ({ children }) => {
             <div key={download.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <Text style={{ color: '#cccccc', fontSize: 13 }} ellipsis={{ tooltip: download.filename }}>
+                  <Text style={{ color: 'var(--nav-text)', fontSize: 13 }} ellipsis={{ tooltip: download.filename }}>
                     {download.filename}
                   </Text>
                   <div style={{ fontSize: 11, color: '#a0a0a0' }}>
@@ -146,15 +146,15 @@ const DownloadsPopover = ({ children }) => {
   return (
     <Popover
       content={content}
-      title={<Text style={{ color: '#cccccc' }}>Downloads</Text>}
+      title={<Text style={{ color: 'var(--nav-text)' }}>Downloads</Text>}
       trigger="click"
       placement="bottomRight"
       open={open}
       onOpenChange={setOpen}
-      overlayStyle={{ backgroundColor: '#2d2d30' }}
+      overlayStyle={{ backgroundColor: 'var(--nav-panel)' }}
       overlayInnerStyle={{
-        backgroundColor: '#2d2d30',
-        border: '1px solid #3e3e42',
+        backgroundColor: 'var(--nav-panel)',
+        border: '1px solid var(--nav-border)',
         borderRadius: '6px'
       }}
     >

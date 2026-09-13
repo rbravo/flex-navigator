@@ -62,8 +62,8 @@ const FindInPageBar = ({ visible, onClose, onFind, matches }) => {
         display: 'flex',
         alignItems: 'center',
         gap: 4,
-        backgroundColor: '#2d2d30',
-        border: '1px solid #3e3e42',
+        backgroundColor: 'var(--nav-panel)',
+        border: '1px solid var(--nav-border)',
         borderRadius: 6,
         padding: '4px 6px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.4)'
@@ -76,7 +76,7 @@ const FindInPageBar = ({ visible, onClose, onFind, matches }) => {
         value={text}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        style={{ width: 180, backgroundColor: '#383838', borderColor: '#3e3e42', color: '#cccccc' }}
+        style={{ width: 180, backgroundColor: 'var(--nav-hover)', borderColor: 'var(--nav-border)', color: 'var(--nav-text)' }}
       />
       <Text style={{ color: '#a0a0a0', fontSize: 12, minWidth: 42, textAlign: 'center' }}>
         {text ? (hasMatches ? `${matches.activeMatchOrdinal}/${matches.matches}` : '0/0') : ''}

@@ -61,7 +61,7 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
   const categoryOrder = ['phone', 'tablet', 'custom'];
 
   const content = (
-    <div style={{ width: '280px', backgroundColor: '#2d2d30', maxHeight: 420, overflowY: 'auto' }}>
+    <div style={{ width: '280px', backgroundColor: 'var(--nav-panel)', maxHeight: 420, overflowY: 'auto' }}>
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
 
         <div>
@@ -93,7 +93,7 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
           </Button>
         </div>
 
-        <Divider style={{ margin: 0, backgroundColor: '#3e3e42' }} />
+        <Divider style={{ margin: 0, backgroundColor: 'var(--nav-border)' }} />
 
         {categoryOrder
           .filter((category) => grouped[category]?.length)
@@ -137,7 +137,7 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
       content={content}
       title={
         <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
-          <Text style={{ color: '#cccccc' }}>
+          <Text style={{ color: 'var(--nav-text)' }}>
             Dimensões {activeDimensions && `— ${activeDimensions.width}×${activeDimensions.height}`}
           </Text>
           {activeDimensions && (
@@ -151,10 +151,10 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
       placement="bottomRight"
       open={open}
       onOpenChange={handleOpenChange}
-      overlayStyle={{ backgroundColor: '#2d2d30' }}
+      overlayStyle={{ backgroundColor: 'var(--nav-panel)' }}
       overlayInnerStyle={{
-        backgroundColor: '#2d2d30',
-        border: '1px solid #3e3e42',
+        backgroundColor: 'var(--nav-panel)',
+        border: '1px solid var(--nav-border)',
         borderRadius: '6px'
       }}
     >

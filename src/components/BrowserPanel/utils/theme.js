@@ -31,3 +31,28 @@ export const darkTheme = {
     },
   },
 };
+
+export const lightTheme = {
+  algorithm: theme.defaultAlgorithm,
+  token: {
+    colorBgContainer: '#ffffff',
+    colorBgElevated: '#ffffff',
+    colorBorder: '#d9d9d9',
+    colorPrimary: '#1677ff',
+    colorText: 'rgba(0, 0, 0, 0.88)',
+    colorTextSecondary: 'rgba(0, 0, 0, 0.45)',
+    colorBgLayout: '#f5f5f5',
+    controlHeight: 32,
+    borderRadius: 4,
+  },
+  components: {
+    Button: {
+      controlHeight: 32,
+      borderRadius: 4,
+    },
+    Input: {
+      controlHeight: 32,
+      borderRadius: 4,
+    },
+  },
+};

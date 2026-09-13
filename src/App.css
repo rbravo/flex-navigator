@@ -433,3 +433,109 @@
 .flexlayout__tabset_selected:not(.panel-navigation-active):not(.panel-navigation-inactive) .flexlayout__tabset_header {
   background-color: #383838 !important;
 }
+
+.control-filled:hover {
+  color: var(--nav-accent) !important;
+}
+
+/* Tema claro: o FlexLayout traz o dark.css como base, então estes overrides
+   acompanham o tema escolhido sem remontar o layout. */
+[data-theme='light'] .App,
+[data-theme='light'] .app-titlebar,
+[data-theme='light'] .flexlayout__layout,
+[data-theme='light'] .flexlayout__tabset_content {
+  background-color: var(--nav-dark) !important;
+}
+
+[data-theme='light'] .app-titlebar,
+[data-theme='light'] .flexlayout__tabset,
+[data-theme='light'] .flexlayout__tabset_tabbar_outer,
+[data-theme='light'] .flexlayout__tabset_header,
+[data-theme='light'] .tabset-button-navbar {
+  background-color: var(--nav-panel) !important;
+}
+
+[data-theme='light'] .tabset-button {
+  color: var(--nav-text);
+}
+[data-theme='light'] .tabset-button:hover {
+  color: var(--nav-accent);
+}
+
+[data-theme='light'] .controls-bar button:hover:not(:disabled) {
+  color: var(--nav-text) !important;
+  background-color: var(--nav-accent) !important;
+}
+
+[data-theme='light'] .flexlayout__tabset_tabbar_outer {
+  background-color: var(--nav-panel) !important;
+  background-image: linear-gradient(var(--nav-panel), var(--nav-dark)) !important;
+  border-color: var(--nav-panel) !important;
+}
+
+[data-theme='light'] .flexlayout__tabset-selected,
+[data-theme='light'] .flexlayout__tabset-maximized {
+  background-color: var(--nav-panel) !important;
+  background-image: none !important;
+  border-color: var(--nav-panel) !important;
+}
+
+[data-theme='light'] .flexlayout__tab,
+[data-theme='light'] .flexlayout__tab_button,
+[data-theme='light'] .flexlayout__tab_button_stretch {
+  color: var(--nav-text) !important;
+}
+
+[data-theme='light'] .flexlayout__tabset_header,
+[data-theme='light'] .flexlayout__splitter {
+  border-color: var(--nav-border) !important;
+  background-color: var(--nav-border) !important;
+}
+
+[data-theme='light'] .flexlayout__tab_button:hover,
+[data-theme='light'] .flexlayout__tab_button_stretch:hover {
+  background-color: var(--nav-hover) !important;
+}
+
+[data-theme='light'] .flexlayout__tab_button {
+  background-color: var(--nav-dark) !important;
+}
+
+[data-theme='light'] .flexlayout__tab_selected {
+  background-color: var(--nav-accent) !important;
+  background-image: linear-gradient(var(--nav-accent), var(--nav-accent)) !important;
+  color: #ffffff !important;
+}
+[data-theme='light'] .flexlayout__tab_button.flexlayout__tab_button_top.flexlayout__tab_button--selected {
+  background-color: var(--nav-panel) !important;
+  background-image: linear-gradient(#fbfbfb, var(--nav-panel)) !important;
+  color: var(--nav-text) !important;
+}
+
+[data-theme='light'] .panel-navigation-overlay {
+  background: var(--nav-panel);
+  color: var(--nav-text);
+  border-color: var(--nav-border);
+}
+
+[data-theme='light'] .panel-navigation-overlay .pno-title,
+[data-theme='light'] .panel-navigation-overlay .pno-label {
+  color: var(--nav-text-strong);
+}
+
+[data-theme='light'] .panel-navigation-overlay .pno-panel-count,
+[data-theme='light'] .panel-navigation-overlay .pno-key {
+  background: var(--nav-hover);
+  border-color: var(--nav-border);
+  color: var(--nav-text);
+}
+
+[data-theme='light'] .app-titlebar-menu-item {
+  color: var(--nav-text);
+}
+
+[data-theme='light'] .app-titlebar-menu-item:hover,
+[data-theme='light'] .app-titlebar-menu-item:focus-visible {
+  background-color: var(--nav-hover);
+  color: var(--nav-text-strong);
+}

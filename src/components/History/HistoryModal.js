@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { ConfigProvider, Modal, Input, Button, Typography, Empty, Spin, Space, Popconfirm, List, Avatar } from 'antd';
+import { Modal, Input, Button, Typography, Empty, Spin, Space, Popconfirm, List, Avatar } from 'antd';
 import { SearchOutlined, DeleteOutlined, GlobalOutlined, ClearOutlined } from '@ant-design/icons';
-import { darkTheme } from '../BrowserPanel/utils/theme';
 
 const { Text } = Typography;
 
@@ -76,8 +75,7 @@ const HistoryModal = ({ visible, onClose }) => {
   };
 
   return (
-    <ConfigProvider theme={darkTheme}>
-      <Modal
+    <Modal
         title="Histórico de navegação"
         open={visible}
         onCancel={onClose}
@@ -165,8 +163,7 @@ const HistoryModal = ({ visible, onClose }) => {
           )}
         />
       )}
-      </Modal>
-    </ConfigProvider>
+    </Modal>
   );
 };
 

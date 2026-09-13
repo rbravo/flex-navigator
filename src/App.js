@@ -3,6 +3,7 @@ import { Layout } from 'flexlayout-react';
 import { ConfigProvider } from 'antd';
 import 'flexlayout-react/style/dark.css'; // ou 'light.css' se preferir tema claro
 import './App.css';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 // Hooks customizados
 import useFlexLayoutModel from './hooks/useFlexLayoutModel';
@@ -44,6 +45,7 @@ import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWeb
 
 // Componente interno do App que usa o hook de notificação
 const AppContent = () => {
+  const { antdTheme } = useTheme();
   // Gerenciar modelo do FlexLayout
   const { model, loadConfiguration } = useFlexLayoutModel();
 
@@ -391,6 +393,7 @@ const AppContent = () => {
 
   return (
     <ConfigProvider
+      theme={antdTheme}
       getPopupContainer={() => document.body}
     >
       <div className="App">
@@ -473,9 +476,11 @@ const AppContent = () => {
 // Componente principal com Provider de notificação
 const App = () => {
   return (
-    <NotificationProvider>
-      <AppContent />
-    </NotificationProvider>
+    <ThemeProvider>
+      <NotificationProvider>
+        <AppContent />
+      </NotificationProvider>
+    </ThemeProvider>
   );
 };
 

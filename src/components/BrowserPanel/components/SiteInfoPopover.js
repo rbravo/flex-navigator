@@ -61,7 +61,7 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
         <div>
           <Space>
             <LockOutlined style={{ color: '#52c41a' }} />
-            <Text style={{ color: '#cccccc' }}>Conexão segura (HTTPS)</Text>
+            <Text style={{ color: 'var(--nav-text)' }}>Conexão segura (HTTPS)</Text>
           </Space>
           {cert ? (
             <div style={{ marginTop: 8, fontSize: 12, color: '#a0a0a0' }}>
@@ -82,7 +82,7 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
       return (
         <Space>
           <WarningOutlined style={{ color: '#faad14' }} />
-          <Text style={{ color: '#cccccc' }}>Conexão não é segura (HTTP)</Text>
+          <Text style={{ color: 'var(--nav-text)' }}>Conexão não é segura (HTTP)</Text>
         </Space>
       );
     }
@@ -91,23 +91,23 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
   };
 
   const content = (
-    <div style={{ width: '300px', backgroundColor: '#2d2d30' }}>
+    <div style={{ width: '300px', backgroundColor: 'var(--nav-panel)' }}>
       {loading || !siteInfo ? (
         <Spin size="small" />
       ) : (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           {renderSecuritySummary()}
 
-          <Divider style={{ margin: 0, backgroundColor: '#3e3e42' }} />
+          <Divider style={{ margin: 0, backgroundColor: 'var(--nav-border)' }} />
 
           <div>
-            <Text style={{ color: '#cccccc', fontSize: '13px', fontWeight: 500 }}>
+            <Text style={{ color: 'var(--nav-text)', fontSize: '13px', fontWeight: 500 }}>
               Permissões para este site
             </Text>
             <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {siteInfo.permissions.map(({ permission, granted }) => (
                 <div key={permission} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <Text style={{ color: '#cccccc', fontSize: 12 }}>{PERMISSION_LABELS[permission] || permission}</Text>
+                  <Text style={{ color: 'var(--nav-text)', fontSize: 12 }}>{PERMISSION_LABELS[permission] || permission}</Text>
                   <Select
                     size="small"
                     value={decisionToOption(granted)}
@@ -128,7 +128,7 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
   const title = (
     <Space>
       <GlobalOutlined style={{ color: '#007acc' }} />
-      <Text style={{ color: '#cccccc' }}>{siteInfo?.hostname || 'Informações do site'}</Text>
+      <Text style={{ color: 'var(--nav-text)' }}>{siteInfo?.hostname || 'Informações do site'}</Text>
     </Space>
   );
 
@@ -140,10 +140,10 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
       placement="bottomLeft"
       open={open}
       onOpenChange={handleOpenChange}
-      overlayStyle={{ backgroundColor: '#2d2d30' }}
+      overlayStyle={{ backgroundColor: 'var(--nav-panel)' }}
       overlayInnerStyle={{
-        backgroundColor: '#2d2d30',
-        border: '1px solid #3e3e42',
+        backgroundColor: 'var(--nav-panel)',
+        border: '1px solid var(--nav-border)',
         borderRadius: '6px'
       }}
     >

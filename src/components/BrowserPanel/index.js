@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ConfigProvider } from 'antd';
 import { Actions } from 'flexlayout-react';
-import { darkTheme } from './utils/theme';
+import { useTheme } from '../../context/ThemeContext';
 import { extractDomainOrTitle, processUrl } from './utils/urlUtils';
 import { consumeUrlBarFocusRequest } from '../../utils/tabActions';
 import { layoutEventEmitter, LAYOUT_EVENTS } from '../../utils/layoutEventEmitter';
@@ -28,6 +28,7 @@ const getHostname = (urlString) => {
  * Componente principal do painel de navegação
  */
 const BrowserPanel = ({ node, model, initialUrl }) => {
+  const { antdTheme } = useTheme();
   const [url, setUrl] = useState(initialUrl);
   const [initialWebviewUrl] = useState(initialUrl); // URL inicial fixa para webview
   const [currentUrl, setCurrentUrl] = useState(initialUrl);
@@ -467,7 +468,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   }, [node, model]);
 
   return (
-    <ConfigProvider theme={darkTheme}>
+    <ConfigProvider theme={antdTheme}>
       <div className="browser-panel">
         {!hideNavigationBar && (
           <ControlsBar
@@ -508,7 +509,7 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
           className="content-area"
           style={
             deviceDimensions
-              ? { backgroundColor: '#2d2d30', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }
+              ? { backgroundColor: 'var(--nav-panel)', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }
               : undefined
           }
         >
@@ -559,8 +560,8 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
                       height: deviceDimensions.height * deviceZoom,
                       position: 'relative',
                       overflow: 'hidden',
-                      backgroundColor: 'white',
-                      boxShadow: '0 0 0 1px #3e3e42',
+                      backgroundColor: 'var(--nav-content)',
+                      boxShadow: '0 0 0 1px var(--nav-border)',
                       flexShrink: 0
                     }
                   : { width: '100%', height: '100%', position: 'relative' }

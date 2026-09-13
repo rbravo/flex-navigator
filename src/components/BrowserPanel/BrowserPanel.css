@@ -14,15 +14,6 @@
 }
 
 /* Cores customizadas */
-:root {
-  --nav-dark: #1e1e1e;
-  --nav-panel: #2d2d30;
-  --nav-border: #3e3e42;
-  --nav-accent: #007acc;
-  --nav-text: #cccccc;
-  --nav-hover: #383838;
-}
-
 /* Estilo para compatibilidade com FlexLayout */
 .browser-panel {
   display: flex;
@@ -64,7 +55,7 @@
 .content-area {
   flex: 1;
   position: relative;
-  background-color: white;
+  background-color: var(--nav-content);
   /* Sempre em flex + centralizado: no tamanho normal o filho preenche 100%
      (visualmente idêntico ao layout de bloco antigo); no modo de dimensões
      (ver BrowserPanel/index.js) o filho vira um tamanho fixo menor,
