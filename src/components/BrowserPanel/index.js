@@ -13,6 +13,7 @@ import ControlsBar from './components/ControlsBar';
 import WebContent from './components/WebContent';
 import LoadingBar from './components/LoadingBar';
 import FindInPageBar from './components/FindInPageBar';
+import DeviceToolbar from './components/DeviceToolbar';
 import './BrowserPanel.css';
 
 const getHostname = (urlString) => {
@@ -39,10 +40,22 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
   const [zoomFactor, setZoomFactor] = useState(ZOOM_DEFAULT);
   const [findBarVisible, setFindBarVisible] = useState(false);
   const [findMatches, setFindMatches] = useState({ activeMatchOrdinal: 0, matches: 0 });
+  // Dimensões de emulação (celular/tablet/personalizado) - null = tamanho
+  // normal (webview preenche o painel). Só encolhe a webview visualmente,
+  // não afeta o tamanho do painel/tabset; cada aba tem a sua própria, pra
+  // permitir testar vários tamanhos ao mesmo tempo em painéis diferentes.
+  const [deviceDimensions, setDeviceDimensions] = useState(null);
+  // Escala visual (CSS transform) do "quadro" do dispositivo - só encolhe a
+  // representação visual, a página continua enxergando o viewport real do
+  // dispositivo escolhido (mesma ideia do "device toolbar" do Chrome
+  // DevTools). Útil quando a altura do dispositivo escolhido não cabe no
+  // painel disponível.
+  const [deviceZoom, setDeviceZoom] = useState(1);
 
   const webviewRef = useRef(null);
   const iframeRef = useRef(null);
   const urlInputRef = useRef(null);
+  const deviceAreaRef = useRef(null);
 
   // Função de refresh que será usada pelo auto-refresh
   const handleRefresh = useCallback(() => {
@@ -286,6 +299,41 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
 
   const handleOpenFind = useCallback(() => setFindBarVisible(true), []);
 
+  const handleApplyDeviceDimensions = useCallback((dimensions) => {
+    setDeviceDimensions(dimensions);
+  }, []);
+
+  const handleResetDeviceDimensions = useCallback(() => setDeviceDimensions(null), []);
+
+  // Calcula o maior zoom que faz o dispositivo escolhido caber por inteiro
+  // na área disponível (a mesma ideia do "Ajustar" do device toolbar do
+  // Chrome) - nunca amplia além de 100%, só reduz quando necessário.
+  const handleFitZoom = useCallback(() => {
+    if (!deviceDimensions || !deviceAreaRef.current) return;
+    const { clientWidth, clientHeight } = deviceAreaRef.current;
+    const padding = 24;
+    const scaleX = (clientWidth - padding) / deviceDimensions.width;
+    const scaleY = (clientHeight - padding) / deviceDimensions.height;
+    const fit = Math.min(scaleX, scaleY, 1);
+    setDeviceZoom(Math.max(0.1, Math.round(fit * 100) / 100));
+  }, [deviceDimensions]);
+
+  // Toda vez que um dispositivo é escolhido (preset novo, personalizado, ou
+  // trocado direto na barra acima da webview), recalcula o zoom pra caber
+  // na área disponível automaticamente - resolve exatamente o problema de o
+  // dispositivo escolhido ser mais alto que o painel disponível. Roda no
+  // próximo frame porque a área (deviceAreaRef) só assume o tamanho novo
+  // (com a barrinha de dispositivo ocupando espaço) depois que esse mesmo
+  // render commitar.
+  useEffect(() => {
+    if (!deviceDimensions) {
+      setDeviceZoom(1);
+      return undefined;
+    }
+    const frame = requestAnimationFrame(handleFitZoom);
+    return () => cancelAnimationFrame(frame);
+  }, [deviceDimensions, handleFitZoom]);
+
   const handleCloseFind = useCallback(async () => {
     setFindBarVisible(false);
     setFindMatches({ activeMatchOrdinal: 0, matches: 0 });
@@ -450,29 +498,108 @@ const BrowserPanel = ({ node, model, initialUrl }) => {
             onZoomOut={handleZoomOut}
             onZoomReset={handleZoomReset}
             onOpenFind={handleOpenFind}
+            deviceDimensions={deviceDimensions}
+            onApplyDeviceDimensions={handleApplyDeviceDimensions}
+            onResetDeviceDimensions={handleResetDeviceDimensions}
           />
         )}
 
-        <div className="content-area">
-          <LoadingBar
-            isLoading={isLoading}
-            loadingComplete={loadingComplete}
-          />
-          <WebContent
-            isElectron={isElectron}
-            currentUrl={initialWebviewUrl} // Usa URL inicial fixa
-            webviewRef={webviewRef}
-            iframeRef={iframeRef}
-            nodeId={node.getId()}
-            setIsLoading={setIsLoading}
-            setLoadingComplete={setLoadingComplete}
-          />
-          <FindInPageBar
-            visible={findBarVisible}
-            onClose={handleCloseFind}
-            onFind={handleFind}
-            matches={findMatches}
-          />
+        <div
+          className="content-area"
+          style={
+            deviceDimensions
+              ? { backgroundColor: '#2d2d30', flexDirection: 'column', alignItems: 'stretch', justifyContent: 'flex-start' }
+              : undefined
+          }
+        >
+          {deviceDimensions && (
+            <DeviceToolbar
+              activeDimensions={deviceDimensions}
+              deviceZoom={deviceZoom}
+              onSelectDevice={handleApplyDeviceDimensions}
+              onChangeZoom={setDeviceZoom}
+              onFitZoom={handleFitZoom}
+              onClose={handleResetDeviceDimensions}
+            />
+          )}
+
+          <div
+            ref={deviceAreaRef}
+            style={
+              deviceDimensions
+                ? {
+                    position: 'relative',
+                    flex: 1,
+                    minHeight: 0,
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden'
+                  }
+                : { position: 'relative', width: '100%', height: '100%' }
+            }
+          >
+            <LoadingBar
+              isLoading={isLoading}
+              loadingComplete={loadingComplete}
+            />
+
+            {/* A estrutura dos 2 wrappers abaixo é sempre a mesma, com ou
+                sem dimensão ativa - só o estilo muda. Isso é proposital:
+                mudar a ESTRUTURA (ex.: renderizar WebContent direto num
+                caso e dentro de wrappers no outro) faria o React desmontar
+                e remontar a <webview>, recarregando a página, toda vez que
+                o usuário liga/desliga o modo de dimensões. */}
+            <div
+              style={
+                deviceDimensions
+                  ? {
+                      width: deviceDimensions.width * deviceZoom,
+                      height: deviceDimensions.height * deviceZoom,
+                      position: 'relative',
+                      overflow: 'hidden',
+                      backgroundColor: 'white',
+                      boxShadow: '0 0 0 1px #3e3e42',
+                      flexShrink: 0
+                    }
+                  : { width: '100%', height: '100%', position: 'relative' }
+              }
+            >
+              <div
+                style={
+                  deviceDimensions
+                    ? {
+                        width: deviceDimensions.width,
+                        height: deviceDimensions.height,
+                        transform: `scale(${deviceZoom})`,
+                        transformOrigin: 'top left',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0
+                      }
+                    : { width: '100%', height: '100%' }
+                }
+              >
+                <WebContent
+                  isElectron={isElectron}
+                  currentUrl={initialWebviewUrl} // Usa URL inicial fixa
+                  webviewRef={webviewRef}
+                  iframeRef={iframeRef}
+                  nodeId={node.getId()}
+                  setIsLoading={setIsLoading}
+                  setLoadingComplete={setLoadingComplete}
+                />
+              </div>
+            </div>
+
+            <FindInPageBar
+              visible={findBarVisible}
+              onClose={handleCloseFind}
+              onFind={handleFind}
+              matches={findMatches}
+            />
+          </div>
         </div>
       </div>
     </ConfigProvider>

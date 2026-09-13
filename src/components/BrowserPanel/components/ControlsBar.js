@@ -19,6 +19,7 @@ import {
   MoreOutlined,
   ZoomInOutlined,
   HistoryOutlined,
+  MobileOutlined,
   LayoutOutlined,
   SaveOutlined,
   ClearOutlined,
@@ -29,6 +30,7 @@ import AutoRefreshSettings from './AutoRefreshSettings';
 import ShortcutsSettings from './ShortcutsSettings';
 import SiteInfoPopover from './SiteInfoPopover';
 import DownloadsPopover from './DownloadsPopover';
+import DimensionsPopover from './DimensionsPopover';
 import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
 
 /**
@@ -64,7 +66,11 @@ const ControlsBar = ({
   onZoomIn,
   onZoomOut,
   onZoomReset,
-  onOpenFind
+  onOpenFind,
+  // Props para dimensões da webview (emulação de tela de celular/tablet)
+  deviceDimensions,
+  onApplyDeviceDimensions,
+  onResetDeviceDimensions
 }) => {
   const { Text } = Typography;
   const [menuOpen, setMenuOpen] = useState(false);
@@ -256,6 +262,26 @@ const ControlsBar = ({
       {/* Seção de Extensions */}
       <div className="extensions-section">
         <Space size="small">
+
+          <DimensionsPopover
+            activeDimensions={deviceDimensions}
+            onApply={onApplyDeviceDimensions}
+            onReset={onResetDeviceDimensions}
+          >
+            <Tooltip title="Dimensões" placement={'bottom'}>
+              <Button
+                type="text"
+                icon={<MobileOutlined />}
+                size="small"
+                style={{
+                  color: deviceDimensions ? '#007acc' : '#cccccc',
+                  borderColor: '#3e3e42',
+                  backgroundColor: '#2d2d30',
+                  border: '1px solid transparent'
+                }}
+              />
+            </Tooltip>
+          </DimensionsPopover>
 
           <DownloadsPopover>
             <Tooltip title="Downloads" placement={'bottom'}>

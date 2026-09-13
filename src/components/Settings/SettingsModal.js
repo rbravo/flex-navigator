@@ -4,6 +4,7 @@ import { CheckCircleOutlined } from '@ant-design/icons';
 import { getUserSettings, saveUserSettings } from '../../utils/userSettings';
 import { useAutoUpdater } from '../../hooks/useAutoUpdater';
 import PermissionsSettingsTab from './PermissionsSettingsTab';
+import DimensionsSettingsTab from './DimensionsSettingsTab';
 
 const { Title, Text } = Typography;
 
@@ -94,7 +95,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
       title="Configurações"
       open={visible}
       onCancel={handleCancel}
-      width={500}
+      width={560}
       footer={[
         <Button key="cancel" onClick={handleCancel}>
           Cancelar
@@ -187,6 +188,11 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
             key: 'permissions',
             label: 'Permissões',
             children: <PermissionsSettingsTab key={openCount} />
+          },
+          {
+            key: 'dimensions',
+            label: 'Dimensões',
+            children: <DimensionsSettingsTab key={openCount} />
           }
         ]}
       />

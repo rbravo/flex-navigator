@@ -65,6 +65,33 @@
   flex: 1;
   position: relative;
   background-color: white;
+  /* Sempre em flex + centralizado: no tamanho normal o filho preenche 100%
+     (visualmente idêntico ao layout de bloco antigo); no modo de dimensões
+     (ver BrowserPanel/index.js) o filho vira um tamanho fixo menor,
+     "flutuando" centralizado sobre o fundo padrão do app. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Barra de dispositivo (modo de dimensões): dropdown de aparelho + zoom,
+   acima da webview - ver DeviceToolbar.js */
+.device-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background-color: var(--nav-panel);
+  border-bottom: 1px solid var(--nav-border);
+  flex-shrink: 0;
+}
+
+.device-toolbar-inner {
+  flex: 1;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* Indicador de loading moderno - barra de progresso no topo */
@@ -93,27 +120,35 @@
   0% {
     width: 0%;
   }
+
   15% {
     width: 25%;
   }
+
   30% {
     width: 45%;
   }
+
   50% {
     width: 65%;
   }
+
   70% {
     width: 78%;
   }
+
   85% {
     width: 87%;
   }
+
   95% {
     width: 92%;
   }
+
   98% {
     width: 95%;
   }
+
   100% {
     width: 97%;
   }
@@ -123,6 +158,7 @@
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
@@ -137,6 +173,7 @@
   0% {
     width: 97%;
   }
+
   100% {
     width: 100%;
     opacity: 0;
@@ -335,31 +372,31 @@ iframe {
     flex-wrap: wrap;
     gap: 4px;
   }
-  
+
   .url-form {
     order: 1;
     width: 100%;
     margin-top: 4px;
   }
-  
+
   /* Ajustes para controles em telas pequenas */
   .browser-panel .ant-space-item {
     margin-right: 4px !important;
   }
-  
+
   .browser-panel .ant-btn {
     min-width: 28px !important;
     height: 28px !important;
   }
-  
+
   .fallback-container {
     padding: 16px;
   }
-  
+
   .fallback-icon {
     font-size: 48px;
   }
-  
+
   .fallback-title {
     font-size: 20px;
   }
