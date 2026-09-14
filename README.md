@@ -62,6 +62,26 @@ To build the application for distribution:
 npm run dist
 ```
 
+To build only the macOS packages from a Mac:
+```bash
+npm run dist:mac
+```
+
+To build and publish the macOS release to GitHub Releases:
+```bash
+npm run distpub:mac
+```
+
+The macOS target generates DMG packages for both Intel (`x64`) and Apple
+Silicon (`arm64`), as configured in `electron-builder.json`. Run the macOS
+command on macOS itself, or from a macOS GitHub Actions runner. The
+`distpub:mac` script reads `GH_TOKEN` from `.env`, just like the Windows
+`distpub` script.
+
+Unsigned builds can be generated and published, but macOS may show a
+Gatekeeper warning when users open them. Automatic updates on macOS generally
+require code signing and notarization.
+
 This generates distributable files under `dist/` for the current package version (`1.0.6`), including:
 - **Windows**: installer and portable executable
 - **macOS**: DMG package
@@ -149,6 +169,8 @@ electron.js                   # Electron main process entry point
 - `npm run dev` - Start both React and Electron in development mode
 - `npm run build` - Build React app for production
 - `npm run dist` - Create distributable Electron packages
+- `npm run dist:mac` - Create macOS DMG packages without publishing
+- `npm run distpub:mac` - Create and publish macOS DMG packages to GitHub
 - `npm test` - Run test suite
 
 #### Project Structure Guidelines

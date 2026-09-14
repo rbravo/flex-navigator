@@ -53,7 +53,9 @@
     "electron": "node scripts/start-electron.js",
     "pack": "electron-builder",
     "distpub": "npm run build && dotenv -e .env -- electron-builder --publish always",
-    "dist": "npm run build && electron-builder"
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "distpub:mac": "npm run build && dotenv -e .env -- electron-builder --mac --publish always"
   },
   "main": "electron.js",
   "homepage": "./",
