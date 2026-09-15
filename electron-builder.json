@@ -9,6 +9,7 @@
     "build/**/*",
     "node_modules/**/*",
     "src/electron/**/*",
+    "src/locales/**/*",
     "!src/electron/**/*.test.js",
     "!src/electron/**/*.spec.js"
   ],
@@ -64,7 +65,11 @@
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
-    "shortcutName": "Flex Navigator"
+    "shortcutName": "Flex Navigator",
+    "artifactName": "Flex-Navigator-Setup-${version}.${ext}"
+  },
+  "portable": {
+    "artifactName": "Flex-Navigator-${version}-portable.${ext}"
   },
   "extraMetadata": {
     "main": "electron.js"

@@ -93,9 +93,6 @@ class AutoUpdaterManager {
   }
 
   async showUpdateAvailableDialog(info) {
-    // Verificar se o auto-download está habilitado
-    const { isAutoDownloadEnabled } = require('../../utils/userSettings');
-    
     const result = await dialog.showMessageBox({
       type: 'info',
       title: t('updates.dialog.availableTitle'),
