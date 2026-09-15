@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flex Navigator — O navegador multi-painel para quem faz muita coisa ao mesmo tempo</title>
+<meta name="description" content="Flex Navigator é um navegador desktop gratuito e de código aberto que deixa você dividir a tela em painéis flexíveis, cada um com suas próprias abas. Windows, macOS e Linux.">
+<link rel="icon" href="assets/favicon.ico">
+<meta property="og:title" content="Flex Navigator — o navegador multi-painel">
+<meta property="og:description" content="Divida a tela em quantos painéis quiser e navegue em várias coisas ao mesmo tempo.">
+<meta property="og:image" content="assets/screenshots/01-hero-tabs.jpg">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#3b5bfd;
+    --accent-dark:#2c46d6;
+    --ink:#12162b;
+    --ink-soft:#4b5169;
+    --bg:#ffffff;
+    --bg-soft:#f5f6fb;
+    --border:#e6e8f2;
+    --card:#ffffff;
+    --shadow:0 20px 45px -20px rgba(18,22,43,.25);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:0 0;
+  }
+  img{max-width:100%;display:block;}
+  a{color:inherit;}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:24px;}
+
+  /* ---------- Header ---------- */
+  header.site{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-block:14px;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.05rem;letter-spacing:-.02em;text-decoration:none;}
+  .brand img{width:30px;height:30px;}
+  .nav-links{display:flex;align-items:center;gap:28px;font-size:.92rem;font-weight:500;color:var(--ink-soft);}
+  .nav-links a{text-decoration:none;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{display:flex;align-items:center;gap:12px;}
+  .icon-btn{
+    display:flex;align-items:center;justify-content:center;
+    width:36px;height:36px;border-radius:9px;border:1px solid var(--border);
+    color:var(--ink-soft);text-decoration:none;
+  }
+  .icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 20px;border-radius:10px;font-weight:600;font-size:.92rem;
+    text-decoration:none;border:1px solid transparent;cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 10px 24px -10px rgba(59,91,253,.65);}
+  .btn-primary:hover{background:var(--accent-dark);transform:translateY(-1px);}
+  .btn-ghost{background:var(--bg-soft);color:var(--ink);border-color:var(--border);}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-sm{padding:8px 14px;font-size:.85rem;border-radius:8px;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:76px 0 40px;
+    background:
+      radial-gradient(900px 420px at 15% -10%, #eef1ff 0%, rgba(238,241,255,0) 60%),
+      radial-gradient(700px 420px at 100% 0%, #eef6ff 0%, rgba(238,246,255,0) 55%);
+  }
+  .hero-inner{text-align:center;max-width:760px;margin:0 auto;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;border-radius:999px;background:var(--bg-soft);
+    border:1px solid var(--border);font-size:.8rem;font-weight:600;color:var(--accent-dark);
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#22c55e;}
+  h1{
+    font-size:clamp(2.1rem, 4.4vw, 3.4rem);
+    line-height:1.08;letter-spacing:-.03em;font-weight:800;margin:0 0 20px;
+  }
+  h1 .accent{color:var(--accent);}
+  .hero p.lead{
+    font-size:clamp(1.02rem,1.6vw,1.18rem);
+    color:var(--ink-soft);line-height:1.6;margin:0 0 34px;
+  }
+  .hero-ctas{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .hero-meta{font-size:.82rem;color:var(--ink-soft);margin-bottom:56px;}
+  .hero-meta a{color:var(--accent);text-decoration:none;font-weight:600;}
+
+  .hero-shot{
+    max-width:1080px;margin:0 auto;border-radius:16px;overflow:hidden;
+    border:1px solid var(--border);box-shadow:var(--shadow);
+    background:var(--bg-soft);
+  }
+  .hero-shot img{width:100%;}
+
+  /* ---------- Sections ---------- */
+  section{padding:88px 0;}
+  .section-head{max-width:640px;margin:0 auto 52px;text-align:center;}
+  .kicker{
+    text-transform:uppercase;letter-spacing:.12em;font-size:.75rem;font-weight:700;
+    color:var(--accent);margin-bottom:12px;
+  }
+  h2{font-size:clamp(1.6rem,2.6vw,2.2rem);letter-spacing:-.02em;margin:0 0 14px;font-weight:800;}
+  .section-head p{color:var(--ink-soft);font-size:1.02rem;line-height:1.6;margin:0;}
+
+  /* ---------- Gallery ---------- */
+  .gallery{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:24px;
+  }
+  .gcard{
+    border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--card);
+    box-shadow:0 10px 30px -18px rgba(18,22,43,.18);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .gcard:hover{transform:translateY(-4px);box-shadow:0 18px 36px -18px rgba(18,22,43,.28);}
+  .gcard .shot{border-bottom:1px solid var(--border);background:var(--bg-soft);}
+  .gcard .shot img{width:100%;}
+  .gcard .meta{padding:18px 20px 22px;}
+  .gcard .meta h3{margin:0 0 6px;font-size:1.05rem;letter-spacing:-.01em;}
+  .gcard .meta p{margin:0;color:var(--ink-soft);font-size:.9rem;line-height:1.55;}
+
+  /* ---------- Features ---------- */
+  .features{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:20px;
+  }
+  .fcard{
+    padding:22px;border-radius:14px;border:1px solid var(--border);background:var(--bg-soft);
+  }
+  .fcard .ico{
+    width:38px;height:38px;border-radius:10px;background:#fff;border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:var(--accent);
+  }
+  .fcard h3{margin:0 0 6px;font-size:.98rem;letter-spacing:-.01em;}
+  .fcard p{margin:0;color:var(--ink-soft);font-size:.87rem;line-height:1.55;}
+
+  /* ---------- Spotlight (two-up) ---------- */
+  .spotlight-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .spot{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--card);box-shadow:0 10px 30px -20px rgba(18,22,43,.2);}
+  .spot .shot img{width:100%;display:block;}
+  .spot .meta{padding:22px 24px 26px;}
+  .spot .meta h3{margin:0 0 8px;font-size:1.15rem;letter-spacing:-.01em;}
+  .spot .meta p{margin:0;color:var(--ink-soft);font-size:.92rem;line-height:1.6;}
+  .spot.dark{background:#12162b;}
+  .spot.dark .meta h3, .spot.dark .meta p{color:#fff;}
+  .spot.dark .meta p{color:#c7cae0;}
+
+  /* ---------- Download ---------- */
+  .download-panel{
+    border-radius:22px;padding:56px 40px;text-align:center;
+    background:linear-gradient(160deg,#12162b 0%, #1c2350 60%, #2c3aa0 130%);
+    color:#fff;
+  }
+  .download-panel h2{color:#fff;}
+  .download-panel .section-head p{color:#c7cae0;}
+  .platforms{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:760px;margin:36px auto 0;
+  }
+  .plat{
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    padding:24px 16px;border-radius:14px;background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.12);text-decoration:none;color:#fff;
+    transition:background .15s ease, transform .15s ease;
+  }
+  .plat:hover{background:rgba(255,255,255,.12);transform:translateY(-3px);}
+  .plat .pico{width:34px;height:34px;}
+  .plat .pname{font-weight:700;font-size:.95rem;}
+  .plat .pnote{font-size:.76rem;color:#c7cae0;}
+  .download-fine{margin-top:26px;font-size:.82rem;color:#a9adcf;}
+  .download-fine a{color:#fff;text-decoration:underline;}
+
+  /* ---------- Footer ---------- */
+  footer{border-top:1px solid var(--border);padding:36px 0;}
+  .foot-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;font-size:.85rem;color:var(--ink-soft);}
+  .foot-links{display:flex;gap:20px;flex-wrap:wrap;}
+  .foot-links a{text-decoration:none;}
+  .foot-links a:hover{color:var(--accent);}
+  .foot-stack a{text-decoration:underline;text-decoration-color:var(--border);text-underline-offset:2px;}
+  .foot-stack a:hover{color:var(--accent);text-decoration-color:currentColor;}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .gallery{grid-template-columns:1fr;}
+    .features{grid-template-columns:repeat(2,1fr);}
+    .spotlight-grid{grid-template-columns:1fr;}
+    .platforms{grid-template-columns:1fr;}
+    .nav-links{display:none;}
+  }
+  @media (max-width:520px){
+    .features{grid-template-columns:1fr;}
+    .hero{padding-top:52px;}
+    section{padding:64px 0;}
+    .download-panel{padding:40px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <img src="assets/icon.png" alt="">
+      Flex Navigator
+    </a>
+    <nav class="nav-links">
+      <a href="#recursos">Recursos</a>
+      <a href="#layouts">Layouts</a>
+      <a href="#download">Download</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="icon-btn" href="https://github.com/rbravo/flex-navigator" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      </a>
+      <a class="btn btn-primary btn-sm" href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">Baixar</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <span class="eyebrow"><span class="dot"></span> Gratuito e de código aberto</span>
+      <h1>O navegador que se organiza <span class="accent">do seu jeito.</span></h1>
+      <p class="lead">
+        Divida a tela em quantos painéis quiser, cada um com suas próprias abas, e navegue em
+        várias coisas ao mesmo tempo — pesquisa, documentação, painel de controle, o que precisar —
+        sem ficar alternando entre janelas.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">
+          ⤓ Baixar para Windows
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">
+          macOS e Linux
+        </a>
+      </div>
+      <div class="hero-meta">
+        Também disponível o código-fonte no <a href="https://github.com/rbravo/flex-navigator" target="_blank" rel="noopener">GitHub</a> · Licença MIT
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="hero-shot">
+        <img src="assets/screenshots/01-hero-tabs.jpg" alt="Flex Navigator com várias abas abertas em um único painel: GitHub, Wikipedia, Tailwind CSS, Figma e Vercel" loading="eager">
+      </div>
+    </div>
+  </section>
+
+  <!-- LAYOUTS / GALLERY -->
+  <section id="layouts">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Versatilidade</div>
+        <h2>Um layout para cada tarefa</h2>
+        <p>Arraste as bordas dos painéis para dividir a tela em linhas, colunas ou grades complexas. O layout fica salvo automaticamente, do jeito que você deixou.</p>
+      </div>
+      <div class="gallery">
+        <div class="gcard">
+          <div class="shot"><img src="assets/screenshots/02-split-horizontal.jpg" alt="Dois painéis lado a lado: documentação da MDN à esquerda e um repositório do GitHub à direita" loading="lazy"></div>
+          <div class="meta">
+            <h3>Pesquise e trabalhe lado a lado</h3>
+            <p>Documentação de um lado, código do outro — sem alternar entre abas para comparar as duas coisas.</p>
+          </div>
+        </div>
+        <div class="gcard">
+          <div class="shot"><img src="assets/screenshots/03-grid-2x2.jpg" alt="Grade 2x2 de painéis mostrando NASA, Figma, Stripe e Wikipedia ao mesmo tempo" loading="lazy"></div>
+          <div class="meta">
+            <h3>Monte seu próprio painel de controle</h3>
+            <p>Notícias, design, pagamentos e referência — quantos painéis fizerem sentido para o seu fluxo, todos visíveis ao mesmo tempo.</p>
+          </div>
+        </div>
+        <div class="gcard">
+          <div class="shot"><img src="assets/screenshots/04-vertical-stack.jpg" alt="Dois painéis empilhados verticalmente, um em cima do outro" loading="lazy"></div>
+          <div class="meta">
+            <h3>Empilhe na vertical</h3>
+            <p>Painéis um sobre o outro quando o conteúdo pede altura em vez de largura.</p>
+          </div>
+        </div>
+        <div class="gcard">
+          <div class="shot"><img src="assets/screenshots/07-device-emulation.jpg" alt="Painel emulando um iPhone SE dentro do próprio navegador, mostrando o site Tailwind CSS em formato mobile" loading="lazy"></div>
+          <div class="meta">
+            <h3>Teste em qualquer tamanho de tela</h3>
+            <p>Emule celulares e tablets com um clique, sem precisar de outra ferramenta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPOTLIGHT: TEMA + HISTÓRICO -->
+  <section>
+    <div class="wrap">
+      <div class="spotlight-grid">
+        <div class="spot dark">
+          <div class="shot"><img src="assets/screenshots/05-dark-theme.jpg" alt="Flex Navigator no tema escuro, com dois painéis abertos" loading="lazy"></div>
+          <div class="meta">
+            <h3>Do jeito que você prefere</h3>
+            <p>Tema claro, escuro ou automático — segue o sistema operacional e muda sem precisar reiniciar o app.</p>
+          </div>
+        </div>
+        <div class="spot">
+          <div class="shot"><img src="assets/screenshots/06-history-modal.jpg" alt="Modal de histórico de navegação do Flex Navigator, com campo de busca e lista de páginas visitadas" loading="lazy"></div>
+          <div class="meta">
+            <h3>Nunca perca uma aba</h3>
+            <p>Histórico local com busca, atalho de teclado e limpeza sob demanda — nada sai da sua máquina.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="recursos">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Recursos</div>
+        <h2>Preparado para uso pesado</h2>
+        <p>Tudo que se espera de um navegador de verdade, mais os controles que fazem diferença em um dia de trabalho.</p>
+      </div>
+      <div class="features">
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
+          </div>
+          <h3>Abas dinâmicas</h3>
+          <p>Crie, feche, duplique, silencie e reordene abas dentro de cada painel.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <h3>Localizar na página</h3>
+          <p>Busque termos na página atual com contagem de resultados e navegação entre eles.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+          </div>
+          <h3>Zoom por site</h3>
+          <p>De 25% a 500%, lembrado individualmente para cada origem que você visita.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+          </div>
+          <h3>Histórico de navegação</h3>
+          <p>Busque, abra, remova ou limpe seu histórico — armazenado localmente.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+          </div>
+          <h3>Gerenciador de downloads</h3>
+          <p>Pause, retome, cancele, abra ou mostre o arquivo na pasta — tudo pela barra de URL.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          </div>
+          <h3>Permissões por site</h3>
+          <p>Controle câmera, microfone, localização, notificações, MIDI e área de transferência por origem.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </div>
+          <h3>Bloqueio de pop-ups</h3>
+          <p>Bloqueados por padrão, liberados por site quando você realmente quiser.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.4 5.4 0 0 1 12 3Z"/></svg>
+          </div>
+          <h3>Temas adaptativos</h3>
+          <p>Automático, claro ou escuro — inclusive a barra de título e os menus nativos seguem junto.</p>
+        </div>
+        <div class="fcard">
+          <div class="ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z"/></svg>
+          </div>
+          <h3>Shell seguro</h3>
+          <p>Isolamento de contexto, sandbox nas webviews, filtro de navegação e CSP em produção.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="download">
+    <div class="wrap">
+      <div class="download-panel">
+        <div class="section-head">
+          <div class="kicker" style="color:#9fb0ff;">Download</div>
+          <h2>Rode no seu sistema operacional</h2>
+          <p>Instalador para Windows, DMG para macOS e AppImage para Linux — grátis, sem conta e sem telemetria.</p>
+        </div>
+        <div class="platforms">
+          <a class="plat" href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">
+            <svg class="pico" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5 10.4 4.5V11.4H3V5.5ZM11.3 4.4 21 3V11.3H11.3V4.4ZM3 12.4H10.4V19.4L3 18.4V12.4ZM11.3 12.4H21V20.9L11.3 19.6V12.4Z"/></svg>
+            <span class="pname">Windows</span>
+            <span class="pnote">Instalador ou versão portátil</span>
+          </a>
+          <a class="plat" href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">
+            <svg class="pico" viewBox="0 0 24 24" fill="currentColor"><path d="M16.36 1.43c.1 1-.28 1.98-.86 2.68-.6.72-1.6 1.28-2.58 1.2-.12-.97.34-1.98.9-2.62.63-.72 1.7-1.26 2.54-1.26Zm3.7 16.5c-.46 1.06-.68 1.53-1.27 2.47-.82 1.3-1.98 2.92-3.42 2.94-1.28.02-1.6-.82-3.34-.82-1.74 0-2.1.8-3.36.84-1.42.05-2.5-1.4-3.33-2.7-2.3-3.53-2.54-7.66-1.12-9.87.97-1.53 2.5-2.42 3.94-2.42 1.47 0 2.4.86 3.62.86 1.18 0 1.9-.87 3.62-.87 1.28 0 2.63.7 3.6 1.9-3.17 1.73-2.65 6.26.06 7.67Z"/></svg>
+            <span class="pname">macOS</span>
+            <span class="pnote">DMG · Intel e Apple Silicon</span>
+          </a>
+          <a class="plat" href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">
+            <svg class="pico" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 2c1.4 1.6 1.2 3.1.6 4.4-.4.9-.9 1.7-.6 2.8.5-.6 1.2-1 2-1 1.8 0 2.8 1.6 3.3 3.1.4 1.2.4 2.5-.2 3.6.6.2 1.1.7 1.3 1.4.3 1.1-.3 2.2-1.3 2.7-.2.9-.9 1.6-1.9 1.9-1 1-2.5 1.1-3.7.5-.6.5-1.4.7-2.2.6-1 1-2.6 1-3.7 0-1.6.4-3.1-.6-3.6-2-.9-.3-1.5-1.2-1.4-2.2-.7-.6-1-1.6-.6-2.5.3-.8 1-1.3 1.8-1.4-.3-1.1-.1-2.3.6-3.3.7-1.1 1.9-1.8 3.2-1.7-.1-1.3.3-2.6 1.2-3.5.7-.8 1.7-1.3 2.7-1.4Z"/></svg>
+            <span class="pname">Linux</span>
+            <span class="pnote">AppImage</span>
+          </a>
+        </div>
+        <div class="download-fine">
+          Prefere compilar você mesmo? Veja as instruções no
+          <a href="https://github.com/rbravo/flex-navigator#-instala%C3%A7%C3%A3o" target="_blank" rel="noopener">README do repositório</a>.
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-row">
+    <div>© <span id="year"></span> Flex Navigator · Licença MIT</div>
+    <div class="foot-links">
+      <a href="https://github.com/rbravo/flex-navigator" target="_blank" rel="noopener">Repositório</a>
+      <a href="https://github.com/rbravo/flex-navigator/issues" target="_blank" rel="noopener">Issues</a>
+      <a href="https://github.com/rbravo/flex-navigator/releases/latest" target="_blank" rel="noopener">Releases</a>
+    </div>
+    <div class="foot-stack">Feito com <a href="https://github.com/electron/electron" target="_blank" rel="noopener">Electron</a>, <a href="https://github.com/facebook/react" target="_blank" rel="noopener">React</a> e <a href="https://github.com/caplin/FlexLayout" target="_blank" rel="noopener">FlexLayout</a></div>
+  </div>
+</footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
