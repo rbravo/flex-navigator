@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Popover, Typography, Space, Button, InputNumber, Divider } from 'antd';
-import { UndoOutlined } from '@ant-design/icons';
+import { ColumnHeightOutlined, ColumnWidthOutlined, UndoOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
-import { getAllDevicePresets, DEVICE_CATEGORY_LABELS } from '../../../utils/devicePresets';
+import { getAllDevicePresets, getDeviceCategoryLabels } from '../../../utils/devicePresets';
 
 const { Text } = Typography;
 
@@ -23,6 +24,8 @@ const groupByCategory = (devices) => {
  * fundo padrão do app. Abre a partir do ícone na barra de URL.
  */
 const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => {
+  const { t } = useTranslation();
+  const deviceCategoryLabels = getDeviceCategoryLabels(t);
   const [open, setOpen] = useState(false);
   const [devices, setDevices] = useState([]);
   const [customWidth, setCustomWidth] = useState(activeDimensions?.width || 375);
@@ -66,7 +69,7 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
 
         <div>
           <Text style={{ color: '#a0a0a0', fontSize: 11, textTransform: 'uppercase' }}>
-            Tamanho personalizado
+            {t('dimensionsPopover.customSize')}
           </Text>
           <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
             <InputNumber
@@ -75,7 +78,7 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
               max={4000}
               value={customWidth}
               onChange={(value) => setCustomWidth(value || 100)}
-              addonAfter="L"
+              addonAfter={<ColumnWidthOutlined />}
               style={{ width: '50%' }}
             />
             <InputNumber
@@ -84,12 +87,12 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
               max={4000}
               value={customHeight}
               onChange={(value) => setCustomHeight(value || 100)}
-              addonAfter="A"
+              addonAfter={<ColumnHeightOutlined />}
               style={{ width: '50%' }}
             />
           </div>
           <Button size="small" primary block style={{ marginTop: 8 }} onClick={handleApplyCustom}>
-            Aplicar
+            {t('dimensionsPopover.apply')}
           </Button>
         </div>
 
@@ -100,7 +103,7 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
           .map((category) => (
             <div key={category}>
               <Text style={{ color: '#a0a0a0', fontSize: 11, textTransform: 'uppercase' }}>
-                {DEVICE_CATEGORY_LABELS[category]}
+                {deviceCategoryLabels[category]}
               </Text>
               <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column' }}>
                 {grouped[category].map((device) => {
@@ -138,11 +141,11 @@ const DimensionsPopover = ({ children, activeDimensions, onApply, onReset }) => 
       title={
         <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
           <Text style={{ color: 'var(--nav-text)' }}>
-            Dimensões {activeDimensions && `— ${activeDimensions.width}×${activeDimensions.height}`}
+            {t('dimensionsPopover.title')} {activeDimensions && `— ${activeDimensions.width}×${activeDimensions.height}`}
           </Text>
           {activeDimensions && (
             <Button size="small" icon={<UndoOutlined />} onClick={onReset}>
-              Resetar
+              {t('dimensionsPopover.reset')}
             </Button>
           )}
         </div>

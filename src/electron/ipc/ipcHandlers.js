@@ -1,7 +1,8 @@
 const { ipcMain, nativeTheme } = require('electron');
 const SessionManager = require('../utils/SessionManager');
 const { getHistoryManager } = require('../utils/HistoryManager');
-const { popupMenuItem } = require('../menu/applicationMenu');
+const { createMenu, popupMenuItem } = require('../menu/applicationMenu');
+const { setLocale } = require('../i18n');
 
 /**
  * Configura todos os manipuladores de eventos IPC
@@ -308,8 +309,19 @@ function setupIpcHandlers(mainWindow) {
   });
 
   // Abre o submenu nativo correspondente a um item da barra de título customizada
-  ipcMain.on('popup-app-menu', (event, { label, x, y }) => {
-    popupMenuItem(mainWindow, label, x, y);
+  ipcMain.on('popup-app-menu', (event, { menuId, x, y }) => {
+    popupMenuItem(mainWindow, menuId, x, y);
+  });
+
+  // Idioma do app: o renderer resolve o modo (auto/pt-BR/en/es) salvo nas
+  // Configurações e manda o idioma já resolvido pra cá, pra reconstruir o
+  // menu nativo (que não tem acesso ao i18next do renderer) com os labels
+  // traduzidos - mesma ideia do set-title-bar-theme para o tema.
+  ipcMain.on('set-app-language', (event, locale) => {
+    setLocale(locale);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      createMenu(mainWindow);
+    }
   });
 
   // Handlers para a tela de Histórico de navegação

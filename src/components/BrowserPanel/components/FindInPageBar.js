@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Input, Button, Typography } from 'antd';
 import { UpOutlined, DownOutlined, CloseOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -12,6 +13,7 @@ const { Text } = Typography;
  * webview).
  */
 const FindInPageBar = ({ visible, onClose, onFind, matches }) => {
+  const { t } = useTranslation();
   const [text, setText] = useState('');
   const inputRef = useRef(null);
 
@@ -72,7 +74,7 @@ const FindInPageBar = ({ visible, onClose, onFind, matches }) => {
       <Input
         ref={inputRef}
         size="small"
-        placeholder="Buscar na página"
+        placeholder={t('findInPage.placeholder')}
         value={text}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

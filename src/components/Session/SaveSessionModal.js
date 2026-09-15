@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Input, Form, message } from 'antd';
 import { Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Modal para salvar os painéis (abas + posicionamento) atuais
  */
 const SaveSessionModal = ({ isVisible, onSave, onCancel, existingSessions = [] }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [sessionName, setSessionName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,14 +24,14 @@ const SaveSessionModal = ({ isVisible, onSave, onCancel, existingSessions = [] }
     try {
       await form.validateFields();
       setIsLoading(true);
-      
+
       const result = await onSave(sessionName.trim());
-      
+
       if (result.success) {
-        message.success(`Painéis "${sessionName}" salvos com sucesso!`);
+        message.success(t('session.save.successMessage', { name: sessionName }));
         onCancel(); // Fechar modal
       } else {
-        message.error(`Erro ao salvar painéis: ${result.error}`);
+        message.error(t('session.save.errorMessage', { error: result.error }));
       }
     } catch (error) {
       console.error('Erro na validação do formulário:', error);
@@ -40,15 +42,15 @@ const SaveSessionModal = ({ isVisible, onSave, onCancel, existingSessions = [] }
 
   const validateSessionName = (_, value) => {
     if (!value || !value.trim()) {
-      return Promise.reject(new Error('Por favor, digite um nome para os painéis'));
+      return Promise.reject(new Error(t('session.save.nameRequired')));
     }
 
     if (value.trim().length < 2) {
-      return Promise.reject(new Error('O nome deve ter pelo menos 2 caracteres'));
+      return Promise.reject(new Error(t('session.save.nameTooShort')));
     }
 
     if (value.trim().length > 50) {
-      return Promise.reject(new Error('O nome não pode ter mais de 50 caracteres'));
+      return Promise.reject(new Error(t('session.save.nameTooLong')));
     }
 
     // Um nome já usado é permitido (sobrescreve o painel salvo existente,
@@ -62,22 +64,21 @@ const SaveSessionModal = ({ isVisible, onSave, onCancel, existingSessions = [] }
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Save size={18} />
-          <span>Salvar Painéis Atuais</span>
+          <span>{t('session.save.title')}</span>
         </div>
       }
       open={isVisible}
       onOk={handleSave}
       onCancel={onCancel}
       confirmLoading={isLoading}
-      okText="Salvar"
-      cancelText="Cancelar"
+      okText={t('session.save.ok')}
+      cancelText={t('session.save.cancel')}
       width={480}
       destroyOnClose
     >
       <div style={{ margin: '20px 0' }}>
         <p style={{ marginBottom: '16px', color: '#666' }}>
-          Salve a configuração atual dos painéis (abas abertas, posicionamento e
-          tamanhos) para poder restaurá-la posteriormente.
+          {t('session.save.description')}
         </p>
 
         <Form
@@ -86,13 +87,13 @@ const SaveSessionModal = ({ isVisible, onSave, onCancel, existingSessions = [] }
           onFinish={handleSave}
         >
           <Form.Item
-            label="Nome dos Painéis"
+            label={t('session.save.nameLabel')}
             name="sessionName"
             rules={[{ validator: validateSessionName }]}
             validateTrigger={['onChange', 'onBlur']}
           >
             <Input
-              placeholder="Digite um nome para identificar estes painéis..."
+              placeholder={t('session.save.namePlaceholder')}
               value={sessionName}
               onChange={(e) => setSessionName(e.target.value)}
               onPressEnter={handleSave}
@@ -115,7 +116,7 @@ const SaveSessionModal = ({ isVisible, onSave, onCancel, existingSessions = [] }
             fontSize: '13px',
             color: '#d46b08'
           }}>
-            ⚠️ Painéis salvos com este nome já existem e serão sobrescritos.
+            {t('session.save.overwriteWarning')}
           </div>
         )}
       </div>

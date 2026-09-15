@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { Select, Button, Tooltip, Typography } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
-import { getAllDevicePresets, DEVICE_CATEGORY_LABELS } from '../../../utils/devicePresets';
+import { useTranslation } from 'react-i18next';
+import { getAllDevicePresets, getDeviceCategoryLabels } from '../../../utils/devicePresets';
 
 const { Text } = Typography;
 
@@ -23,6 +24,8 @@ const presetKey = (device) => `${device.name}:${device.width}:${device.height}`;
  * toolbar do Chrome DevTools).
  */
 const DeviceToolbar = ({ activeDimensions, deviceZoom, onSelectDevice, onChangeZoom, onFitZoom, onClose }) => {
+  const { t } = useTranslation();
+  const deviceCategoryLabels = getDeviceCategoryLabels(t);
   const grouped = useMemo(() => {
     const groups = {};
     getAllDevicePresets().forEach((device) => {
@@ -64,11 +67,11 @@ const DeviceToolbar = ({ activeDimensions, deviceZoom, onSelectDevice, onChangeZ
         >
           {deviceSelectValue === CUSTOM_DEVICE_KEY && (
             <Select.Option value={CUSTOM_DEVICE_KEY}>
-              {`Personalizado (${activeDimensions.width}×${activeDimensions.height})`}
+              {t('deviceToolbar.custom', { width: activeDimensions.width, height: activeDimensions.height })}
             </Select.Option>
           )}
           {CATEGORY_ORDER.filter((category) => grouped[category]?.length).map((category) => (
-            <Select.OptGroup key={category} label={DEVICE_CATEGORY_LABELS[category]}>
+            <Select.OptGroup key={category} label={deviceCategoryLabels[category]}>
               {grouped[category].map((device) => (
                 <Select.Option key={device.id} value={presetKey(device)}>
                   {device.name} ({device.width}×{device.height})
@@ -82,7 +85,7 @@ const DeviceToolbar = ({ activeDimensions, deviceZoom, onSelectDevice, onChangeZ
           {zoomSelectValue === CUSTOM_ZOOM_KEY && (
             <Select.Option value={CUSTOM_ZOOM_KEY}>{Math.round(deviceZoom * 100)}%</Select.Option>
           )}
-          <Select.Option value="fit">Ajustar</Select.Option>
+          <Select.Option value="fit">{t('deviceToolbar.fit')}</Select.Option>
           {ZOOM_OPTIONS.map((zoom) => (
             <Select.Option key={zoom} value={String(zoom)}>
               {Math.round(zoom * 100)}%
@@ -94,7 +97,7 @@ const DeviceToolbar = ({ activeDimensions, deviceZoom, onSelectDevice, onChangeZ
           {activeDimensions.width}×{activeDimensions.height}
         </Text>
       </div>
-      <Tooltip title="Sair do modo de dimensões">
+      <Tooltip title={t('deviceToolbar.exit')}>
         <Button size="small" type="text" icon={<CloseOutlined />} onClick={onClose} />
       </Tooltip>
     </div>

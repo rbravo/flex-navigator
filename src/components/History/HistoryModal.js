@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Modal, Input, Button, Typography, Empty, Spin, Space, Popconfirm, List, Avatar } from 'antd';
 import { SearchOutlined, DeleteOutlined, GlobalOutlined, ClearOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -18,6 +19,7 @@ const formatVisitedAt = (isoString) => {
  * opção de abrir, remover uma entrada ou limpar tudo.
  */
 const HistoryModal = ({ visible, onClose }) => {
+  const { t } = useTranslation();
   const [entries, setEntries] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
@@ -76,31 +78,31 @@ const HistoryModal = ({ visible, onClose }) => {
 
   return (
     <Modal
-        title="Histórico de navegação"
+        title={t('history.title')}
         open={visible}
         onCancel={onClose}
         width={640}
         footer={[
         <Popconfirm
           key="clear"
-          title="Limpar todo o histórico?"
-          description="Essa ação não pode ser desfeita."
-          okText="Limpar"
-          cancelText="Cancelar"
+          title={t('history.clearConfirmTitle')}
+          description={t('history.clearConfirmDescription')}
+          okText={t('history.clearOk')}
+          cancelText={t('history.cancel')}
           onConfirm={handleClearHistory}
           disabled={!entries || entries.length === 0}
         >
           <Button danger icon={<ClearOutlined />} disabled={!entries || entries.length === 0}>
-            Limpar histórico
+            {t('history.clear')}
           </Button>
         </Popconfirm>,
         <Button key="close" type="primary" onClick={onClose}>
-          Fechar
+          {t('history.close')}
         </Button>
         ]}
       >
       <Input
-        placeholder="Pesquisar no histórico..."
+        placeholder={t('history.searchPlaceholder')}
         prefix={<SearchOutlined />}
         value={searchText}
         onChange={handleSearchChange}
@@ -114,7 +116,7 @@ const HistoryModal = ({ visible, onClose }) => {
         </div>
       ) : entries.length === 0 ? (
         <Empty
-          description={searchText ? 'Nenhum resultado encontrado' : 'Nenhuma página visitada ainda'}
+          description={searchText ? t('history.noResults') : t('history.empty')}
           style={{ padding: '24px 0' }}
         />
       ) : (

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Select, Typography, Empty, Button, Spin, Space, Popconfirm } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import {
-  PERMISSION_LABELS,
-  PERMISSION_DECISION_OPTIONS,
+  getPermissionLabels,
+  getPermissionDecisionOptions,
   decisionToOption,
   optionToDecision
 } from '../../utils/permissionLabels';
@@ -19,8 +20,12 @@ const { Text } = Typography;
  * pelo popover de informações do site.
  */
 const PermissionsSettingsTab = () => {
+  const { t } = useTranslation();
   const [sites, setSites] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const permissionLabels = getPermissionLabels(t);
+  const permissionDecisionOptions = getPermissionDecisionOptions(t);
 
   const loadSites = useCallback(async () => {
     if (!window.electronAPI) return;
@@ -71,13 +76,13 @@ const PermissionsSettingsTab = () => {
   }
 
   if (sites.length === 0) {
-    return <Empty description="Nenhuma permissão configurada ainda" style={{ padding: '24px 0' }} />;
+    return <Empty description={t('settings.permissions.empty')} style={{ padding: '24px 0' }} />;
   }
 
   return (
     <div>
       <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 16 }}>
-        Sites que já pediram câmera, localização, notificações etc. Mudanças aqui são aplicadas imediatamente.
+        {t('settings.permissions.description')}
       </Text>
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {sites.map((site) => (
@@ -88,14 +93,14 @@ const PermissionsSettingsTab = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
               <Text strong>{site.origin}</Text>
               <Popconfirm
-                title="Esquecer permissões deste site?"
-                description="O site voltará a poder pedir cada permissão normalmente."
-                okText="Esquecer"
-                cancelText="Cancelar"
+                title={t('settings.permissions.forgetSiteTitle')}
+                description={t('settings.permissions.forgetSiteDescription')}
+                okText={t('settings.permissions.forgetSite')}
+                cancelText={t('common.cancel')}
                 onConfirm={() => handleForgetSite(site.origin)}
               >
                 <Button size="small" icon={<DeleteOutlined />} danger>
-                  Esquecer site
+                  {t('settings.permissions.forgetSite')}
                 </Button>
               </Popconfirm>
             </div>
@@ -105,13 +110,13 @@ const PermissionsSettingsTab = () => {
                   key={permission}
                   style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}
                 >
-                  <Text style={{ fontSize: 12 }}>{PERMISSION_LABELS[permission] || permission}</Text>
+                  <Text style={{ fontSize: 12 }}>{permissionLabels[permission] || permission}</Text>
                   <Select
                     size="small"
                     value={decisionToOption(granted)}
                     onChange={(option) => handlePermissionChange(site.origin, permission, option)}
                     style={{ width: 150 }}
-                    options={PERMISSION_DECISION_OPTIONS}
+                    options={permissionDecisionOptions}
                   />
                 </div>
               ))}

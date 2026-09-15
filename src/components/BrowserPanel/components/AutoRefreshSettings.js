@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, InputNumber, Space, Typography, Divider, Select } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -14,6 +15,7 @@ const AutoRefreshSettings = ({
   onToggleAutoRefresh,
   onIntervalChange
 }) => {
+  const { t } = useTranslation();
   const [localInterval, setLocalInterval] = useState(refreshInterval);
   const [timeUnit, setTimeUnit] = useState('segundos');
 
@@ -56,7 +58,7 @@ const AutoRefreshSettings = ({
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Toggle principal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ color: 'var(--nav-text)' }}>Ativar auto atualização</Text>
+          <Text style={{ color: 'var(--nav-text)' }}>{t('autoRefresh.enable')}</Text>
           <Switch
             checked={isAutoRefreshEnabled}
             onChange={onToggleAutoRefresh}
@@ -66,14 +68,14 @@ const AutoRefreshSettings = ({
           />
         </div>
 
-        <p style={{ color: '#a0a0a0', fontSize: 11, marginTop: -5, marginBottom: -5 }}>Atualizar aba automaticamente no intervalo definido</p>
+        <p style={{ color: '#a0a0a0', fontSize: 11, marginTop: -5, marginBottom: -5 }}>{t('autoRefresh.description')}</p>
 
         <Divider style={{ margin: '0 0 0 0', backgroundColor: 'var(--nav-border)' }} />
 
         {/* Configuração do intervalo */}
         <div style={{ opacity: isAutoRefreshEnabled ? 1 : 0.5 }}>
           <Text style={{ color: 'var(--nav-text)', fontSize: '14px' }}>
-            Intervalo de atualização
+            {t('autoRefresh.intervalLabel')}
           </Text>
 
           <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -109,8 +111,8 @@ const AutoRefreshSettings = ({
               }}
               popupClassName="dark-select-dropdown"
             >
-              <Option value="segundos">segundos</Option>
-              <Option value="minutos">minutos</Option>
+              <Option value="segundos">{t('autoRefresh.seconds')}</Option>
+              <Option value="minutos">{t('autoRefresh.minutes')}</Option>
             </Select>
           </div>
         </div>

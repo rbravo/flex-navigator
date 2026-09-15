@@ -1,5 +1,6 @@
 import { Actions, DockLocation } from 'flexlayout-react';
 import { createNewTab } from './layoutActions';
+import i18n from '../i18n';
 
 /**
  * Utilitários para ações específicas das tabs
@@ -96,7 +97,7 @@ export const duplicateTab = (model, tabId) => {
       // Criar uma nova tab limpa que navegará para a URL
       const newTabConfig = {
         type: "tab",
-        name: "Nova Aba", // Nome genérico - será atualizado automaticamente quando carregar
+        name: i18n.t('tabs.newTab'), // Nome genérico - será atualizado automaticamente quando carregar
         component: tabNode.getComponent(),
         config: { 
           url: targetUrl // A URL para onde a nova tab navegará

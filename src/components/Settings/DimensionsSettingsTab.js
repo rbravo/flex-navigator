@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Typography, Space, Button, Input, InputNumber, Tag, Popconfirm, Form } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import {
   BUILTIN_DEVICE_PRESETS,
-  DEVICE_CATEGORY_LABELS,
+  getDeviceCategoryLabels,
   loadCustomDevices,
   addCustomDevice,
   removeCustomDevice
@@ -19,8 +20,11 @@ const { Text } = Typography;
  * do tamanho de um aparelho conhecido, sem precisar redimensionar o painel.
  */
 const DimensionsSettingsTab = () => {
+  const { t } = useTranslation();
   const [customDevices, setCustomDevices] = useState([]);
   const [form] = Form.useForm();
+
+  const deviceCategoryLabels = getDeviceCategoryLabels(t);
 
   const loadDevices = useCallback(() => {
     setCustomDevices(loadCustomDevices());
@@ -53,15 +57,15 @@ const DimensionsSettingsTab = () => {
         </Text>
         {removable ? (
           <Popconfirm
-            title="Remover esta dimensão?"
-            okText="Remover"
-            cancelText="Cancelar"
+            title={t('settings.dimensions.removeTitle')}
+            okText={t('common.remove')}
+            cancelText={t('common.cancel')}
             onConfirm={() => handleRemove(device.id)}
           >
             <Button size="small" type="text" danger icon={<DeleteOutlined />} />
           </Popconfirm>
         ) : (
-          <Tag style={{ fontSize: 11, marginRight: 0 }}>Padrão</Tag>
+          <Tag style={{ fontSize: 11, marginRight: 0 }}>{t('settings.dimensions.default')}</Tag>
         )}
       </Space>
     </div>
@@ -70,25 +74,24 @@ const DimensionsSettingsTab = () => {
   return (
     <div>
       <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 16 }}>
-        Tamanhos disponíveis no popover de Dimensões da barra de navegação, pra
-        testar como um site se comporta em celulares e tablets conhecidos.
+        {t('settings.dimensions.description')}
       </Text>
 
       <div style={{ marginBottom: 8 }}>
-        <Text strong style={{ fontSize: 12 }}>{DEVICE_CATEGORY_LABELS.phone}</Text>
+        <Text strong style={{ fontSize: 12 }}>{deviceCategoryLabels.phone}</Text>
         {BUILTIN_DEVICE_PRESETS.filter((d) => d.category === 'phone').map((d) => renderDeviceRow(d, false))}
       </div>
 
       <div style={{ marginBottom: 8 }}>
-        <Text strong style={{ fontSize: 12 }}>{DEVICE_CATEGORY_LABELS.tablet}</Text>
+        <Text strong style={{ fontSize: 12 }}>{deviceCategoryLabels.tablet}</Text>
         {BUILTIN_DEVICE_PRESETS.filter((d) => d.category === 'tablet').map((d) => renderDeviceRow(d, false))}
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <Text strong style={{ fontSize: 12 }}>{DEVICE_CATEGORY_LABELS.custom}</Text>
+        <Text strong style={{ fontSize: 12 }}>{deviceCategoryLabels.custom}</Text>
         {customDevices.length === 0 ? (
           <div style={{ padding: '6px 0' }}>
-            <Text type="secondary" style={{ fontSize: 12 }}>Nenhuma dimensão personalizada ainda.</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>{t('settings.dimensions.noneCustom')}</Text>
           </div>
         ) : (
           customDevices.map((d) => renderDeviceRow(d, true))
@@ -98,20 +101,20 @@ const DimensionsSettingsTab = () => {
       <Form form={form} layout="inline" onFinish={handleAdd} style={{ flexWrap: 'wrap', rowGap: 8 }}>
         <Form.Item
           name="name"
-          rules={[{ required: true, message: 'Nome obrigatório' }]}
+          rules={[{ required: true, message: t('settings.dimensions.nameRequired') }]}
           style={{ flex: 1, minWidth: 140, marginRight: 8 }}
         >
-          <Input placeholder="Nome do aparelho" maxLength={40} />
+          <Input placeholder={t('settings.dimensions.namePlaceholder')} maxLength={40} />
         </Form.Item>
-        <Form.Item name="width" rules={[{ required: true, message: 'Largura' }]} style={{ marginRight: 8 }}>
-          <InputNumber min={100} max={4000} placeholder="Largura" addonAfter="L" />
+        <Form.Item name="width" rules={[{ required: true, message: t('settings.dimensions.widthRequired') }]} style={{ marginRight: 8 }}>
+          <InputNumber min={100} max={4000} placeholder={t('settings.dimensions.widthPlaceholder')} addonAfter="L" />
         </Form.Item>
-        <Form.Item name="height" rules={[{ required: true, message: 'Altura' }]} style={{ marginRight: 8 }}>
-          <InputNumber min={100} max={4000} placeholder="Altura" addonAfter="A" />
+        <Form.Item name="height" rules={[{ required: true, message: t('settings.dimensions.heightRequired') }]} style={{ marginRight: 8 }}>
+          <InputNumber min={100} max={4000} placeholder={t('settings.dimensions.heightPlaceholder')} addonAfter="A" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" icon={<PlusOutlined />} htmlType="submit">
-            Adicionar
+            {t('settings.dimensions.add')}
           </Button>
         </Form.Item>
       </Form>

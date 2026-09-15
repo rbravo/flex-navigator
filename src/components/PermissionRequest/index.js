@@ -1,27 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Modal, Typography } from 'antd';
 import { SafetyCertificateOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
-const PERMISSION_LABELS = {
-  geolocation: 'ver sua localização',
-  notifications: 'mostrar notificações',
-  midiSysex: 'acessar dispositivos MIDI',
-  'clipboard-read': 'ler a área de transferência'
-};
-
-const describePermission = (permission, mediaTypes) => {
+const describePermission = (t, permission, mediaTypes) => {
   if (permission === 'media') {
     const types = mediaTypes || [];
     const hasAudio = types.includes('audio');
     const hasVideo = types.includes('video');
-    if (hasAudio && hasVideo) return 'usar sua câmera e microfone';
-    if (hasVideo) return 'usar sua câmera';
-    if (hasAudio) return 'usar seu microfone';
-    return 'usar câmera/microfone';
+    if (hasAudio && hasVideo) return t('permissionRequest.actions.mediaAudioVideo');
+    if (hasVideo) return t('permissionRequest.actions.mediaVideo');
+    if (hasAudio) return t('permissionRequest.actions.mediaAudio');
+    return t('permissionRequest.actions.mediaGeneric');
   }
-  return PERMISSION_LABELS[permission] || `usar a permissão "${permission}"`;
+
+  const knownActions = ['geolocation', 'notifications', 'midiSysex', 'clipboard-read'];
+  if (knownActions.includes(permission)) {
+    return t(`permissionRequest.actions.${permission}`);
+  }
+  return t('permissionRequest.actions.generic', { permission });
 };
 
 /**
@@ -32,6 +31,7 @@ const describePermission = (permission, mediaTypes) => {
  * chegam em fila para não empilhar vários modais ao mesmo tempo.
  */
 const PermissionRequestManager = () => {
+  const { t } = useTranslation();
   const [queue, setQueue] = useState([]);
 
   useEffect(() => {
@@ -54,12 +54,12 @@ const PermissionRequestManager = () => {
 
   return (
     <Modal
-      title="Solicitação de permissão"
+      title={t('permissionRequest.title')}
       open={!!current}
       onOk={() => respond(true)}
       onCancel={() => respond(false)}
-      okText="Permitir"
-      cancelText="Bloquear"
+      okText={t('permissionRequest.allow')}
+      cancelText={t('permissionRequest.block')}
       centered
       width={420}
     >
@@ -71,7 +71,7 @@ const PermissionRequestManager = () => {
           <div>
             <Text strong>{current.origin}</Text>
             <br />
-            <Text>quer {describePermission(current.permission, current.mediaTypes)}.</Text>
+            <Text>{t('permissionRequest.wantsTo', { action: describePermission(t, current.permission, current.mediaTypes) })}</Text>
           </div>
         </div>
       )}

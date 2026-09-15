@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Input, Space, Tooltip, Dropdown, Typography } from 'antd';
+import { useTranslation } from 'react-i18next';
 import {
   LeftOutlined,
   RightOutlined,
@@ -73,6 +74,7 @@ const ControlsBar = ({
   onResetDeviceDimensions
 }) => {
   const { Text } = Typography;
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [savedPanels, setSavedPanels] = useState([]);
   useCloseOnWebviewFocus(menuOpen, () => setMenuOpen(false));
@@ -93,7 +95,7 @@ const ControlsBar = ({
     {
       key: 'panels-save',
       icon: <SaveOutlined />,
-      label: 'Salvar painéis atuais...',
+      label: t('session.menu.saveCurrent'),
       onClick: () => {
         setMenuOpen(false);
         window.dispatchEvent(new CustomEvent('show-save-session-dialog'));
@@ -102,7 +104,7 @@ const ControlsBar = ({
     {
       key: 'panels-clear',
       icon: <ClearOutlined />,
-      label: 'Limpar painéis atuais...',
+      label: t('session.menu.clearCurrent'),
       onClick: () => {
         setMenuOpen(false);
         window.dispatchEvent(new CustomEvent('show-clear-session-dialog'));
@@ -110,7 +112,7 @@ const ControlsBar = ({
     },
     { type: 'divider' },
     ...(savedPanels.length === 0
-      ? [{ key: 'panels-empty', label: 'Nenhum painel salvo', disabled: true }]
+      ? [{ key: 'panels-empty', label: t('session.menu.empty'), disabled: true }]
       : savedPanels.map((panel) => ({
           key: `panel-${panel.id}`,
           icon: <FolderOpenOutlined />,
@@ -118,7 +120,7 @@ const ControlsBar = ({
           children: [
             {
               key: `panel-${panel.id}-open-here`,
-              label: 'Abrir nesta janela',
+              label: t('session.menu.openHere'),
               onClick: () => {
                 setMenuOpen(false);
                 window.dispatchEvent(
@@ -128,7 +130,7 @@ const ControlsBar = ({
             },
             {
               key: `panel-${panel.id}-open-new`,
-              label: 'Abrir em nova janela',
+              label: t('session.menu.openNewWindow'),
               onClick: () => {
                 setMenuOpen(false);
                 window.electronAPI?.openSessionInNewWindow(panel.id);
@@ -139,7 +141,7 @@ const ControlsBar = ({
               key: `panel-${panel.id}-delete`,
               icon: <DeleteOutlined />,
               danger: true,
-              label: 'Apagar painéis',
+              label: t('session.menu.delete'),
               onClick: () => {
                 setMenuOpen(false);
                 window.dispatchEvent(
@@ -170,7 +172,7 @@ const ControlsBar = ({
   return (
     <div className="controls-bar">
       <Space size="small">
-        <Tooltip title="Voltar" placement={'bottom'}>
+        <Tooltip title={t('controlsBar.back')} placement={'bottom'}>
           <Button
             type="text"
             icon={<LeftOutlined />}
@@ -185,7 +187,7 @@ const ControlsBar = ({
           />
         </Tooltip>
 
-        <Tooltip title="Avançar" placement={'bottom'}>
+        <Tooltip title={t('controlsBar.forward')} placement={'bottom'}>
           <Button
             type="text"
             icon={<RightOutlined />}
@@ -199,7 +201,7 @@ const ControlsBar = ({
           />
         </Tooltip>
 
-        <Tooltip title={isLoading ? "Parar carregamento" : "Atualizar página"} placement={'bottom'}>
+        <Tooltip title={isLoading ? t('controlsBar.stopLoading') : t('controlsBar.refresh')} placement={'bottom'}>
           <Button
             type="text"
             icon={isLoading ? <StopOutlined /> : <ReloadOutlined />}
@@ -217,14 +219,14 @@ const ControlsBar = ({
         <div className="url-input-container">
           <Input
             ref={urlInputRef}
-            placeholder="Digite uma URL ou pesquise..."
+            placeholder={t('controlsBar.urlPlaceholder')}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             prefix={
               isLoading ?
                 <ReloadOutlined spin style={{ color: '#007acc' }} /> :
                 <SiteInfoPopover currentUrl={currentUrl}>
-                  <Tooltip title="Informações do site" placement={'bottom'}>
+                  <Tooltip title={t('controlsBar.siteInfo')} placement={'bottom'}>
                     <span style={{ cursor: 'pointer', display: 'inline-flex' }}>
                       <ControlFilled className="control-filled"
                         style={{ color: '#999999', fontSize: 18, marginRight: 2, marginLeft: -4 }} />
@@ -270,7 +272,7 @@ const ControlsBar = ({
             onApply={onApplyDeviceDimensions}
             onReset={onResetDeviceDimensions}
           >
-            <Tooltip title="Dimensões" placement={'bottom'}>
+            <Tooltip title={t('controlsBar.dimensions')} placement={'bottom'}>
               <Button
                 type="text"
                 icon={<MobileOutlined />}
@@ -286,7 +288,7 @@ const ControlsBar = ({
           </DimensionsPopover>
 
           <DownloadsPopover>
-            <Tooltip title="Downloads" placement={'bottom'}>
+            <Tooltip title={t('controlsBar.downloads')} placement={'bottom'}>
               <Button
                 type="text"
                 icon={<DownloadOutlined />}
@@ -320,7 +322,7 @@ const ControlsBar = ({
                         style={{ flex: 1, textAlign: 'left', cursor: 'pointer' }}
                         onClick={(e) => { e.stopPropagation(); }}
                       >
-                        Zoom
+                        {t('controlsBar.zoom')}
                       </Text>
                       <Button
                         size="small"
@@ -349,7 +351,7 @@ const ControlsBar = ({
                   icon: <SearchOutlined />,
                   label: (
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-                      <span>Buscar na página</span>
+                      <span>{t('controlsBar.findInPage')}</span>
                       <span style={{ opacity: 0.5 }}>Ctrl+F</span>
                     </div>
                   ),
@@ -360,7 +362,7 @@ const ControlsBar = ({
                   icon: <HistoryOutlined />,
                   label: (
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-                      <span>Histórico</span>
+                      <span>{t('controlsBar.history')}</span>
                       <span style={{ opacity: 0.5 }}>Ctrl+H</span>
                     </div>
                   ),
@@ -375,10 +377,10 @@ const ControlsBar = ({
                   icon: <ClockCircleOutlined style={{ color: isAutoRefreshEnabled ? '#007acc' : undefined }} />,
                   label: (
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-                      <span>Auto-atualizar</span>
+                      <span>{t('controlsBar.autoRefresh')}</span>
                       {isAutoRefreshEnabled && (
                         <span style={{ opacity: 0.6, fontSize: 12 }}>
-                          {timeRemaining > 0 ? formatTimeRemaining(timeRemaining) : 'Ativo'}
+                          {timeRemaining > 0 ? formatTimeRemaining(timeRemaining) : t('controlsBar.autoRefreshActive')}
                         </span>
                       )}
                     </div>
@@ -405,7 +407,7 @@ const ControlsBar = ({
                   icon: <AppstoreAddOutlined style={{ color: isShortcutsEnabled ? '#007acc' : undefined }} />,
                   label: (
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
-                      <span>Atalhos de navegação</span>
+                      <span>{t('controlsBar.shortcuts')}</span>
                       {isShortcutsEnabled && <span style={{ opacity: 0.6, fontSize: 12 }}>{shortcutModifiers}</span>}
                     </div>
                   ),
@@ -431,14 +433,14 @@ const ControlsBar = ({
                 {
                   key: 'panels',
                   icon: <LayoutOutlined />,
-                  label: 'Painéis',
+                  label: t('controlsBar.panels'),
                   children: panelsMenuItems
                 },
                 { type: 'divider' },
                 {
                   key: 'settings',
                   icon: <SettingOutlined />,
-                  label: 'Configurações',
+                  label: t('controlsBar.settings'),
                   onClick: () => {
                     setMenuOpen(false);
                     window.dispatchEvent(new CustomEvent('show-settings-dialog'));
@@ -447,7 +449,7 @@ const ControlsBar = ({
               ]
             }}
           >
-            <Tooltip title="Menu" placement={'bottom'}>
+            <Tooltip title={t('controlsBar.menu')} placement={'bottom'}>
               <Button
                 type="text"
                 icon={<MoreOutlined />}

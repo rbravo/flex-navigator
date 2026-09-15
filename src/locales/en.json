@@ -1,0 +1,423 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "close": "Close",
+    "delete": "Remove",
+    "remove": "Remove",
+    "add": "Add",
+    "search": "Search",
+    "unknown": "Unknown"
+  },
+  "languages": {
+    "auto": "Automatic (system language)",
+    "pt-BR": "Português (Brasil)",
+    "en": "English",
+    "es": "Español"
+  },
+  "menu": {
+    "app": {
+      "about": "About",
+      "services": "Services",
+      "hide": "Hide",
+      "hideOthers": "Hide Others",
+      "unhide": "Show All",
+      "quit": "Quit"
+    },
+    "file": {
+      "title": "File",
+      "newTab": "New Tab",
+      "closeTab": "Close Tab",
+      "splitHorizontal": "Split Panel Horizontally",
+      "splitVertical": "Split Panel Vertically",
+      "quit": "Quit"
+    },
+    "edit": {
+      "title": "Edit",
+      "undo": "Undo",
+      "redo": "Redo",
+      "cut": "Cut",
+      "copy": "Copy",
+      "paste": "Paste",
+      "selectAll": "Select All"
+    },
+    "view": {
+      "title": "View",
+      "reload": "Reload",
+      "forceReload": "Force Reload",
+      "devTools": "Developer Tools",
+      "zoomReset": "Actual Size",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
+      "fullScreen": "Full Screen"
+    },
+    "navigate": {
+      "title": "Navigate",
+      "back": "Back",
+      "forward": "Forward",
+      "reload": "Reload",
+      "stop": "Stop"
+    },
+    "dev": {
+      "title": "Dev",
+      "reloadApp": "Reload App",
+      "forceReloadApp": "Force Reload",
+      "toggleDevTools": "Application DevTools"
+    },
+    "help": {
+      "title": "Help",
+      "settings": "Settings...",
+      "howToContribute": "How to Contribute",
+      "checkForUpdates": "Check for Updates",
+      "version": "Version {{version}}"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "permissions": "Permissions",
+      "dimensions": "Dimensions",
+      "language": "Language"
+    },
+    "general": {
+      "navigationTitle": "Navigation",
+      "defaultHomePage": "Default home page",
+      "defaultHomePageExtra": "This will be the home page for new tabs",
+      "defaultHomePageRequired": "Please enter a valid URL",
+      "defaultHomePageInvalid": "Please enter a valid URL",
+      "themeLabel": "Theme",
+      "themeExtra": "Automatic follows the operating system theme",
+      "themeAuto": "Automatic",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "updatesTitle": "Updates",
+      "autoUpdateLabel": "Check for updates automatically",
+      "autoUpdateExtra": "Checks for new versions when the app starts",
+      "autoDownloadLabel": "Download updates automatically",
+      "autoDownloadExtra": "Downloads updates in the background (still asks for confirmation to install)",
+      "currentVersion": "Current Version: {{version}}",
+      "unknownVersion": "Unknown",
+      "checkNow": "Check Now",
+      "lastCheck": "Last check: on app startup"
+    },
+    "language": {
+      "title": "Language",
+      "label": "App language",
+      "extra": "In automatic mode, the browser follows the language configured in the operating system. If the system language isn't available, the app falls back to English."
+    },
+    "permissions": {
+      "empty": "No permissions configured yet",
+      "description": "Sites that have already asked for camera, location, notifications, etc. Changes here apply immediately.",
+      "forgetSite": "Forget site",
+      "forgetSiteTitle": "Forget permissions for this site?",
+      "forgetSiteDescription": "The site will be able to ask for each permission again normally."
+    },
+    "dimensions": {
+      "description": "Sizes available in the Dimensions popover on the navigation bar, to test how a site behaves on known phones and tablets.",
+      "default": "Default",
+      "noneCustom": "No custom dimensions yet.",
+      "namePlaceholder": "Device name",
+      "nameRequired": "Name is required",
+      "widthPlaceholder": "Width",
+      "widthRequired": "Width",
+      "heightPlaceholder": "Height",
+      "heightRequired": "Height",
+      "add": "Add",
+      "removeTitle": "Remove this dimension?"
+    },
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "session": {
+    "save": {
+      "title": "Save Current Panels",
+      "description": "Save the current panel configuration (open tabs, positioning and sizes) so you can restore it later.",
+      "nameLabel": "Panel Set Name",
+      "namePlaceholder": "Type a name to identify these panels...",
+      "nameRequired": "Please type a name for the panels",
+      "nameTooShort": "The name must be at least 2 characters long",
+      "nameTooLong": "The name can't be longer than 50 characters",
+      "overwriteWarning": "⚠️ Saved panels with this name already exist and will be overwritten.",
+      "successMessage": "Panels \"{{name}}\" saved successfully!",
+      "errorMessage": "Error saving panels: {{error}}",
+      "ok": "Save",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Confirm Removal",
+      "confirmText": "Are you sure you want to remove the panels \"{{name}}\"?",
+      "warningText": "This action cannot be undone. All layout settings for these panels will be permanently lost.",
+      "ok": "Remove",
+      "cancel": "Cancel",
+      "successMessage": "Panels \"{{name}}\" removed successfully!",
+      "errorMessage": "Error removing panels: {{error}}",
+      "unexpectedError": "Unexpected error removing panels"
+    },
+    "clear": {
+      "title": "Clear current panels",
+      "confirmText": "This action will close all open tabs and panels and start from scratch.",
+      "warningText": "⚠️ Make sure to save the current panels if you want to keep them.",
+      "ok": "Yes, clear",
+      "cancel": "Cancel",
+      "notificationTitle": "Panels Cleared",
+      "notificationBody": "The current session was cleared and a new session was started."
+    },
+    "menu": {
+      "saveCurrent": "Save current panels...",
+      "clearCurrent": "Clear current panels...",
+      "empty": "No saved panels",
+      "openHere": "Open in this window",
+      "openNewWindow": "Open in new window",
+      "delete": "Delete panels",
+      "panels": "Panels"
+    }
+  },
+  "history": {
+    "title": "Browsing history",
+    "searchPlaceholder": "Search history...",
+    "clear": "Clear history",
+    "clearConfirmTitle": "Clear all history?",
+    "clearConfirmDescription": "This action cannot be undone.",
+    "clearOk": "Clear",
+    "cancel": "Cancel",
+    "close": "Close",
+    "noResults": "No results found",
+    "empty": "No pages visited yet"
+  },
+  "controlsBar": {
+    "back": "Back",
+    "forward": "Forward",
+    "stopLoading": "Stop loading",
+    "refresh": "Reload page",
+    "urlPlaceholder": "Type a URL or search...",
+    "siteInfo": "Site information",
+    "dimensions": "Dimensions",
+    "downloads": "Downloads",
+    "menu": "Menu",
+    "zoom": "Zoom",
+    "findInPage": "Find in page",
+    "history": "History",
+    "autoRefresh": "Auto-refresh",
+    "autoRefreshActive": "Active",
+    "shortcuts": "Navigation shortcuts",
+    "panels": "Panels",
+    "settings": "Settings"
+  },
+  "siteInfo": {
+    "title": "Site information",
+    "noSecurityInfo": "No security information for this page.",
+    "secureConnection": "Secure connection (HTTPS)",
+    "insecureConnection": "Connection is not secure (HTTP)",
+    "internalPage": "Internal page, no connection information.",
+    "issuedTo": "Issued to: {{name}}",
+    "issuedBy": "Issued by: {{name}}",
+    "validUntil": "Valid until: {{date}}",
+    "certUnavailable": "Certificate details not available yet - reload the page.",
+    "permissionsTitle": "Permissions for this site"
+  },
+  "downloads": {
+    "title": "Downloads",
+    "empty": "No downloads in this session",
+    "pause": "Pause",
+    "resume": "Resume",
+    "cancel": "Cancel",
+    "openFile": "Open file",
+    "showInFolder": "Show in folder",
+    "of": "{{received}} of {{total}}",
+    "state": {
+      "progressing": "Downloading...",
+      "paused": "Paused",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "interrupted": "Failed"
+    }
+  },
+  "deviceToolbar": {
+    "custom": "Custom ({{width}}×{{height}})",
+    "fit": "Fit",
+    "exit": "Exit dimensions mode"
+  },
+  "dimensionsPopover": {
+    "customSize": "Custom size",
+    "apply": "Apply",
+    "reset": "Reset",
+    "title": "Dimensions"
+  },
+  "findInPage": {
+    "placeholder": "Find in page"
+  },
+  "shortcutsSettings": {
+    "enable": "Enable navigation shortcuts",
+    "modifierKeysLabel": "Modifier keys",
+    "modifierKeysHint": "Hold the keys down to activate the mode",
+    "availableShortcuts": "Available shortcuts:",
+    "showOverlay": "Show overlay while using shortcuts",
+    "showOverlayHint": "Turn off if you already know the shortcuts by heart",
+    "overlayEnabledTip": "💡 Hold the modifier keys down to see the overlay with the available shortcuts",
+    "overlayDisabledTip": "💡 Shortcuts keep working normally, only the overlay was turned off",
+    "actions": {
+      "splitVertical": "Split vertically",
+      "splitHorizontal": "Split horizontally",
+      "closePanel": "Close panel",
+      "navigatePanels": "Navigate between panels",
+      "firstLastPanel": "First/Last panel",
+      "focusPanel": "Focus panel"
+    }
+  },
+  "panelNavigationOverlay": {
+    "title": "🎯 Panel Navigation",
+    "subtitle": "Hold together · separator is the combination",
+    "panelLabel": "Panel",
+    "of": "of {{total}}",
+    "actions": {
+      "splitVertical": "Split vertically",
+      "splitHorizontal": "Split horizontally",
+      "navigatePanels": "Navigate between panels",
+      "firstLastPanel": "Go to first/last panel",
+      "focusPanel": "Focus panel",
+      "closePanel": "Close panel",
+      "exitMode": "Exit mode"
+    }
+  },
+  "autoRefresh": {
+    "enable": "Enable auto-refresh",
+    "description": "Automatically refresh the tab at the defined interval",
+    "intervalLabel": "Refresh interval",
+    "seconds": "seconds",
+    "minutes": "minutes"
+  },
+  "tabSetRenderer": {
+    "addTab": "Add new tab",
+    "showNavBar": "Show navigation bar",
+    "hideNavBar": "Hide navigation bar",
+    "splitHorizontal": "Split panel horizontally",
+    "splitVertical": "Split panel vertically",
+    "restorePanel": "Restore panel",
+    "maximizePanel": "Maximize panel"
+  },
+  "tabContextMenu": {
+    "refresh": "Refresh",
+    "duplicate": "Duplicate tab",
+    "mute": "Mute tab",
+    "unmute": "Unmute tab",
+    "close": "Close tab"
+  },
+  "tabs": {
+    "newTab": "New tab",
+    "newPage": "New Page",
+    "homePage": "Home Page"
+  },
+  "permissions": {
+    "labels": {
+      "media": "Camera and microphone",
+      "geolocation": "Location",
+      "notifications": "Notifications",
+      "midiSysex": "MIDI devices",
+      "clipboard-read": "Clipboard",
+      "popups": "Pop-ups"
+    },
+    "decisions": {
+      "ask": "Always ask",
+      "allow": "Allow",
+      "block": "Block"
+    }
+  },
+  "devices": {
+    "categories": {
+      "phone": "Phones",
+      "tablet": "Tablets",
+      "custom": "Custom"
+    }
+  },
+  "permissionRequest": {
+    "title": "Permission request",
+    "allow": "Allow",
+    "block": "Block",
+    "wantsTo": "wants to {{action}}.",
+    "actions": {
+      "geolocation": "see your location",
+      "notifications": "show notifications",
+      "midiSysex": "access MIDI devices",
+      "clipboard-read": "read the clipboard",
+      "mediaAudioVideo": "use your camera and microphone",
+      "mediaVideo": "use your camera",
+      "mediaAudio": "use your microphone",
+      "mediaGeneric": "use camera/microphone",
+      "generic": "use the \"{{permission}}\" permission"
+    }
+  },
+  "fallback": {
+    "title": "Flex Navigator",
+    "urlLabel": "URL:",
+    "statusLabel": "Status:",
+    "statusActive": "🎯 Active",
+    "environmentLabel": "Environment:",
+    "environmentElectron": "Electron",
+    "environmentBrowser": "Browser",
+    "description": "This is the browser panel. In Electron, the real web content will appear here using webview.",
+    "tipLabel": "Tip:",
+    "tip": "The navigation bar is always active and ready to use!",
+    "devModeWarningBefore": "Run",
+    "devModeWarningAfter": "to see it in Electron with real navigation!",
+    "iframeWarning": "Some sites (like Google/GitHub) block iframes for security reasons."
+  },
+  "updates": {
+    "checking": {
+      "title": "Checking for Updates",
+      "description": "Looking for new versions available..."
+    },
+    "available": {
+      "title": "Update Available",
+      "description": "New version {{version}} is available for download",
+      "download": "Download Now",
+      "later": "Later"
+    },
+    "downloading": {
+      "title": "Downloading Update",
+      "description": "Download in progress...",
+      "progress": "Progress: {{percent}}% ({{transferred}}MB / {{total}}MB)"
+    },
+    "ready": {
+      "title": "Update Ready",
+      "description": "New version downloaded and ready to install",
+      "installNow": "Install Now",
+      "later": "Later"
+    },
+    "error": {
+      "title": "Update Error",
+      "description": "Could not check for updates: {{error}}",
+      "retry": "Try Again"
+    },
+    "none": {
+      "title": "No Updates",
+      "description": "You're already using the latest version"
+    },
+    "dialog": {
+      "availableTitle": "Update Available",
+      "availableMessage": "A new version ({{version}}) is available!",
+      "availableDetail": "Current version: {{currentVersion}}\nNew version: {{newVersion}}\n\nDo you want to download and install it automatically?",
+      "downloadNow": "Yes, download now",
+      "downloadLater": "No, maybe later",
+      "downloadedTitle": "Update Downloaded",
+      "downloadedMessage": "The update was downloaded successfully!",
+      "downloadedDetail": "The new version ({{version}}) has been downloaded and is ready to install.\n\nThe app will restart to apply the update.",
+      "restartNow": "Restart Now",
+      "restartLater": "Restart Later",
+      "errorTitle": "Update Error",
+      "errorMessage": "An error occurred while checking for updates:\n\n{{message}}\n\nTechnical details:\n{{stack}}",
+      "errorUnavailable": "Not available"
+    }
+  },
+  "notification": {
+    "defaultTitle": "Notification"
+  },
+  "webviewContextMenu": {
+    "back": "Back",
+    "forward": "Forward",
+    "reload": "Reload",
+    "openLinkInNewTab": "Open link in a new tab",
+    "openDevTools": "Open DevTools"
+  }
+}

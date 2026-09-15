@@ -43,7 +43,8 @@ export const getUserSettings = () => {
     defaultHomePage: 'https://www.google.com',
     autoUpdate: true,
     autoDownload: true,
-    themeMode: 'auto'
+    themeMode: 'auto',
+    languageMode: 'auto'
   };
 
   try {

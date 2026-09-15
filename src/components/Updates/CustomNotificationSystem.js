@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import './CustomNotifications.css';
+import i18n from '../../i18n';
 
 // Context para gerenciar notificações
 const NotificationContext = createContext();
@@ -98,7 +99,7 @@ export const NotificationProvider = ({ children }) => {
     const notification = {
       id,
       type: config.type || 'info',
-      title: config.title || config.message || 'Notificação',
+      title: config.title || config.message || i18n.t('notification.defaultTitle'),
       message: config.description || config.content,
       duration: config.duration || 4500,
       actions: config.actions || []
@@ -270,8 +271,8 @@ export class CustomNotificationManager {
     console.log('📢 Mostrando: Verificando atualizações');
     
     const id = CustomNotificationManager.notificationAPI.info({
-      title: 'Verificando Atualizações',
-      description: 'Procurando por novas versões disponíveis...',
+      title: i18n.t('updates.checking.title'),
+      description: i18n.t('updates.checking.description'),
       duration: 0 // Não fecha automaticamente
     });
     
@@ -287,11 +288,11 @@ export class CustomNotificationManager {
     console.log('📢 Mostrando: Baixando atualização');
     
     const id = CustomNotificationManager.notificationAPI.download({
-      title: 'Baixando Atualização',
-      description: 'Download em andamento...',
+      title: i18n.t('updates.downloading.title'),
+      description: i18n.t('updates.downloading.description'),
       duration: 0
     });
-    
+
     this.activeNotifications.set('downloading', id);
     return id;
   }
@@ -304,12 +305,12 @@ export class CustomNotificationManager {
     console.log('📢 Mostrando: Pronto para instalar');
     
     const id = CustomNotificationManager.notificationAPI.success({
-      title: 'Atualização Pronta',
-      description: 'Nova versão baixada e pronta para instalação',
+      title: i18n.t('updates.ready.title'),
+      description: i18n.t('updates.ready.description'),
       duration: 0,
       actions: [
         {
-          label: 'Instalar Agora',
+          label: i18n.t('updates.ready.installNow'),
           type: 'primary',
           onClick: () => {
             console.log('🔄 Reiniciando para instalar atualização...');
@@ -320,7 +321,7 @@ export class CustomNotificationManager {
           }
         },
         {
-          label: 'Mais Tarde',
+          label: i18n.t('updates.ready.later'),
           type: 'default',
           closeOnClick: true
         }
@@ -339,12 +340,12 @@ export class CustomNotificationManager {
     //console.log('📢 Mostrando erro:', error);
     
     const id = CustomNotificationManager.notificationAPI.error({
-      title: 'Erro na Atualização',
-      description: `Não foi possível verificar atualizações: ${error}`,
+      title: i18n.t('updates.error.title'),
+      description: i18n.t('updates.error.description', { error }),
       duration: 6000,
       actions: [
         {
-          label: 'Tentar Novamente',
+          label: i18n.t('updates.error.retry'),
           type: 'primary',
           onClick: () => {
             console.log('🔄 Tentando verificar atualizações novamente...');
@@ -368,12 +369,12 @@ export class CustomNotificationManager {
     console.log('📢 Mostrando: Atualização disponível', version);
     
     const id = CustomNotificationManager.notificationAPI.success({
-      title: 'Atualização Disponível',
-      description: `Nova versão ${version} está disponível para download`,
+      title: i18n.t('updates.available.title'),
+      description: i18n.t('updates.available.description', { version }),
       duration: 0,
       actions: [
         {
-          label: 'Baixar Agora',
+          label: i18n.t('updates.available.download'),
           type: 'primary',
           onClick: () => {
             console.log('📥 Iniciando download da atualização...');
@@ -382,7 +383,7 @@ export class CustomNotificationManager {
           closeOnClick: true
         },
         {
-          label: 'Mais Tarde',
+          label: i18n.t('updates.available.later'),
           type: 'default',
           closeOnClick: true
         }
@@ -399,7 +400,11 @@ export class CustomNotificationManager {
     const progressPercent = Math.round(progress?.percent || 0);
     const transferredMB = Math.round((progress?.transferred || 0) / 1024 / 1024);
     const totalMB = Math.round((progress?.total || 0) / 1024 / 1024);
-    const description = `Progresso: ${progressPercent}% (${transferredMB}MB / ${totalMB}MB)`;
+    const description = i18n.t('updates.downloading.progress', {
+      percent: progressPercent,
+      transferred: transferredMB,
+      total: totalMB
+    });
 
     // Já existe uma notificação de download em andamento: só atualizar o
     // texto dela, em vez de empilhar uma nova a cada tick de progresso
@@ -412,7 +417,7 @@ export class CustomNotificationManager {
     this.closeNotification('available');
 
     const id = CustomNotificationManager.notificationAPI.download({
-      title: 'Baixando Atualização',
+      title: i18n.t('updates.downloading.title'),
       description,
       duration: 0
     });
@@ -429,8 +434,8 @@ export class CustomNotificationManager {
     console.log('📢 Mostrando: Nenhuma atualização disponível');
     
     const id = CustomNotificationManager.notificationAPI.info({
-      title: 'Nenhuma Atualização',
-      description: 'Você já está usando a versão mais recente',
+      title: i18n.t('updates.none.title'),
+      description: i18n.t('updates.none.description'),
       duration: 4000
     });
     

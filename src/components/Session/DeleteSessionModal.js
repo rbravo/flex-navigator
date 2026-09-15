@@ -1,23 +1,26 @@
 import React from 'react';
 import { Modal, message } from 'antd';
 import { Trash2, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Modal para confirmar remoção de painéis salvos
  */
 const DeleteSessionModal = ({ isVisible, sessionName, onConfirm, onCancel }) => {
+  const { t } = useTranslation();
+
   const handleDelete = async () => {
     try {
       const result = await onConfirm();
 
       if (result.success) {
-        message.success(`Painéis "${sessionName}" removidos com sucesso!`);
+        message.success(t('session.delete.successMessage', { name: sessionName }));
       } else {
-        message.error(`Erro ao remover painéis: ${result.error}`);
+        message.error(t('session.delete.errorMessage', { error: result.error }));
       }
     } catch (error) {
       console.error('Erro ao remover painéis:', error);
-      message.error('Erro inesperado ao remover painéis');
+      message.error(t('session.delete.unexpectedError'));
     }
   };
 
@@ -26,33 +29,32 @@ const DeleteSessionModal = ({ isVisible, sessionName, onConfirm, onCancel }) => 
       title={
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Trash2 size={18} color="#ff4d4f" />
-          <span>Confirmar Remoção</span>
+          <span>{t('session.delete.title')}</span>
         </div>
       }
       open={isVisible}
       onOk={handleDelete}
       onCancel={onCancel}
-      okText="Remover"
-      cancelText="Cancelar"
+      okText={t('session.delete.ok')}
+      cancelText={t('session.delete.cancel')}
       okType="danger"
       width={480}
       destroyOnClose
     >
       <div style={{ margin: '20px 0' }}>
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'flex-start', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
           gap: '12px',
           marginBottom: '16px'
         }}>
           <AlertTriangle size={20} color="#faad14" style={{ marginTop: '2px' }} />
           <div>
             <p style={{ margin: 0, fontWeight: 500 }}>
-              Tem certeza que deseja remover os painéis "<strong>{sessionName}</strong>"?
+              {t('session.delete.confirmText', { name: sessionName })}
             </p>
             <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '14px' }}>
-              Esta ação não pode ser desfeita. Todas as configurações de layout
-              destes painéis serão perdidas permanentemente.
+              {t('session.delete.warningText')}
             </p>
           </div>
         </div>

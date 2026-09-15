@@ -1,6 +1,14 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Dev', 'Ajuda'];
+const MENU_ITEMS = [
+  { id: 'file', labelKey: 'menu.file.title' },
+  { id: 'edit', labelKey: 'menu.edit.title' },
+  { id: 'view', labelKey: 'menu.view.title' },
+  { id: 'navigate', labelKey: 'menu.navigate.title' },
+  { id: 'dev', labelKey: 'menu.dev.title' },
+  { id: 'help', labelKey: 'menu.help.title' }
+];
 
 /**
  * Barra de título customizada: substitui a barra de título nativa + a barra
@@ -10,12 +18,14 @@ const MENU_LABELS = ['Arquivo', 'Editar', 'Visualizar', 'Navegar', 'Dev', 'Ajuda
  * direito; só o ícone, o menu e a área arrastável são nossos.
  */
 const TitleBar = () => {
-  const handleMenuClick = (label, event) => {
+  const { t } = useTranslation();
+
+  const handleMenuClick = (menuId, event) => {
     if (!window.electronAPI) return;
 
     try {
       const rect = event.currentTarget.getBoundingClientRect();
-      window.electronAPI.popupAppMenu(label, Math.round(rect.left), Math.round(rect.bottom));
+      window.electronAPI.popupAppMenu(menuId, Math.round(rect.left), Math.round(rect.bottom));
     } catch (error) {
       console.log('IPC não disponível para abrir o menu:', error);
     }
@@ -29,14 +39,14 @@ const TitleBar = () => {
         <img src={`${process.env.PUBLIC_URL}/favicon.ico`} alt="" />
       </div>
       <div className="app-titlebar-menu">
-        {MENU_LABELS.map((label) => (
+        {MENU_ITEMS.map(({ id, labelKey }) => (
           <button
-            key={label}
+            key={id}
             type="button"
             className="app-titlebar-menu-item"
-            onClick={(event) => handleMenuClick(label, event)}
+            onClick={(event) => handleMenuClick(id, event)}
           >
-            {label}
+            {t(labelKey)}
           </button>
         ))}
       </div>

@@ -4,6 +4,8 @@ import { ConfigProvider } from 'antd';
 import 'flexlayout-react/style/dark.css'; // ou 'light.css' se preferir tema claro
 import './App.css';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 // Hooks customizados
 import useFlexLayoutModel from './hooks/useFlexLayoutModel';
@@ -46,6 +48,7 @@ import { refreshTab, duplicateTab, toggleTabMute, closeTab, isTabMuted, setupWeb
 // Componente interno do App que usa o hook de notificação
 const AppContent = () => {
   const { antdTheme } = useTheme();
+  const { t } = useTranslation();
   // Gerenciar modelo do FlexLayout
   const { model, loadConfiguration } = useFlexLayoutModel();
 
@@ -314,8 +317,8 @@ const AppContent = () => {
         // Mostrar notificação de sucesso se disponível
         if (window.electron?.showNotification) {
           window.electron.showNotification({
-            title: 'Sessão Limpa',
-            body: 'A sessão atual foi limpa e uma nova sessão foi iniciada.'
+            title: t('session.clear.notificationTitle'),
+            body: t('session.clear.notificationBody')
           });
         }
       } else {
@@ -476,11 +479,13 @@ const AppContent = () => {
 // Componente principal com Provider de notificação
 const App = () => {
   return (
-    <ThemeProvider>
-      <NotificationProvider>
-        <AppContent />
-      </NotificationProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <NotificationProvider>
+          <AppContent />
+        </NotificationProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 };
 

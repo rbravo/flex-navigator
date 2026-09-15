@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Switch, Select, Space, Typography, Divider } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -17,6 +18,7 @@ const ShortcutsSettings = ({
   showOverlay = true,
   onToggleShowOverlay
 }) => {
+  const { t } = useTranslation();
   const [localEnabled, setLocalEnabled] = useState(isShortcutsEnabled);
   const [localModifiers, setLocalModifiers] = useState(shortcutModifiers);
   const [localShowOverlay, setLocalShowOverlay] = useState(showOverlay);
@@ -56,12 +58,12 @@ const ShortcutsSettings = ({
   ];
 
   const shortcuts = [
-    { keys: `${localModifiers}+V`, action: 'Dividir verticalmente' },
-    { keys: `${localModifiers}+H`, action: 'Dividir horizontalmente' },
-    { keys: `${localModifiers}+W`, action: 'Fechar painel' },
-    { keys: `${localModifiers}+←/→`, action: 'Navegar entre painéis' },
-    { keys: `${localModifiers}+↑/↓`, action: 'Primeiro/Último painel' },
-    { keys: `${localModifiers}+Enter`, action: 'Focar no painel' }
+    { keys: `${localModifiers}+V`, action: t('shortcutsSettings.actions.splitVertical') },
+    { keys: `${localModifiers}+H`, action: t('shortcutsSettings.actions.splitHorizontal') },
+    { keys: `${localModifiers}+W`, action: t('shortcutsSettings.actions.closePanel') },
+    { keys: `${localModifiers}+←/→`, action: t('shortcutsSettings.actions.navigatePanels') },
+    { keys: `${localModifiers}+↑/↓`, action: t('shortcutsSettings.actions.firstLastPanel') },
+    { keys: `${localModifiers}+Enter`, action: t('shortcutsSettings.actions.focusPanel') }
   ];
 
   return (
@@ -69,7 +71,7 @@ const ShortcutsSettings = ({
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Toggle principal */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={{ color: 'var(--nav-text)' }}>Ativar atalhos de navegação</Text>
+          <Text style={{ color: 'var(--nav-text)' }}>{t('shortcutsSettings.enable')}</Text>
           <Switch
             checked={localEnabled}
             onChange={handleToggleChange}
@@ -84,7 +86,7 @@ const ShortcutsSettings = ({
         {/* Configuração das teclas modificadoras */}
         <div style={{ opacity: localEnabled ? 1 : 0.5 }}>
           <Text style={{ color: 'var(--nav-text)', fontSize: '14px' }}>
-            Teclas modificadoras
+            {t('shortcutsSettings.modifierKeysLabel')}
           </Text>
 
           <div style={{ marginTop: '8px' }}>
@@ -118,7 +120,7 @@ const ShortcutsSettings = ({
           </div>
 
           <Text style={{ color: '#666666', fontSize: '11px', marginTop: '4px', display: 'block' }}>
-            Mantenha as teclas pressionadas para ativar o modo
+            {t('shortcutsSettings.modifierKeysHint')}
           </Text>
         </div>
 
@@ -127,7 +129,7 @@ const ShortcutsSettings = ({
         {/* Lista de atalhos */}
         <div style={{ opacity: localEnabled ? 1 : 0.3 }}>
           <Text style={{ color: 'var(--nav-text)', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
-            Atalhos disponíveis:
+            {t('shortcutsSettings.availableShortcuts')}
           </Text>
 
           <div>
@@ -168,8 +170,8 @@ const ShortcutsSettings = ({
         }}>
           <Text style={{ color: '#999999', fontSize: '11px' }}>
             {localShowOverlay
-              ? '💡 Mantenha as teclas modificadoras pressionadas para ver o overlay com os atalhos disponíveis'
-              : '💡 Os atalhos continuam funcionando normalmente, só o overlay foi desativado'}
+              ? t('shortcutsSettings.overlayEnabledTip')
+              : t('shortcutsSettings.overlayDisabledTip')}
           </Text>
         </div>
 
@@ -181,9 +183,9 @@ const ShortcutsSettings = ({
           opacity: localEnabled ? 1 : 0.5
         }}>
           <div>
-            <Text style={{ color: 'var(--nav-text)' }}>Mostrar overlay ao usar os atalhos</Text>
+            <Text style={{ color: 'var(--nav-text)' }}>{t('shortcutsSettings.showOverlay')}</Text>
             <Text style={{ color: '#666666', fontSize: '11px', display: 'block' }}>
-              Desative se você já souber os atalhos de cor
+              {t('shortcutsSettings.showOverlayHint')}
             </Text>
           </div>
           <Switch

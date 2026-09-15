@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, Copy, Volume2, VolumeX, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import './TabContextMenu.css';
 
 /**
@@ -14,8 +15,9 @@ const TabContextMenu = ({
   onDuplicate, 
   onToggleMute, 
   onCloseTab,
-  isMuted = false 
+  isMuted = false
 }) => {
+  const { t } = useTranslation();
   const [menuPosition, setMenuPosition] = useState(position);
   const menuRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -201,19 +203,19 @@ const TabContextMenu = ({
   const menuItems = [
     {
       icon: <RefreshCw size={16} />,
-      label: 'Atualizar',
+      label: t('tabContextMenu.refresh'),
       action: onRefresh,
       className: 'refresh'
     },
     {
       icon: <Copy size={16} />,
-      label: 'Duplicar aba',
+      label: t('tabContextMenu.duplicate'),
       action: onDuplicate,
       className: 'duplicate'
     },
     {
       icon: isMuted ? <Volume2 size={16} /> : <VolumeX size={16} />,
-      label: isMuted ? 'Ativar som' : 'Silenciar aba',
+      label: isMuted ? t('tabContextMenu.unmute') : t('tabContextMenu.mute'),
       action: onToggleMute,
       className: 'mute'
     },
@@ -222,7 +224,7 @@ const TabContextMenu = ({
     },
     {
       icon: <X size={16} />,
-      label: 'Fechar aba',
+      label: t('tabContextMenu.close'),
       action: onCloseTab,
       className: 'close'
     }

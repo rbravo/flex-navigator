@@ -1,0 +1,423 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "close": "Fechar",
+    "delete": "Remover",
+    "remove": "Remover",
+    "add": "Adicionar",
+    "search": "Pesquisar",
+    "unknown": "Desconhecido"
+  },
+  "languages": {
+    "auto": "Automático (idioma do sistema)",
+    "pt-BR": "Português (Brasil)",
+    "en": "English",
+    "es": "Español"
+  },
+  "menu": {
+    "app": {
+      "about": "Sobre",
+      "services": "Serviços",
+      "hide": "Esconder",
+      "hideOthers": "Esconder Outros",
+      "unhide": "Mostrar Todos",
+      "quit": "Sair"
+    },
+    "file": {
+      "title": "Arquivo",
+      "newTab": "Nova Aba",
+      "closeTab": "Fechar Aba",
+      "splitHorizontal": "Dividir Painel Horizontalmente",
+      "splitVertical": "Dividir Painel Verticalmente",
+      "quit": "Sair"
+    },
+    "edit": {
+      "title": "Editar",
+      "undo": "Desfazer",
+      "redo": "Refazer",
+      "cut": "Recortar",
+      "copy": "Copiar",
+      "paste": "Colar",
+      "selectAll": "Selecionar Tudo"
+    },
+    "view": {
+      "title": "Visualizar",
+      "reload": "Recarregar",
+      "forceReload": "Forçar Recarregar",
+      "devTools": "Ferramentas de Desenvolvedor",
+      "zoomReset": "Zoom Real",
+      "zoomIn": "Aumentar Zoom",
+      "zoomOut": "Diminuir Zoom",
+      "fullScreen": "Tela Cheia"
+    },
+    "navigate": {
+      "title": "Navegar",
+      "back": "Voltar",
+      "forward": "Avançar",
+      "reload": "Recarregar",
+      "stop": "Parar"
+    },
+    "dev": {
+      "title": "Dev",
+      "reloadApp": "Recarregar App",
+      "forceReloadApp": "Forçar Recarregamento",
+      "toggleDevTools": "DevTools da Aplicação"
+    },
+    "help": {
+      "title": "Ajuda",
+      "settings": "Configurações...",
+      "howToContribute": "Como Contribuir",
+      "checkForUpdates": "Verificar Atualizações",
+      "version": "Versão {{version}}"
+    }
+  },
+  "settings": {
+    "title": "Configurações",
+    "tabs": {
+      "general": "Geral",
+      "permissions": "Permissões",
+      "dimensions": "Dimensões",
+      "language": "Idioma"
+    },
+    "general": {
+      "navigationTitle": "Navegação",
+      "defaultHomePage": "Página inicial padrão",
+      "defaultHomePageExtra": "Esta será a página inicial ao criar novas abas",
+      "defaultHomePageRequired": "Por favor, insira uma URL válida",
+      "defaultHomePageInvalid": "Por favor, insira uma URL válida",
+      "themeLabel": "Tema",
+      "themeExtra": "Automático acompanha o tema do sistema operacional",
+      "themeAuto": "Automático",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "updatesTitle": "Atualizações",
+      "autoUpdateLabel": "Verificar atualizações automaticamente",
+      "autoUpdateExtra": "Verifica por novas versões ao iniciar o aplicativo",
+      "autoDownloadLabel": "Baixar atualizações automaticamente",
+      "autoDownloadExtra": "Baixa atualizações em segundo plano (requer confirmação para instalar)",
+      "currentVersion": "Versão Atual: {{version}}",
+      "unknownVersion": "Desconhecida",
+      "checkNow": "Verificar Agora",
+      "lastCheck": "Última verificação: ao iniciar o aplicativo"
+    },
+    "language": {
+      "title": "Idioma",
+      "label": "Idioma do aplicativo",
+      "extra": "No modo automático, o navegador segue o idioma configurado no sistema operacional. Se o idioma do sistema não tiver tradução disponível, o aplicativo usa o inglês."
+    },
+    "permissions": {
+      "empty": "Nenhuma permissão configurada ainda",
+      "description": "Sites que já pediram câmera, localização, notificações etc. Mudanças aqui são aplicadas imediatamente.",
+      "forgetSite": "Esquecer site",
+      "forgetSiteTitle": "Esquecer permissões deste site?",
+      "forgetSiteDescription": "O site voltará a poder pedir cada permissão normalmente."
+    },
+    "dimensions": {
+      "description": "Tamanhos disponíveis no popover de Dimensões da barra de navegação, pra testar como um site se comporta em celulares e tablets conhecidos.",
+      "default": "Padrão",
+      "noneCustom": "Nenhuma dimensão personalizada ainda.",
+      "namePlaceholder": "Nome do aparelho",
+      "nameRequired": "Nome obrigatório",
+      "widthPlaceholder": "Largura",
+      "widthRequired": "Largura",
+      "heightPlaceholder": "Altura",
+      "heightRequired": "Altura",
+      "add": "Adicionar",
+      "removeTitle": "Remover esta dimensão?"
+    },
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "session": {
+    "save": {
+      "title": "Salvar Painéis Atuais",
+      "description": "Salve a configuração atual dos painéis (abas abertas, posicionamento e tamanhos) para poder restaurá-la posteriormente.",
+      "nameLabel": "Nome dos Painéis",
+      "namePlaceholder": "Digite um nome para identificar estes painéis...",
+      "nameRequired": "Por favor, digite um nome para os painéis",
+      "nameTooShort": "O nome deve ter pelo menos 2 caracteres",
+      "nameTooLong": "O nome não pode ter mais de 50 caracteres",
+      "overwriteWarning": "⚠️ Painéis salvos com este nome já existem e serão sobrescritos.",
+      "successMessage": "Painéis \"{{name}}\" salvos com sucesso!",
+      "errorMessage": "Erro ao salvar painéis: {{error}}",
+      "ok": "Salvar",
+      "cancel": "Cancelar"
+    },
+    "delete": {
+      "title": "Confirmar Remoção",
+      "confirmText": "Tem certeza que deseja remover os painéis \"{{name}}\"?",
+      "warningText": "Esta ação não pode ser desfeita. Todas as configurações de layout destes painéis serão perdidas permanentemente.",
+      "ok": "Remover",
+      "cancel": "Cancelar",
+      "successMessage": "Painéis \"{{name}}\" removidos com sucesso!",
+      "errorMessage": "Erro ao remover painéis: {{error}}",
+      "unexpectedError": "Erro inesperado ao remover painéis"
+    },
+    "clear": {
+      "title": "Limpar painéis atuais",
+      "confirmText": "Esta ação irá fechar todas as abas e painéis abertos e começar do zero.",
+      "warningText": "⚠️ Certifique-se de salvar os painéis atuais se desejar mantê-los.",
+      "ok": "Sim, limpar",
+      "cancel": "Cancelar",
+      "notificationTitle": "Sessão Limpa",
+      "notificationBody": "A sessão atual foi limpa e uma nova sessão foi iniciada."
+    },
+    "menu": {
+      "saveCurrent": "Salvar painéis atuais...",
+      "clearCurrent": "Limpar painéis atuais...",
+      "empty": "Nenhum painel salvo",
+      "openHere": "Abrir nesta janela",
+      "openNewWindow": "Abrir em nova janela",
+      "delete": "Apagar painéis",
+      "panels": "Painéis"
+    }
+  },
+  "history": {
+    "title": "Histórico de navegação",
+    "searchPlaceholder": "Pesquisar no histórico...",
+    "clear": "Limpar histórico",
+    "clearConfirmTitle": "Limpar todo o histórico?",
+    "clearConfirmDescription": "Essa ação não pode ser desfeita.",
+    "clearOk": "Limpar",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "noResults": "Nenhum resultado encontrado",
+    "empty": "Nenhuma página visitada ainda"
+  },
+  "controlsBar": {
+    "back": "Voltar",
+    "forward": "Avançar",
+    "stopLoading": "Parar carregamento",
+    "refresh": "Atualizar página",
+    "urlPlaceholder": "Digite uma URL ou pesquise...",
+    "siteInfo": "Informações do site",
+    "dimensions": "Dimensões",
+    "downloads": "Downloads",
+    "menu": "Menu",
+    "zoom": "Zoom",
+    "findInPage": "Buscar na página",
+    "history": "Histórico",
+    "autoRefresh": "Auto-atualizar",
+    "autoRefreshActive": "Ativo",
+    "shortcuts": "Atalhos de navegação",
+    "panels": "Painéis",
+    "settings": "Configurações"
+  },
+  "siteInfo": {
+    "title": "Informações do site",
+    "noSecurityInfo": "Sem informações de segurança para esta página.",
+    "secureConnection": "Conexão segura (HTTPS)",
+    "insecureConnection": "Conexão não é segura (HTTP)",
+    "internalPage": "Página interna, sem informações de conexão.",
+    "issuedTo": "Emitido para: {{name}}",
+    "issuedBy": "Emitido por: {{name}}",
+    "validUntil": "Válido até: {{date}}",
+    "certUnavailable": "Detalhes do certificado ainda não disponíveis - recarregue a página.",
+    "permissionsTitle": "Permissões para este site"
+  },
+  "downloads": {
+    "title": "Downloads",
+    "empty": "Nenhum download nesta sessão",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "cancel": "Cancelar",
+    "openFile": "Abrir arquivo",
+    "showInFolder": "Mostrar na pasta",
+    "of": "{{received}} de {{total}}",
+    "state": {
+      "progressing": "Baixando...",
+      "paused": "Pausado",
+      "completed": "Concluído",
+      "cancelled": "Cancelado",
+      "interrupted": "Falhou"
+    }
+  },
+  "deviceToolbar": {
+    "custom": "Personalizado ({{width}}×{{height}})",
+    "fit": "Ajustar",
+    "exit": "Sair do modo de dimensões"
+  },
+  "dimensionsPopover": {
+    "customSize": "Tamanho personalizado",
+    "apply": "Aplicar",
+    "reset": "Resetar",
+    "title": "Dimensões"
+  },
+  "findInPage": {
+    "placeholder": "Buscar na página"
+  },
+  "shortcutsSettings": {
+    "enable": "Ativar atalhos de navegação",
+    "modifierKeysLabel": "Teclas modificadoras",
+    "modifierKeysHint": "Mantenha as teclas pressionadas para ativar o modo",
+    "availableShortcuts": "Atalhos disponíveis:",
+    "showOverlay": "Mostrar overlay ao usar os atalhos",
+    "showOverlayHint": "Desative se você já souber os atalhos de cor",
+    "overlayEnabledTip": "💡 Mantenha as teclas modificadoras pressionadas para ver o overlay com os atalhos disponíveis",
+    "overlayDisabledTip": "💡 Os atalhos continuam funcionando normalmente, só o overlay foi desativado",
+    "actions": {
+      "splitVertical": "Dividir verticalmente",
+      "splitHorizontal": "Dividir horizontalmente",
+      "closePanel": "Fechar painel",
+      "navigatePanels": "Navegar entre painéis",
+      "firstLastPanel": "Primeiro/Último painel",
+      "focusPanel": "Focar no painel"
+    }
+  },
+  "panelNavigationOverlay": {
+    "title": "🎯 Navegação entre Painéis",
+    "subtitle": "Segurados juntos · separador é a combinação",
+    "panelLabel": "Painel",
+    "of": "de {{total}}",
+    "actions": {
+      "splitVertical": "Dividir verticalmente",
+      "splitHorizontal": "Dividir horizontalmente",
+      "navigatePanels": "Navegar entre painéis",
+      "firstLastPanel": "Ir para primeiro/último painel",
+      "focusPanel": "Focar no painel",
+      "closePanel": "Fechar painel",
+      "exitMode": "Sair do modo"
+    }
+  },
+  "autoRefresh": {
+    "enable": "Ativar auto atualização",
+    "description": "Atualizar aba automaticamente no intervalo definido",
+    "intervalLabel": "Intervalo de atualização",
+    "seconds": "segundos",
+    "minutes": "minutos"
+  },
+  "tabSetRenderer": {
+    "addTab": "Adicionar nova tab",
+    "showNavBar": "Mostrar barra de navegação",
+    "hideNavBar": "Esconder barra de navegação",
+    "splitHorizontal": "Dividir painel horizontalmente",
+    "splitVertical": "Dividir painel verticalmente",
+    "restorePanel": "Restaurar painel",
+    "maximizePanel": "Maximizar painel"
+  },
+  "tabContextMenu": {
+    "refresh": "Atualizar",
+    "duplicate": "Duplicar aba",
+    "mute": "Silenciar aba",
+    "unmute": "Ativar som",
+    "close": "Fechar aba"
+  },
+  "tabs": {
+    "newTab": "Nova aba",
+    "newPage": "Nova Página",
+    "homePage": "Página Inicial"
+  },
+  "permissions": {
+    "labels": {
+      "media": "Câmera e microfone",
+      "geolocation": "Localização",
+      "notifications": "Notificações",
+      "midiSysex": "Dispositivos MIDI",
+      "clipboard-read": "Área de transferência",
+      "popups": "Pop-ups"
+    },
+    "decisions": {
+      "ask": "Perguntar sempre",
+      "allow": "Permitir",
+      "block": "Bloquear"
+    }
+  },
+  "devices": {
+    "categories": {
+      "phone": "Celulares",
+      "tablet": "Tablets",
+      "custom": "Personalizados"
+    }
+  },
+  "permissionRequest": {
+    "title": "Solicitação de permissão",
+    "allow": "Permitir",
+    "block": "Bloquear",
+    "wantsTo": "quer {{action}}.",
+    "actions": {
+      "geolocation": "ver sua localização",
+      "notifications": "mostrar notificações",
+      "midiSysex": "acessar dispositivos MIDI",
+      "clipboard-read": "ler a área de transferência",
+      "mediaAudioVideo": "usar sua câmera e microfone",
+      "mediaVideo": "usar sua câmera",
+      "mediaAudio": "usar seu microfone",
+      "mediaGeneric": "usar câmera/microfone",
+      "generic": "usar a permissão \"{{permission}}\""
+    }
+  },
+  "fallback": {
+    "title": "Flex Navigator",
+    "urlLabel": "URL:",
+    "statusLabel": "Status:",
+    "statusActive": "🎯 Ativo",
+    "environmentLabel": "Ambiente:",
+    "environmentElectron": "Electron",
+    "environmentBrowser": "Browser",
+    "description": "Este é o painel do navegador. No Electron, aqui aparecerá o conteúdo web real usando webview.",
+    "tipLabel": "Dica:",
+    "tip": "A barra de navegação está sempre ativa e pronta para uso!",
+    "devModeWarningBefore": "Execute com",
+    "devModeWarningAfter": "para ver no Electron com navegação real!",
+    "iframeWarning": "Alguns sites (como Google/GitHub) bloqueiam iframes por segurança."
+  },
+  "updates": {
+    "checking": {
+      "title": "Verificando Atualizações",
+      "description": "Procurando por novas versões disponíveis..."
+    },
+    "available": {
+      "title": "Atualização Disponível",
+      "description": "Nova versão {{version}} está disponível para download",
+      "download": "Baixar Agora",
+      "later": "Mais Tarde"
+    },
+    "downloading": {
+      "title": "Baixando Atualização",
+      "description": "Download em andamento...",
+      "progress": "Progresso: {{percent}}% ({{transferred}}MB / {{total}}MB)"
+    },
+    "ready": {
+      "title": "Atualização Pronta",
+      "description": "Nova versão baixada e pronta para instalação",
+      "installNow": "Instalar Agora",
+      "later": "Mais Tarde"
+    },
+    "error": {
+      "title": "Erro na Atualização",
+      "description": "Não foi possível verificar atualizações: {{error}}",
+      "retry": "Tentar Novamente"
+    },
+    "none": {
+      "title": "Nenhuma Atualização",
+      "description": "Você já está usando a versão mais recente"
+    },
+    "dialog": {
+      "availableTitle": "Atualização Disponível",
+      "availableMessage": "Uma nova versão ({{version}}) está disponível!",
+      "availableDetail": "Versão atual: {{currentVersion}}\nNova versão: {{newVersion}}\n\nDeseja baixar e instalar automaticamente?",
+      "downloadNow": "Sim, baixar agora",
+      "downloadLater": "Não, talvez depois",
+      "downloadedTitle": "Atualização Baixada",
+      "downloadedMessage": "A atualização foi baixada com sucesso!",
+      "downloadedDetail": "A nova versão ({{version}}) foi baixada e está pronta para ser instalada.\n\nO aplicativo será reiniciado para aplicar a atualização.",
+      "restartNow": "Reiniciar Agora",
+      "restartLater": "Reiniciar Depois",
+      "errorTitle": "Erro na Atualização",
+      "errorMessage": "Ocorreu um erro ao verificar atualizações:\n\n{{message}}\n\nDetalhes técnicos:\n{{stack}}",
+      "errorUnavailable": "Não disponível"
+    }
+  },
+  "notification": {
+    "defaultTitle": "Notificação"
+  },
+  "webviewContextMenu": {
+    "back": "Voltar",
+    "forward": "Avançar",
+    "reload": "Recarregar",
+    "openLinkInNewTab": "Abrir link em nova aba",
+    "openDevTools": "Abrir DevTools"
+  }
+}

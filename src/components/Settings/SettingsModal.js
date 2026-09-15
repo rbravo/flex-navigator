@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Button, Typography, Switch, Divider, Space, Tabs, Select } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { getUserSettings, saveUserSettings } from '../../utils/userSettings';
 import { useAutoUpdater } from '../../hooks/useAutoUpdater';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 import PermissionsSettingsTab from './PermissionsSettingsTab';
 import DimensionsSettingsTab from './DimensionsSettingsTab';
 
@@ -13,6 +15,7 @@ const { Title, Text } = Typography;
  * Modal de configurações da aplicação
  */
 const SettingsModal = ({ visible, onClose, onSave }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [currentVersion, setCurrentVersion] = useState('');
@@ -23,6 +26,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
   // depender desse update.
   const [openCount, setOpenCount] = useState(0);
   const { setThemeMode } = useTheme();
+  const { setLanguageMode } = useLanguage();
 
   const { checkForUpdates, getAppVersion } = useAutoUpdater();
 
@@ -38,7 +42,7 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
   const loadAppVersion = async () => {
     try {
       const version = await getAppVersion();
-      setCurrentVersion(version || 'Desconhecida');
+      setCurrentVersion(version || t('settings.general.unknownVersion'));
     } catch (error) {
       console.error('Erro ao carregar versão:', error);
     }
@@ -58,17 +62,18 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
     try {
       setLoading(true);
       const values = await form.validateFields();
-      
+
       // Usar a função utilitária para salvar
       const success = saveUserSettings(values);
-      
+
       if (success) {
         setThemeMode(values.themeMode);
+        setLanguageMode(values.languageMode);
         // Chamar callback se fornecido
         if (onSave) {
           onSave(values);
         }
-        
+
         onClose();
       } else {
         throw new Error('Falha ao salvar configurações');
@@ -95,44 +100,45 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
 
   return (
     <Modal
-        title="Configurações"
+        title={t('settings.title')}
         open={visible}
         onCancel={handleCancel}
         width={560}
         footer={[
         <Button key="cancel" onClick={handleCancel}>
-          Cancelar
+          {t('settings.cancel')}
         </Button>,
         <Button key="save" type="primary" loading={loading} onClick={handleSave}>
-          Salvar
+          {t('settings.save')}
         </Button>
         ]}
+      >
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          defaultHomePage: 'https://www.google.com',
+          autoUpdate: true,
+          autoDownload: true
+        }}
       >
       <Tabs
         items={[
           {
             key: 'general',
-            label: 'Geral',
+            label: t('settings.tabs.general'),
             children: (
-              <Form
-                form={form}
-                layout="vertical"
-                initialValues={{
-                  defaultHomePage: 'https://www.google.com',
-                  autoUpdate: true,
-                  autoDownload: true
-                }}
-              >
-                <Title level={5}>Navegação</Title>
+              <>
+                <Title level={5}>{t('settings.general.navigationTitle')}</Title>
 
                 <Form.Item
                   name="defaultHomePage"
-                  label="Página inicial padrão"
+                  label={t('settings.general.defaultHomePage')}
                   rules={[
-                    { required: true, message: 'Por favor, insira uma URL válida' },
-                    { type: 'url', message: 'Por favor, insira uma URL válida' }
+                    { required: true, message: t('settings.general.defaultHomePageRequired') },
+                    { type: 'url', message: t('settings.general.defaultHomePageInvalid') }
                   ]}
-                  extra="Esta será a página inicial ao criar novas abas"
+                  extra={t('settings.general.defaultHomePageExtra')}
                 >
                   <Input
                     placeholder="https://www.google.com"
@@ -142,36 +148,36 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
 
                 <Form.Item
                   name="themeMode"
-                  label="Tema"
-                  extra="Automático acompanha o tema do sistema operacional"
+                  label={t('settings.general.themeLabel')}
+                  extra={t('settings.general.themeExtra')}
                 >
                   <Select
                     options={[
-                      { value: 'auto', label: 'Automático' },
-                      { value: 'light', label: 'Light' },
-                      { value: 'dark', label: 'Dark' }
+                      { value: 'auto', label: t('settings.general.themeAuto') },
+                      { value: 'light', label: t('settings.general.themeLight') },
+                      { value: 'dark', label: t('settings.general.themeDark') }
                     ]}
                   />
                 </Form.Item>
 
                 <Divider />
 
-                <Title level={5}>Atualizações</Title>
+                <Title level={5}>{t('settings.general.updatesTitle')}</Title>
 
                 <Form.Item
                   name="autoUpdate"
-                  label="Verificar atualizações automaticamente"
+                  label={t('settings.general.autoUpdateLabel')}
                   valuePropName="checked"
-                  extra="Verifica por novas versões ao iniciar o aplicativo"
+                  extra={t('settings.general.autoUpdateExtra')}
                 >
                   <Switch />
                 </Form.Item>
 
                 <Form.Item
                   name="autoDownload"
-                  label="Baixar atualizações automaticamente"
+                  label={t('settings.general.autoDownloadLabel')}
                   valuePropName="checked"
-                  extra="Baixa atualizações em segundo plano (requer confirmação para instalar)"
+                  extra={t('settings.general.autoDownloadExtra')}
                 >
                   <Switch />
                 </Form.Item>
@@ -184,35 +190,56 @@ const SettingsModal = ({ visible, onClose, onSave }) => {
                 }}>
                   <Space direction="vertical" size="small" style={{ width: '100%' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text strong>Versão Atual: {currentVersion}</Text>
+                      <Text strong>{t('settings.general.currentVersion', { version: currentVersion })}</Text>
                       <Button
                         size="small"
                         icon={<CheckCircleOutlined />}
                         onClick={handleCheckUpdates}
                       >
-                        Verificar Agora
+                        {t('settings.general.checkNow')}
                       </Button>
                     </div>
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      Última verificação: ao iniciar o aplicativo
+                      {t('settings.general.lastCheck')}
                     </Text>
                   </Space>
                 </div>
-              </Form>
+              </>
+            )
+          },
+          {
+            key: 'language',
+            label: t('settings.tabs.language'),
+            children: (
+              <Form.Item
+                name="languageMode"
+                label={t('settings.language.label')}
+                extra={t('settings.language.extra')}
+              >
+                <Select
+                  options={[
+                    { value: 'auto', label: t('languages.auto') },
+                    { value: 'pt-BR', label: t('languages.pt-BR') },
+                    { value: 'en', label: t('languages.en') },
+                    { value: 'es', label: t('languages.es') }
+                  ]}
+                />
+              </Form.Item>
             )
           },
           {
             key: 'permissions',
-            label: 'Permissões',
+            label: t('settings.tabs.permissions'),
             children: <PermissionsSettingsTab key={openCount} />
           },
           {
             key: 'dimensions',
-            label: 'Dimensões',
+            label: t('settings.tabs.dimensions'),
             children: <DimensionsSettingsTab key={openCount} />
           }
         ]}
       />
+      </Form>
     </Modal>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Typography } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Text } = Typography;
 
@@ -8,14 +9,16 @@ const { Text } = Typography;
  * Modal de confirmação para limpar os painéis atuais
  */
 const ClearSessionModal = ({ visible, onConfirm, onCancel }) => {
+  const { t } = useTranslation();
+
   return (
     <Modal
-      title="Limpar painéis atuais"
+      title={t('session.clear.title')}
       open={visible}
       onOk={onConfirm}
       onCancel={onCancel}
-      okText="Sim, limpar"
-      cancelText="Cancelar"
+      okText={t('session.clear.ok')}
+      cancelText={t('session.clear.cancel')}
       okType="danger"
       centered
       width={420}
@@ -30,12 +33,12 @@ const ClearSessionModal = ({ visible, onConfirm, onCancel }) => {
         />
         <div>
           <Text>
-            Esta ação irá fechar todas as abas e painéis abertos e começar do zero.
+            {t('session.clear.confirmText')}
           </Text>
           <br />
           <br />
           <Text type="warning">
-            ⚠️ Certifique-se de salvar os painéis atuais se desejar mantê-los.
+            {t('session.clear.warningText')}
           </Text>
         </div>
       </div>

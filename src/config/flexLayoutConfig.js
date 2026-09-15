@@ -4,6 +4,7 @@
  */
 
 import { getDefaultHomePage } from '../utils/userSettings';
+import i18n from '../i18n';
 
 export const getDefaultLayoutConfig = () => ({
   global: {
@@ -35,7 +36,7 @@ export const getDefaultLayoutConfig = () => ({
         children: [
           {
             type: "tab",
-            name: "Página Inicial",
+            name: i18n.t('tabs.homePage'),
             component: "browser",
             config: {
               url: getDefaultHomePage(),

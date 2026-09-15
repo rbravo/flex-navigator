@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Overlay que mostra os atalhos de navegação entre painéis enquanto os
@@ -10,29 +11,32 @@ const PanelNavigationOverlay = ({
   totalPanels,
   shortcutModifiers = 'Ctrl+Shift'
 }) => {
+  const { t } = useTranslation();
+
   if (!isVisible) return null;
 
   const modifierKeys = shortcutModifiers.split('+');
 
   const shortcuts = [
-    { label: 'Dividir verticalmente', keys: [...modifierKeys, 'V'] },
-    { label: 'Dividir horizontalmente', keys: [...modifierKeys, 'H'] },
-    { label: 'Navegar entre painéis', keys: [...modifierKeys, '←  →'] },
-    { label: 'Ir para primeiro/último painel', keys: [...modifierKeys, '↑  ↓'] },
-    { label: 'Focar no painel', keys: [...modifierKeys, 'Enter'] },
-    { label: 'Fechar painel', keys: [...modifierKeys, 'W'] },
-    { label: 'Sair do modo', keys: ['Esc'] }
+    { label: t('panelNavigationOverlay.actions.splitVertical'), keys: [...modifierKeys, 'V'] },
+    { label: t('panelNavigationOverlay.actions.splitHorizontal'), keys: [...modifierKeys, 'H'] },
+    { label: t('panelNavigationOverlay.actions.navigatePanels'), keys: [...modifierKeys, '←  →'] },
+    { label: t('panelNavigationOverlay.actions.firstLastPanel'), keys: [...modifierKeys, '↑  ↓'] },
+    { label: t('panelNavigationOverlay.actions.focusPanel'), keys: [...modifierKeys, 'Enter'] },
+    { label: t('panelNavigationOverlay.actions.closePanel'), keys: [...modifierKeys, 'W'] },
+    { label: t('panelNavigationOverlay.actions.exitMode'), keys: ['Esc'] }
   ];
 
   return (
     <div className="panel-navigation-overlay">
       <div className="pno-header">
         <div>
-          <div className="pno-title">🎯 Navegação entre Painéis</div>
-          <div className="pno-subtitle">Segurados juntos · separador é a combinação</div>
+          <div className="pno-title">{t('panelNavigationOverlay.title')}</div>
+          <div className="pno-subtitle">{t('panelNavigationOverlay.subtitle')}</div>
         </div>
         <div className="pno-panel-count">
-          Painel <strong>{activePanelIndex + 1}</strong> de {totalPanels}
+          {t('panelNavigationOverlay.panelLabel')} <strong>{activePanelIndex + 1}</strong>{' '}
+          {t('panelNavigationOverlay.of', { total: totalPanels })}
         </div>
       </div>
 

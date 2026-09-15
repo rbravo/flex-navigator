@@ -1,6 +1,7 @@
 const { Menu, app } = require('electron');
 const { executeOnActiveWebview, executeZoomCommand } = require('../utils/webviewUtils');
 const { isDev } = require('../utils/config');
+const { t } = require('../i18n');
 
 let autoUpdaterManager = null;
 
@@ -13,7 +14,8 @@ let currentMenu = null;
 function createMenuTemplate(mainWindow) {
   return [
     {
-      label: 'Arquivo',
+      id: 'file',
+      label: t('menu.file.title'),
       submenu: [
         {
           // Sem "accelerator": Ctrl+T é tratado inteiramente pelo listener de
@@ -21,7 +23,7 @@ function createMenuTemplate(mainWindow) {
           // useElectronIPC.js / navigationShortcuts.js) - o accelerator
           // nativo do Menu do Electron para de disparar de forma confiável
           // assim que qualquer <webview> já ganhou foco de teclado.
-          label: 'Nova Aba',
+          label: t('menu.file.newTab'),
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('menu-new-tab');
@@ -31,7 +33,7 @@ function createMenuTemplate(mainWindow) {
         {
           // Mesmo motivo do item acima: sem "accelerator", Ctrl+W é tratado
           // pelo renderer/webview.
-          label: 'Fechar Aba',
+          label: t('menu.file.closeTab'),
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('menu-close-tab');
@@ -39,7 +41,7 @@ function createMenuTemplate(mainWindow) {
           }
         },
         {
-          label: 'Dividir Painel Horizontalmente',
+          label: t('menu.file.splitHorizontal'),
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('menu-split-horizontal');
@@ -47,7 +49,7 @@ function createMenuTemplate(mainWindow) {
           }
         },
         {
-          label: 'Dividir Painel Verticalmente',
+          label: t('menu.file.splitVertical'),
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('menu-split-vertical');
@@ -56,7 +58,7 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Sair',
+          label: t('menu.file.quit'),
           accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
           click: () => {
             app.quit();
@@ -65,17 +67,18 @@ function createMenuTemplate(mainWindow) {
       ]
     },
     {
-      label: 'Editar',
+      id: 'edit',
+      label: t('menu.edit.title'),
       submenu: [
         {
-          label: 'Desfazer',
+          label: t('menu.edit.undo'),
           accelerator: 'CmdOrCtrl+Z',
           click: () => {
             executeOnActiveWebview(mainWindow, 'undo()');
           }
         },
         {
-          label: 'Refazer',
+          label: t('menu.edit.redo'),
           accelerator: 'CmdOrCtrl+Shift+Z',
           click: () => {
             executeOnActiveWebview(mainWindow, 'redo()');
@@ -83,21 +86,21 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Recortar',
+          label: t('menu.edit.cut'),
           accelerator: 'CmdOrCtrl+X',
           click: () => {
             executeOnActiveWebview(mainWindow, 'cut()');
           }
         },
         {
-          label: 'Copiar',
+          label: t('menu.edit.copy'),
           accelerator: 'CmdOrCtrl+C',
           click: () => {
             executeOnActiveWebview(mainWindow, 'copy()');
           }
         },
         {
-          label: 'Colar',
+          label: t('menu.edit.paste'),
           accelerator: 'CmdOrCtrl+V',
           click: () => {
             executeOnActiveWebview(mainWindow, 'paste()');
@@ -105,7 +108,7 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Selecionar Tudo',
+          label: t('menu.edit.selectAll'),
           accelerator: 'CmdOrCtrl+A',
           click: () => {
             executeOnActiveWebview(mainWindow, 'selectAll()');
@@ -114,24 +117,25 @@ function createMenuTemplate(mainWindow) {
       ]
     },
     {
-      label: 'Visualizar',
+      id: 'view',
+      label: t('menu.view.title'),
       submenu: [
         {
-          label: 'Recarregar',
+          label: t('menu.view.reload'),
           accelerator: 'CmdOrCtrl+R',
           click: () => {
             executeOnActiveWebview(mainWindow, 'reload()');
           }
         },
         {
-          label: 'Forçar Recarregar',
+          label: t('menu.view.forceReload'),
           accelerator: 'CmdOrCtrl+Shift+R',
           click: () => {
             executeOnActiveWebview(mainWindow, 'reloadIgnoringCache()');
           }
         },
         {
-          label: 'Ferramentas de Desenvolvedor',
+          label: t('menu.view.devTools'),
           accelerator: 'F12',
           click: () => {
             executeOnActiveWebview(mainWindow, 'openDevTools()');
@@ -139,21 +143,21 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Zoom Real',
+          label: t('menu.view.zoomReset'),
           accelerator: 'CmdOrCtrl+0',
           click: () => {
             executeZoomCommand(mainWindow, 'reset');
           }
         },
         {
-          label: 'Aumentar Zoom',
+          label: t('menu.view.zoomIn'),
           accelerator: 'CmdOrCtrl+Plus',
           click: () => {
             executeZoomCommand(mainWindow, 'increase');
           }
         },
         {
-          label: 'Diminuir Zoom',
+          label: t('menu.view.zoomOut'),
           accelerator: 'CmdOrCtrl+-',
           click: () => {
             executeZoomCommand(mainWindow, 'decrease');
@@ -161,7 +165,7 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Tela Cheia',
+          label: t('menu.view.fullScreen'),
           accelerator: 'F11',
           click: () => {
             mainWindow.setFullScreen(!mainWindow.isFullScreen());
@@ -170,31 +174,32 @@ function createMenuTemplate(mainWindow) {
       ]
     },
     {
-      label: 'Navegar',
+      id: 'navigate',
+      label: t('menu.navigate.title'),
       submenu: [
         {
-          label: 'Voltar',
+          label: t('menu.navigate.back'),
           accelerator: 'Alt+Left',
           click: () => {
             executeOnActiveWebview(mainWindow, 'goBack()');
           }
         },
         {
-          label: 'Avançar',
+          label: t('menu.navigate.forward'),
           accelerator: 'Alt+Right',
           click: () => {
             executeOnActiveWebview(mainWindow, 'goForward()');
           }
         },
         {
-          label: 'Recarregar',
+          label: t('menu.navigate.reload'),
           accelerator: 'CmdOrCtrl+R',
           click: () => {
             executeOnActiveWebview(mainWindow, 'reload()');
           }
         },
         {
-          label: 'Parar',
+          label: t('menu.navigate.stop'),
           accelerator: 'Escape',
           click: () => {
             executeOnActiveWebview(mainWindow, 'stop()');
@@ -203,11 +208,12 @@ function createMenuTemplate(mainWindow) {
       ]
     },
     {
-      label: 'Dev',
+      id: 'dev',
+      label: t('menu.dev.title'),
       submenu: [
-        { role: 'reload', label: 'Recarregar App' },
-        { role: 'forceReload', label: 'Forçar Recarregamento' },
-        { role: 'toggleDevTools', label: 'DevTools da Aplicação' },
+        { role: 'reload', label: t('menu.dev.reloadApp') },
+        { role: 'forceReload', label: t('menu.dev.forceReloadApp') },
+        { role: 'toggleDevTools', label: t('menu.dev.toggleDevTools') },
         // { type: 'separator' },
         // {
         //   label: 'Testar Notificações',
@@ -220,10 +226,11 @@ function createMenuTemplate(mainWindow) {
       ]
     },
     {
-      label: 'Ajuda',
+      id: 'help',
+      label: t('menu.help.title'),
       submenu: [
         {
-          label: 'Configurações...',
+          label: t('menu.help.settings'),
           accelerator: 'CmdOrCtrl+,',
           click: () => {
             if (mainWindow && mainWindow.webContents) {
@@ -233,7 +240,7 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Como Contribuir',
+          label: t('menu.help.howToContribute'),
           click: () => {
             if (mainWindow && mainWindow.webContents) {
               mainWindow.webContents.send('open-url', 'https://github.com/rbravo/flex-navigator');
@@ -242,7 +249,7 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: 'Verificar Atualizações',
+          label: t('menu.help.checkForUpdates'),
           click: () => {
             if (autoUpdaterManager) {
               autoUpdaterManager.checkForUpdates();
@@ -251,7 +258,7 @@ function createMenuTemplate(mainWindow) {
         },
         { type: 'separator' },
         {
-          label: `Versão ${app.getVersion()}`,
+          label: t('menu.help.version', { version: app.getVersion() }),
           enabled: false
         },
       ]
@@ -267,17 +274,18 @@ function createMenu(mainWindow) {
 
   if (process.platform === 'darwin') {
     template.unshift({
+      id: 'app',
       label: app.getName(),
       submenu: [
-        { role: 'about', label: 'Sobre' },
+        { role: 'about', label: t('menu.app.about') },
         { type: 'separator' },
-        { role: 'services', label: 'Serviços', submenu: [] },
+        { role: 'services', label: t('menu.app.services'), submenu: [] },
         { type: 'separator' },
-        { role: 'hide', label: 'Esconder' },
-        { role: 'hideothers', label: 'Esconder Outros' },
-        { role: 'unhide', label: 'Mostrar Todos' },
+        { role: 'hide', label: t('menu.app.hide') },
+        { role: 'hideothers', label: t('menu.app.hideOthers') },
+        { role: 'unhide', label: t('menu.app.unhide') },
         { type: 'separator' },
-        { role: 'quit', label: 'Sair' }
+        { role: 'quit', label: t('menu.app.quit') }
       ]
     });
   }
@@ -292,14 +300,15 @@ function createMenu(mainWindow) {
 }
 
 /**
- * Exibe o submenu de um item de topo (ex.: "Arquivo") na posição informada.
+ * Exibe o submenu de um item de topo (ex.: "file") na posição informada.
  * Usado pela barra de título customizada, já que a barra de menu nativa
- * fica oculta.
+ * fica oculta. Casa por `id` estável (não pelo `label`, que é traduzido e
+ * muda conforme o idioma escolhido pelo usuário).
  */
-function popupMenuItem(mainWindow, label, x, y) {
+function popupMenuItem(mainWindow, id, x, y) {
   if (!currentMenu) return;
 
-  const item = currentMenu.items.find((menuItem) => menuItem.label === label);
+  const item = currentMenu.items.find((menuItem) => menuItem.id === id);
   if (item && item.submenu) {
     item.submenu.popup({
       window: mainWindow,

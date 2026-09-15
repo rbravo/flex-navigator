@@ -1,5 +1,6 @@
 const { autoUpdater } = require('electron-updater');
 const { dialog, BrowserWindow } = require('electron');
+const { t } = require('../i18n');
 
 class AutoUpdaterManager {
   constructor() {
@@ -97,10 +98,13 @@ class AutoUpdaterManager {
     
     const result = await dialog.showMessageBox({
       type: 'info',
-      title: 'Atualização Disponível',
-      message: `Uma nova versão (${info.version}) está disponível!`,
-      detail: `Versão atual: ${require('../../../package.json').version}\nNova versão: ${info.version}\n\nDeseja baixar e instalar automaticamente?`,
-      buttons: ['Sim, baixar agora', 'Não, talvez depois'],
+      title: t('updates.dialog.availableTitle'),
+      message: t('updates.dialog.availableMessage', { version: info.version }),
+      detail: t('updates.dialog.availableDetail', {
+        currentVersion: require('../../../package.json').version,
+        newVersion: info.version
+      }),
+      buttons: [t('updates.dialog.downloadNow'), t('updates.dialog.downloadLater')],
       defaultId: 0,
       cancelId: 1
     });
@@ -113,10 +117,10 @@ class AutoUpdaterManager {
   async showUpdateDownloadedDialog(info) {
     const result = await dialog.showMessageBox({
       type: 'info',
-      title: 'Atualização Baixada',
-      message: 'A atualização foi baixada com sucesso!',
-      detail: `A nova versão (${info.version}) foi baixada e está pronta para ser instalada.\n\nO aplicativo será reiniciado para aplicar a atualização.`,
-      buttons: ['Reiniciar Agora', 'Reiniciar Depois'],
+      title: t('updates.dialog.downloadedTitle'),
+      message: t('updates.dialog.downloadedMessage'),
+      detail: t('updates.dialog.downloadedDetail', { version: info.version }),
+      buttons: [t('updates.dialog.restartNow'), t('updates.dialog.restartLater')],
       defaultId: 0,
       cancelId: 1
     });
@@ -127,8 +131,11 @@ class AutoUpdaterManager {
   }
 
   showErrorDialog(error) {
-    const errorMsg = `Ocorreu um erro ao verificar atualizações:\n\n${error.message}\n\nDetalhes técnicos:\n${error.stack || 'Não disponível'}`;
-    dialog.showErrorBox('Erro na Atualização', errorMsg);
+    const errorMsg = t('updates.dialog.errorMessage', {
+      message: error.message,
+      stack: error.stack || t('updates.dialog.errorUnavailable')
+    });
+    dialog.showErrorBox(t('updates.dialog.errorTitle'), errorMsg);
   }
 
   async checkForUpdates() {

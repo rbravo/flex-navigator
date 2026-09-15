@@ -8,18 +8,11 @@ import {
   FileDoneOutlined,
   ExclamationCircleOutlined
 } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
 import { formatBytes } from '../../../utils/formatBytes';
 
 const { Text } = Typography;
-
-const STATE_LABELS = {
-  progressing: 'Baixando...',
-  paused: 'Pausado',
-  completed: 'Concluído',
-  cancelled: 'Cancelado',
-  interrupted: 'Falhou'
-};
 
 const upsertDownload = (list, download) => {
   const index = list.findIndex((d) => d.id === download.id);
@@ -36,8 +29,17 @@ const upsertDownload = (list, download) => {
  * barra de URL, ao lado do botão de Configurações.
  */
 const DownloadsPopover = ({ children }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [downloads, setDownloads] = useState([]);
+
+  const stateLabels = {
+    progressing: t('downloads.state.progressing'),
+    paused: t('downloads.state.paused'),
+    completed: t('downloads.state.completed'),
+    cancelled: t('downloads.state.cancelled'),
+    interrupted: t('downloads.state.interrupted')
+  };
 
   useCloseOnWebviewFocus(open, () => setOpen(false));
 
@@ -67,10 +69,10 @@ const DownloadsPopover = ({ children }) => {
     if (download.state === 'progressing') {
       return (
         <Space size="small">
-          <Tooltip title="Pausar">
+          <Tooltip title={t('downloads.pause')}>
             <Button size="small" type="text" icon={<PauseCircleOutlined />} onClick={() => window.electronAPI.pauseDownload(download.id)} />
           </Tooltip>
-          <Tooltip title="Cancelar">
+          <Tooltip title={t('downloads.cancel')}>
             <Button size="small" type="text" danger icon={<CloseCircleOutlined />} onClick={() => window.electronAPI.cancelDownload(download.id)} />
           </Tooltip>
         </Space>
@@ -79,10 +81,10 @@ const DownloadsPopover = ({ children }) => {
     if (download.state === 'paused') {
       return (
         <Space size="small">
-          <Tooltip title="Retomar">
+          <Tooltip title={t('downloads.resume')}>
             <Button size="small" type="text" icon={<PlayCircleOutlined />} onClick={() => window.electronAPI.resumeDownload(download.id)} disabled={!download.canResume} />
           </Tooltip>
-          <Tooltip title="Cancelar">
+          <Tooltip title={t('downloads.cancel')}>
             <Button size="small" type="text" danger icon={<CloseCircleOutlined />} onClick={() => window.electronAPI.cancelDownload(download.id)} />
           </Tooltip>
         </Space>
@@ -91,17 +93,17 @@ const DownloadsPopover = ({ children }) => {
     if (download.state === 'completed') {
       return (
         <Space size="small">
-          <Tooltip title="Abrir arquivo">
+          <Tooltip title={t('downloads.openFile')}>
             <Button size="small" type="text" icon={<FileDoneOutlined />} onClick={() => window.electronAPI.openDownloadFile(download.id)} />
           </Tooltip>
-          <Tooltip title="Mostrar na pasta">
+          <Tooltip title={t('downloads.showInFolder')}>
             <Button size="small" type="text" icon={<FolderOpenOutlined />} onClick={() => window.electronAPI.showDownloadInFolder(download.id)} />
           </Tooltip>
         </Space>
       );
     }
     return (
-      <Tooltip title={STATE_LABELS[download.state] || download.state}>
+      <Tooltip title={stateLabels[download.state] || download.state}>
         <ExclamationCircleOutlined style={{ color: '#faad14' }} />
       </Tooltip>
     );
@@ -110,7 +112,7 @@ const DownloadsPopover = ({ children }) => {
   const content = (
     <div style={{ width: '320px', backgroundColor: 'var(--nav-panel)', maxHeight: 360, overflowY: 'auto' }}>
       {downloads.length === 0 ? (
-        <Empty description="Nenhum download nesta sessão" image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        <Empty description={t('downloads.empty')} image={Empty.PRESENTED_IMAGE_SIMPLE} />
       ) : (
         <Space direction="vertical" size="middle" style={{ width: '100%' }}>
           {downloads.map((download) => (
@@ -122,8 +124,11 @@ const DownloadsPopover = ({ children }) => {
                   </Text>
                   <div style={{ fontSize: 11, color: '#a0a0a0' }}>
                     {download.state === 'progressing' || download.state === 'paused'
-                      ? `${formatBytes(download.receivedBytes)} de ${download.totalBytes ? formatBytes(download.totalBytes) : '?'}`
-                      : STATE_LABELS[download.state] || download.state}
+                      ? t('downloads.of', {
+                          received: formatBytes(download.receivedBytes),
+                          total: download.totalBytes ? formatBytes(download.totalBytes) : '?'
+                        })
+                      : stateLabels[download.state] || download.state}
                   </div>
                 </div>
                 {renderActions(download)}
@@ -146,7 +151,7 @@ const DownloadsPopover = ({ children }) => {
   return (
     <Popover
       content={content}
-      title={<Text style={{ color: 'var(--nav-text)' }}>Downloads</Text>}
+      title={<Text style={{ color: 'var(--nav-text)' }}>{t('downloads.title')}</Text>}
       trigger="click"
       placement="bottomRight"
       open={open}

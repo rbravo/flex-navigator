@@ -1,6 +1,7 @@
 import { Actions, DockLocation } from 'flexlayout-react';
 import { getDefaultHomePage } from './userSettings';
 import { layoutEventEmitter, LAYOUT_EVENTS } from './layoutEventEmitter';
+import i18n from '../i18n';
 
 /**
  * Utilitários para ações do FlexLayout
@@ -12,7 +13,7 @@ import { layoutEventEmitter, LAYOUT_EVENTS } from './layoutEventEmitter';
 export const createNewTab = (model, tabSetId, tabConfig = {}) => {
   const defaultConfig = {
     type: "tab",
-    name: "Nova aba",
+    name: i18n.t('tabs.newTab'),
     component: "browser",
     config: {
       url: getDefaultHomePage()
@@ -49,7 +50,7 @@ export const addNewTab = (model, url = null, name = null) => {
 
   const firstTabSet = findFirstTabSet(root);
   if (firstTabSet) {
-    const tabName = name || new URL(targetUrl).hostname || 'Nova aba';
+    const tabName = name || new URL(targetUrl).hostname || i18n.t('tabs.newTab');
     const tabConfig = {
       name: tabName,
       config: {
@@ -73,7 +74,7 @@ export const splitPanelHorizontal = (model, tabSetId) => {
   // tab original por um instante à toa)
   const newTabJson = {
     type: "tab",
-    name: "Nova Página",
+    name: i18n.t('tabs.newPage'),
     component: "browser",
     config: {
       url: getDefaultHomePage()
@@ -101,7 +102,7 @@ export const splitPanelVertical = (model, tabSetId) => {
   // tab original por um instante à toa)
   const newTabJson = {
     type: "tab",
-    name: "Nova Página",
+    name: i18n.t('tabs.newPage'),
     component: "browser",
     config: {
       url: getDefaultHomePage()
@@ -247,7 +248,7 @@ export const cycleTabInTabset = (model, tabsetId, direction) => {
 export const addNewTabToTabset = (model, tabsetId, tabConfig) => {
   const defaultConfig = {
     type: "tab",
-    name: "Nova aba",
+    name: i18n.t('tabs.newTab'),
     component: "browser",
     config: {
       url: tabConfig?.url || getDefaultHomePage()

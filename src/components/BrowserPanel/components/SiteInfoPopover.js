@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Popover, Select, Space, Typography, Divider, Spin } from 'antd';
 import { LockOutlined, WarningOutlined, GlobalOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import useCloseOnWebviewFocus from '../../../hooks/useCloseOnWebviewFocus';
-import { PERMISSION_LABELS, PERMISSION_DECISION_OPTIONS, decisionToOption, optionToDecision } from '../../../utils/permissionLabels';
+import { getPermissionLabels, getPermissionDecisionOptions, decisionToOption, optionToDecision } from '../../../utils/permissionLabels';
 
 const { Text } = Typography;
 
@@ -18,6 +19,9 @@ const formatCertDate = (unixSeconds) => {
  * Abre a partir do ícone de globo na barra de URL (ver ControlsBar.js).
  */
 const SiteInfoPopover = ({ children, currentUrl }) => {
+  const { t } = useTranslation();
+  const permissionLabels = getPermissionLabels(t);
+  const permissionDecisionOptions = getPermissionDecisionOptions(t);
   const [open, setOpen] = useState(false);
   const [siteInfo, setSiteInfo] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,7 +56,7 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
 
   const renderSecuritySummary = () => {
     if (!siteInfo || !siteInfo.protocol) {
-      return <Text style={{ color: '#a0a0a0' }}>Sem informações de segurança para esta página.</Text>;
+      return <Text style={{ color: '#a0a0a0' }}>{t('siteInfo.noSecurityInfo')}</Text>;
     }
 
     if (siteInfo.protocol === 'https:') {
@@ -61,17 +65,17 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
         <div>
           <Space>
             <LockOutlined style={{ color: '#52c41a' }} />
-            <Text style={{ color: 'var(--nav-text)' }}>Conexão segura (HTTPS)</Text>
+            <Text style={{ color: 'var(--nav-text)' }}>{t('siteInfo.secureConnection')}</Text>
           </Space>
           {cert ? (
             <div style={{ marginTop: 8, fontSize: 12, color: '#a0a0a0' }}>
-              <div>Emitido para: {cert.subject?.commonName || siteInfo.hostname}</div>
-              <div>Emitido por: {cert.issuer?.commonName || cert.issuer?.organizations?.[0] || 'desconhecido'}</div>
-              <div>Válido até: {formatCertDate(cert.validExpiry)}</div>
+              <div>{t('siteInfo.issuedTo', { name: cert.subject?.commonName || siteInfo.hostname })}</div>
+              <div>{t('siteInfo.issuedBy', { name: cert.issuer?.commonName || cert.issuer?.organizations?.[0] || t('common.unknown') })}</div>
+              <div>{t('siteInfo.validUntil', { date: formatCertDate(cert.validExpiry) })}</div>
             </div>
           ) : (
             <div style={{ marginTop: 8, fontSize: 12, color: '#a0a0a0' }}>
-              Detalhes do certificado ainda não disponíveis - recarregue a página.
+              {t('siteInfo.certUnavailable')}
             </div>
           )}
         </div>
@@ -82,12 +86,12 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
       return (
         <Space>
           <WarningOutlined style={{ color: '#faad14' }} />
-          <Text style={{ color: 'var(--nav-text)' }}>Conexão não é segura (HTTP)</Text>
+          <Text style={{ color: 'var(--nav-text)' }}>{t('siteInfo.insecureConnection')}</Text>
         </Space>
       );
     }
 
-    return <Text style={{ color: '#a0a0a0' }}>Página interna, sem informações de conexão.</Text>;
+    return <Text style={{ color: '#a0a0a0' }}>{t('siteInfo.internalPage')}</Text>;
   };
 
   const content = (
@@ -102,19 +106,19 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
 
           <div>
             <Text style={{ color: 'var(--nav-text)', fontSize: '13px', fontWeight: 500 }}>
-              Permissões para este site
+              {t('siteInfo.permissionsTitle')}
             </Text>
             <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {siteInfo.permissions.map(({ permission, granted }) => (
                 <div key={permission} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  <Text style={{ color: 'var(--nav-text)', fontSize: 12 }}>{PERMISSION_LABELS[permission] || permission}</Text>
+                  <Text style={{ color: 'var(--nav-text)', fontSize: 12 }}>{permissionLabels[permission] || permission}</Text>
                   <Select
                     size="small"
                     value={decisionToOption(granted)}
                     onChange={(option) => handlePermissionChange(permission, option)}
                     style={{ width: 140 }}
                     popupClassName="dark-select-dropdown"
-                    options={PERMISSION_DECISION_OPTIONS}
+                    options={permissionDecisionOptions}
                   />
                 </div>
               ))}
@@ -128,7 +132,7 @@ const SiteInfoPopover = ({ children, currentUrl }) => {
   const title = (
     <Space>
       <GlobalOutlined style={{ color: '#007acc' }} />
-      <Text style={{ color: 'var(--nav-text)' }}>{siteInfo?.hostname || 'Informações do site'}</Text>
+      <Text style={{ color: 'var(--nav-text)' }}>{siteInfo?.hostname || t('siteInfo.title')}</Text>
     </Space>
   );
 

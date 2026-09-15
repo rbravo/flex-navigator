@@ -3,6 +3,7 @@ const { isDev } = require('./config');
 const { attachShortcutInterception } = require('./navigationShortcuts');
 const PermissionManager = require('./PermissionManager');
 const { getHistoryManager } = require('./HistoryManager');
+const { t } = require('../i18n');
 
 // Permissões que fazem sentido perguntar ao usuário para um navegador de
 // propósito geral. Qualquer outra (hid, usb, serial, window-management...)
@@ -357,21 +358,21 @@ function setupWebContentsHandlers(mainWindow) {
           showServices: false,
           prepend: (defaultActions, parameters, browserWindow) => [
             {
-              label: 'Back',
+              label: t('webviewContextMenu.back'),
               visible: contents.navigationHistory && contents.navigationHistory.canGoBack(),
               click: () => {
                 contents.navigationHistory.goBack();
               }
             },
             {
-              label: 'Forward',
+              label: t('webviewContextMenu.forward'),
               visible: contents.navigationHistory && contents.navigationHistory.canGoForward(),
               click: () => {
                 contents.navigationHistory.goForward();
               }
             },
             {
-              label: 'Reload',
+              label: t('webviewContextMenu.reload'),
               click: () => {
                 contents.reload();
               }
@@ -380,7 +381,7 @@ function setupWebContentsHandlers(mainWindow) {
               type: 'separator'
             },
             {
-              label: 'Open link in a new tab',
+              label: t('webviewContextMenu.openLinkInNewTab'),
               visible: !!parameters.linkURL,
               click: () => {
                 if (mainWindow && mainWindow.webContents) {
@@ -399,7 +400,7 @@ function setupWebContentsHandlers(mainWindow) {
               type: 'separator'
             },
             {
-              label: 'Open DevTools',
+              label: t('webviewContextMenu.openDevTools'),
               visible: isDev,
               click: () => {
                 contents.openDevTools();

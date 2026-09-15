@@ -7,6 +7,7 @@ const { setupWebContentsHandlers, setupPermissionHandler, setupSiteInfoHandlers 
 const { setupDownloadHandler } = require('./src/electron/utils/downloadManager');
 const { setupContentSecurityPolicy } = require('./src/electron/utils/csp');
 const { AutoUpdaterManager } = require('./src/electron/utils/autoUpdater');
+const { setLocale } = require('./src/electron/i18n');
 
 // Imprimir informações de debug
 printDebugInfo();
@@ -22,9 +23,14 @@ app.whenReady().then(() => {
   // precisa ser registrado antes de criar a janela)
   setupContentSecurityPolicy();
 
+  // Definir idioma inicial do menu nativo a partir do locale do sistema -
+  // o renderer confirma/corrige isso pouco depois (via IPC set-app-language)
+  // assim que resolve o modo salvo nas Configurações (auto/pt-BR/en/es).
+  setLocale(app.getLocale());
+
   // Criar janela principal
   const mainWindow = createWindow();
-  
+
   // Criar menu da aplicação
   createMenu(mainWindow);
   

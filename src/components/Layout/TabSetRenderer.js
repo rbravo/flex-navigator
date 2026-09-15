@@ -2,19 +2,21 @@ import React from 'react';
 import { Plus, SplitSquareHorizontal, SplitSquareVertical, Maximize2, Minimize2, Navigation, NavigationOff, PanelTopClose, PanelBottomClose } from 'lucide-react';
 import { createNewTab, splitPanelHorizontal, splitPanelVertical, toggleMaximize, toggleNavigationBar } from '../../utils/layoutActions';
 import { markTabForUrlBarFocus } from '../../utils/tabActions';
+import i18n from '../../i18n';
 
 /**
  * Renderizador customizado para tabsets do FlexLayout
  * Adiciona botões de controle personalizados
  */
 const TabSetRenderer = ({ model }) => {
+  const t = i18n.t.bind(i18n);
   return (tabSetNode, renderValues) => {
     // Botão para adicionar nova tab
     renderValues.stickyButtons.push(
       <button
         key="add-tab"
         className="tabset-button tabset-button-add"
-        title="Adicionar nova tab"
+        title={t('tabSetRenderer.addTab')}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -34,7 +36,7 @@ const TabSetRenderer = ({ model }) => {
       <button
         key="toggle-navbar"
         className="tabset-button tabset-button-navbar button-hidenavbar"
-        title={hideNavBar ? "Mostrar barra de navegação" : "Esconder barra de navegação"}
+        title={hideNavBar ? t('tabSetRenderer.showNavBar') : t('tabSetRenderer.hideNavBar')}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -52,7 +54,7 @@ const TabSetRenderer = ({ model }) => {
       <button
         key="split-horizontal"
         className="tabset-button tabset-button-split"
-        title="Dividir painel horizontalmente"
+        title={t('tabSetRenderer.splitHorizontal')}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -70,7 +72,7 @@ const TabSetRenderer = ({ model }) => {
       <button
         key="split-vertical"
         className="tabset-button tabset-button-split"
-        title="Dividir painel verticalmente"
+        title={t('tabSetRenderer.splitVertical')}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -88,7 +90,7 @@ const TabSetRenderer = ({ model }) => {
       <button
         key="maximize"
         className="tabset-button tabset-button-maximize"
-        title={tabSetNode.isMaximized() ? "Restaurar painel" : "Maximizar painel"}
+        title={tabSetNode.isMaximized() ? t('tabSetRenderer.restorePanel') : t('tabSetRenderer.maximizePanel')}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();

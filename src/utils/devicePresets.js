@@ -18,11 +18,15 @@ export const BUILTIN_DEVICE_PRESETS = [
   { id: 'galaxy-tab-s8', name: 'Galaxy Tab S8', width: 800, height: 1280, category: 'tablet' }
 ];
 
-export const DEVICE_CATEGORY_LABELS = {
-  phone: 'Celulares',
-  tablet: 'Tablets',
-  custom: 'Personalizados'
-};
+/**
+ * Recebe a função `t` de useTranslation() porque este utilitário não é um
+ * componente React.
+ */
+export const getDeviceCategoryLabels = (t) => ({
+  phone: t('devices.categories.phone'),
+  tablet: t('devices.categories.tablet'),
+  custom: t('devices.categories.custom')
+});
 
 const STORAGE_KEY = 'flex-navigator-custom-devices';
 
