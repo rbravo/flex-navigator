@@ -44,7 +44,8 @@
   "devDependencies": {
     "dotenv-cli": "^9.0.0",
     "electron": "^41.7.1",
-    "electron-builder": "^26.15.3"
+    "electron-builder": "^26.15.3",
+    "gh-pages": "^6.3.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -57,7 +58,8 @@
     "distpub": "npm run build && dotenv -e .env -- electron-builder --publish always",
     "dist": "npm run build && electron-builder",
     "dist:mac": "npm run build && electron-builder --mac",
-    "distpub:mac": "npm run build && dotenv -e .env -- electron-builder --mac --publish always"
+    "distpub:mac": "npm run build && dotenv -e .env -- electron-builder --mac --publish always",
+    "deploy": "gh-pages -d docs"
   },
   "main": "electron.js",
   "homepage": "./",
